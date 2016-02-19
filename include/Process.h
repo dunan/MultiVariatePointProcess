@@ -1,7 +1,7 @@
 #include <vector>
 #include <Sequence.h>
 
-class Process
+class IProcess
 {
 
 private:
@@ -12,14 +12,14 @@ private:
 
 public:
 
-	Process(const unsigned& n, const unsigned& num_dims)
+	IProcess(const unsigned& n, const unsigned& num_dims)
 	{
 		parameters_ = std::vector<double>(n, 0);
 
 		num_dims_ = num_dims;
 	}
 
-	~Process(){}
+	~IProcess(){}
 
 	std::vector<double> GetParameters() {return parameters_;}
 
@@ -27,10 +27,8 @@ public:
 
 	virtual double Intensity(const double& t) = 0;
 
-	virtual double Loglikelihood(const std::vector<Sequence>& data) = 0;
+	virtual Loglikelihood(const std::vector<Sequence>& data, double& objvalue, std::vector<double>& Gradient) = 0;
 
-	virtual std::vector<double> Gradient() = 0;
-
-	virtual double IntensityUpperBound(const double& t) = 0;
+	virtual double IntensityUpperBound(const double& t, const Sequence& data) = 0;
 
 };

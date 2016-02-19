@@ -2,9 +2,11 @@
 #include <Process.h>
 #include <Sequence.h>
 
-class Learner
+class UniversalLearner
 {
+
 public:
 
-	virtual std::vector<double> fit(std::vector<Sequence>& data, const double& T) = 0;
+	void fit(IProcess& process, std::vector<Sequence>& data, const double& T){}
+	
 };
