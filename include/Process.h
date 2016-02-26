@@ -1,5 +1,8 @@
+#ifndef PROCESS_H
+#define PROCESS_H
+
 #include <vector>
-#include <Sequence.h>
+#include "Sequence.h"
 
 class IProcess
 {
@@ -21,14 +24,24 @@ public:
 
 	~IProcess(){}
 
-	std::vector<double> GetParameters() {return parameters_;}
+	const std::vector<double>& GetParameters() {return parameters_;}
 
-	void SetParameters(std::vector<double> v) {parameters_ = v;}
+	unsigned GetNumDims(){return num_dims_;};
 
-	virtual double Intensity(const double& t) = 0;
+	void SetParameters(const std::vector<double>& v) 
+	{
+		parameters_ = v;
+		num_dims_ = parameters_.size();
+	}
 
-	virtual Loglikelihood(const std::vector<Sequence>& data, double& objvalue, std::vector<double>& Gradient) = 0;
+	virtual void Initialize(const std::vector<Sequence>& data) = 0;
 
-	virtual double IntensityUpperBound(const double& t, const Sequence& data) = 0;
+	virtual void NegLoglikelihood(double& objvalue, std::vector<double>& Gradient) = 0;
+
+	virtual double Intensity(const double& t, const Sequence& data, std::vector<double>& intensity_dim) = 0;
+
+	virtual double IntensityUpperBound(const double& t, const Sequence& data, std::vector<double>& intensity_upper_dim) = 0;
 
 };
+
+#endif
