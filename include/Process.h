@@ -46,10 +46,6 @@ public:
 	}
 
 
-//  This virtual function requires process-specific implementation. It calculates the temporal features associated with the input data that is necessary for calculating the negative loglikelihood and intensity functions. The commonly used temporal features include the intensity function features and the integral of the intensity function features. 
-//	The input parameter data is a collection of sequences; 
-	virtual void Initialize(const std::vector<Sequence>& data) = 0;
-
 //  This virtual function requires process-specific implementation. It calculates the negative loglikelihood of the given data. This function must be called after the Initialize method to return the negative loglikelihood of the data with respect to the current parameters. 
 //	The returned negative loglikelihood is stored in the variable objvalue;
 //	The returned gradient vector wrt the current parameters is stored in the variable Gradient; 

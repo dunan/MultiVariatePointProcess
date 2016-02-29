@@ -6,31 +6,38 @@
 
 /*
 	
-	This class defines the Homogeneous Poisson process which implements the general process internface IPorcess.
+	This class defines the Hawkes process which implements the general process internface IPorcess.
 	 
 */
 
-class HPoisson : public IProcess
+class PlainHawkes : public IProcess
 {
 
 protected:
 
-//  This variable is process-specific. It stores the temporal features associated with the intensity function of the homogeneous poisson process.
-	std::vector<double> intensity_features_;
+//  This variable is process-specific. It stores the temporal features associated with the intensity function of the multivariate hawkes process.
+//  for each sequence c, given a pair of dimension n and m, and a point t^m_{c,i} on the dimension m, all_exp_kernel_recursive_sum_[c][m][n][i] stores the exponential sum of all the past events t^n_{c,j} < t^m_{c,i} on the dimension n in the sequence c
+	std::vector<std::vector<std::vector<std::vector<double> > > > all_exp_kernel_recursive_sum_;
 
-//	This variable is process-specific. It stores the temporal features associated with the integral intensity function of the homogeneous poisson process.
-	double intensity_itegral_features_;
+//	This variable is process-specific. It stores the temporal features associated with the integral intensity function of the multivariate hawkes process. intensity_itegral_features_[c][m][n] stores the summation \sum_{t^n_{c,i} < T_c} (1 - exp(-\beta^nm(T_c - t^n_{c,i})))
+	std::vector<std::vector<std::vector<double> > > intensity_itegral_features_;
+
+	std::vector<std::vector<std::vector<double> > > all_timestamp_per_dimension_;
 
 //  This variable is process-specific. It records totoal number of sequences used to fit the process.
 	unsigned num_sequences_;
 
+	const std::vector<double>& beta_;
+
 //  This function requires process-specific implementation. It initializes the temporal features used to calculate the negative loglikelihood and the gradient. 
 	void Initialize(const std::vector<Sequence>& data);
+
+	unsigned Idx(const unsigned& i, const unsigned& j);
 
 public:
 
 //  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
-	HPoisson(const unsigned& n, const unsigned& num_dims) : IProcess(n, num_dims), num_sequences_(0) {}
+	PlainHawkes(const unsigned& n, const unsigned& num_dims, const std::vector<double>& beta) : IProcess(n, num_dims), beta_(beta), num_sequences_(0) {}
 
 //  This virtual function requires process-specific implementation. It calculates the negative loglikelihood of the given data. This function must be called after the Initialize method to return the negative loglikelihood of the data with respect to the current parameters. 
 //	The returned negative loglikelihood is stored in the variable objvalue;
