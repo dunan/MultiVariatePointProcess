@@ -4,7 +4,7 @@
 
 void BasicPoissonLearner::fit(const std::vector<Sequence>& data, std::vector<double>& returned_params)
 {
-	Initialize(data);
+	HPoisson::Initialize(data);
 
 	const unsigned& D = IProcess::GetNumDims();
 

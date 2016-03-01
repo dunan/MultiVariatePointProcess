@@ -16,13 +16,15 @@ class PlainHawkes : public IProcess
 protected:
 
 //  This variable is process-specific. It stores the temporal features associated with the intensity function of the multivariate hawkes process.
-//  for each sequence c, given a pair of dimension n and m, and a point t^m_{c,i} on the dimension m, all_exp_kernel_recursive_sum_[c][m][n][i] stores the exponential sum of all the past events t^n_{c,j} < t^m_{c,i} on the dimension n in the sequence c
+//  for each sequence c, given a pair of dimension n and m, and a point t^n{c,i} on the dimension n, all_exp_kernel_recursive_sum_[c][m][n][i] stores the exponential sum of all the past events t^m_{c,j} < t^n_{c,i} on the dimension m in the sequence c
 	std::vector<std::vector<std::vector<std::vector<double> > > > all_exp_kernel_recursive_sum_;
 
-//	This variable is process-specific. It stores the temporal features associated with the integral intensity function of the multivariate hawkes process. intensity_itegral_features_[c][m][n] stores the summation \sum_{t^n_{c,i} < T_c} (1 - exp(-\beta^nm(T_c - t^n_{c,i})))
+//	This variable is process-specific. It stores the temporal features associated with the integral intensity function of the multivariate hawkes process. intensity_itegral_features_[c][m][n] stores the summation \sum_{t^m_{c,i} < T_c} (1 - exp(-\beta^mn(T_c - t^m_{c,i})))
 	std::vector<std::vector<std::vector<double> > > intensity_itegral_features_;
 
 	std::vector<std::vector<std::vector<double> > > all_timestamp_per_dimension_;
+
+	std::vector<double> observation_window_T_;
 
 //  This variable is process-specific. It records totoal number of sequences used to fit the process.
 	unsigned num_sequences_;
