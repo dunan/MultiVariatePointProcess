@@ -3,6 +3,7 @@
 #include <iostream>
 #include "../include/PlainHawkes.h"
 #include "../include/Sequence.h"
+#include "../include/Optimizer.h"
 
 void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 {
@@ -328,3 +329,9 @@ void PlainHawkes::Gradient(const unsigned &k, std::vector<double>& gradient)
   	}
 }
 
+void PlainHawkes::fit(const std::vector<Sequence>& data, const std::string& method)
+{
+	PlainHawkes::Initialize(data);
+	Optimizer opt;
+	opt.SGD(this, 1e-5, 500, data);
+}

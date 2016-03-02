@@ -44,12 +44,16 @@ public:
 //  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
 	PlainHawkes(const unsigned& n, const unsigned& num_dims, const std::vector<double>& beta) : IProcess(n, num_dims), beta_(beta), num_sequences_(0) {}
 
+//  MLE esitmation of the parameters
 	void fit(const std::vector<Sequence>& data, const std::string& opt);
 
 //  This virtual function requires process-specific implementation. It calculates the negative loglikelihood of the given data. This function must be called after the Initialize method to return the negative loglikelihood of the data with respect to the current parameters. 
 //	The returned negative loglikelihood is stored in the variable objvalue;
 //	The returned gradient vector wrt the current parameters is stored in the variable Gradient; 
 	virtual void NegLoglikelihood(double& objvalue, std::vector<double>& Gradient);
+
+	//  Return the stochastic gradient on the random sample k.
+	virtual void Gradient(const unsigned &k, std::vector<double>& gradient);
 
 //  This virtual function requires process-specific implementation. It returns the intensity value on each dimension in the variable intensity_dim for the given sequence stored in data and the given time t;
 //  This function returns the summation of the individual intensity function on all dimensions. 
@@ -59,8 +63,6 @@ public:
 //	This function returns the summation of the individual intensity upper bound on all dimensions. 
 	virtual double IntensityUpperBound(const double& t, const Sequence& data, std::vector<double>& intensity_upper_dim);
 
-	//  Return the stochastic gradient on the random sample k.
-	virtual void Gradient(const unsigned &k, std::vector<double>& gradient);
 
 
 };

@@ -92,11 +92,11 @@ void TestModule::TestPlainHawkes()
 		std::cout << std::endl;
 	}
 
-	HawkesSGDLearner hawkes_sgd(2, 1, beta);
+	PlainHawkes hawkes_new(2, 1, beta);
 
-	// Store estimated parameter vector
-	std::vector<double> params_hat;
-	hawkes_sgd.fit(sequences, params_hat);
+	hawkes_new.fit(sequences, "SGD");
+
+	const std::vector<double>& params_hat = hawkes_new.GetParameters();
 
 	std::cout << "estimated : " << std::endl;
 	for(unsigned d = 0; d < 2; ++ d)
