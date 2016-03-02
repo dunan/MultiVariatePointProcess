@@ -86,4 +86,9 @@ void HPoisson::NegLoglikelihood(double& objvalue, std::vector<double>& gradient)
 
 }
 
+void HPoisson::Gradient(const unsigned &k, std::vector<double>& gradient)
+{
+	return;
+}
+
 

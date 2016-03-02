@@ -9,11 +9,8 @@ void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 	num_sequences_ = data.size();
 	const unsigned& num_of_dimensions = IProcess::GetNumDims();
 
-	all_exp_kernel_recursive_sum_ = std::vector<std::vector<std::vector<std::vector<double> > > >(
-      num_sequences_,
-      std::vector<std::vector<std::vector<double> > >(
-          num_of_dimensions,
-          std::vector<std::vector<double> >(num_of_dimensions, std::vector<double>())));
+	all_exp_kernel_recursive_sum_ = std::vector<std::vector<std::vector<std::vector<double> > > >(num_sequences_, std::vector<std::vector<std::vector<double> > >(
+          num_of_dimensions, std::vector<std::vector<double> >(num_of_dimensions, std::vector<double>())));
 
 
 	all_timestamp_per_dimension_ = std::vector<std::vector<std::vector<double> > >(num_sequences_, std::vector<std::vector<double> > (num_of_dimensions, std::vector<double> ()));
@@ -29,11 +26,14 @@ void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 
 	}
 
-	for (unsigned k = 0; k < num_sequences_; ++k) {
+	for (unsigned k = 0; k < num_sequences_; ++k) 
+	{
 
-	    for (unsigned m = 0; m < num_of_dimensions; ++m) {
+	    for (unsigned m = 0; m < num_of_dimensions; ++m) 
+	    {
 
-	      for (unsigned n = 0; n < num_of_dimensions; ++n) {
+	      for (unsigned n = 0; n < num_of_dimensions; ++n) 
+	      {
 
 	        all_exp_kernel_recursive_sum_[k][m][n].push_back(0);
 
@@ -85,8 +85,6 @@ void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 	      }
 	  	}
 	}
-
-
 }
 
 unsigned PlainHawkes::PlainHawkes::Idx(const unsigned& i, const unsigned& j)
@@ -263,3 +261,70 @@ void PlainHawkes::NegLoglikelihood(double& objvalue, std::vector<double>& gradie
 	objvalue = -objvalue / num_sequences_;
 
 }
+
+void PlainHawkes::Gradient(const unsigned &k, std::vector<double>& gradient)
+{
+	if(all_timestamp_per_dimension_.size() == 0)
+	{
+		std::cout << "Process is uninitialzed with any data." << std::endl;
+		return;
+	}
+
+	const unsigned& num_of_dimensions = IProcess::GetNumDims();
+
+	// first num_of_dimensions of the parameters are the base intensity
+	// the rest num_of_dimensions * num_of_dimensions constitute the alpha matrix
+	const std::vector<double>& params = IProcess::GetParameters();
+
+	std::vector<double> grad_lambda0_vector(num_of_dimensions, 0);
+
+	std::vector<double> grad_alpha_matrix(num_of_dimensions * num_of_dimensions, 0);
+
+	std::vector<double> lambda0_vector(params.begin(), params.begin() + num_of_dimensions);
+
+	std::vector<double> alpha_matrix(params.begin() + num_of_dimensions, params.end());
+
+	const std::vector<std::vector<double> > &timestamp_per_dimension = all_timestamp_per_dimension_[k];
+
+    const std::vector<std::vector<std::vector<double> > > &exp_kernel_recursive_sum = all_exp_kernel_recursive_sum_[k];
+
+	for (unsigned n = 0; n < num_of_dimensions; ++n) 
+    {
+      for (unsigned i = 0; i < timestamp_per_dimension[n].size(); ++i) 
+      {
+        double local_sum = lambda0_vector[n];
+        
+        for (unsigned m = 0; m < num_of_dimensions; ++m) 
+        {
+          local_sum += alpha_matrix[PlainHawkes::Idx(m, n)] * exp_kernel_recursive_sum[m][n][i];
+        }
+
+        grad_lambda0_vector[n] += (1 / local_sum);
+
+        for (unsigned m = 0; m < num_of_dimensions; ++m) 
+        {
+          grad_alpha_matrix[PlainHawkes::Idx(m, n)] += exp_kernel_recursive_sum[m][n][i] / local_sum;
+        }
+      }
+
+      for (unsigned m = 0; m < num_of_dimensions; ++ m) 
+      {
+      	const unsigned& idx = PlainHawkes::Idx(m, n);
+
+        grad_alpha_matrix[idx] -= intensity_itegral_features_[k][m][n] / beta_[idx];
+      }
+
+      grad_lambda0_vector[n] -= observation_window_T_[k];
+
+    }    
+
+    gradient = std::vector<double>(grad_lambda0_vector.begin(), grad_lambda0_vector.end());
+
+  	gradient.insert(gradient.end(), grad_alpha_matrix.begin(), grad_alpha_matrix.end());
+
+  	for(unsigned i = 0; i < gradient.size(); ++ i)
+  	{
+  		gradient[i] = (-gradient[i]) / num_sequences_;
+  	}
+}
+

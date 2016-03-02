@@ -62,6 +62,11 @@ void HawkesSGDLearner::StochasticGradient(const unsigned &k, std::vector<double>
 
   	gradient.insert(gradient.end(), grad_alpha_matrix.begin(), grad_alpha_matrix.end());
 
+  	for(unsigned i = 0; i < gradient.size(); ++ i)
+  	{
+  		gradient[i] = (-gradient[i]) / num_sequences_;
+  	}
+
 }
 
 void HawkesSGDLearner::fit(const std::vector<Sequence>& data, std::vector<double>& returned_params)
@@ -88,11 +93,15 @@ void HawkesSGDLearner::fit(const std::vector<Sequence>& data, std::vector<double
 
 	double gamma = 0;
 
+	ini_gamma_ = 1e-5;
+
 	while(true)
 	{
 		std::vector<double> local_p0 = returned_params;
 
 		std::vector<double> last_local_p0 = returned_params;
+
+		IProcess::SetParameters(local_p0);
 
 		double old_diff = 0;
 
@@ -102,10 +111,13 @@ void HawkesSGDLearner::fit(const std::vector<Sequence>& data, std::vector<double
     	{
     		for (unsigned i = 0; i < num_sequences_; ++i) 
     		{
-    			gamma = sqrt(ini_gamma_ / (ini_gamma_ + t + 1));
+    			// gamma = sqrt(ini_gamma_ / (ini_gamma_ + t + 1));
+
+    			gamma = ini_gamma_;
+
+    			IProcess::SetParameters(local_p0);
 
     			std::vector<double> grad;
-
     			StochasticGradient(i, grad);
 
     			// update and projection

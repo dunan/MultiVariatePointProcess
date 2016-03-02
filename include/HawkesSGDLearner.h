@@ -1,3 +1,6 @@
+#ifndef HAWKES_SGD_LEARNER_H
+#define HAWKES_SGD_LEARNER_H
+
 #include "PlainHawkes.h"
 #include "SimpleRNG.h"
 
@@ -26,7 +29,7 @@ private:
 public:
 
 //  Constructor : n is the number of parameters; num_dims is the number of dimensions;
-	HawkesSGDLearner(const unsigned& n, const unsigned& num_dims, const std::vector<double>& beta) : PlainHawkes(n, num_dims, beta), ini_gamma_(1e-2), ini_max_iter_(100) 
+	HawkesSGDLearner(const unsigned& n, const unsigned& num_dims, const std::vector<double>& beta) : PlainHawkes(n, num_dims, beta), ini_gamma_(1e-3), ini_max_iter_(500) 
 	{
 		RNG_.SetState(0, 0);
 	}
@@ -35,3 +38,5 @@ public:
 	void fit(const std::vector<Sequence>& data, std::vector<double>& returned_params);
 
 };
+
+#endif

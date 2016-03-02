@@ -42,7 +42,6 @@ public:
 	void SetParameters(const std::vector<double>& v) 
 	{
 		parameters_ = v;
-		num_dims_ = parameters_.size();
 	}
 
 
@@ -58,6 +57,8 @@ public:
 //  This virtual function requires process-specific implementation. It returns the upper bound of the intensity function on each dimension at time t given the history data in the variable intensity_upper_dim;
 //	This function returns the summation of the individual intensity upper bound on all dimensions. 
 	virtual double IntensityUpperBound(const double& t, const Sequence& data, std::vector<double>& intensity_upper_dim) = 0;
+
+	virtual void Gradient(const unsigned &k, std::vector<double>& gradient) = 0;
 
 };
 

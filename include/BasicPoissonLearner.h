@@ -1,3 +1,6 @@
+#ifndef BASIC_POISSON_LEARNER_H
+#define BASIC_POISSON_LEARNER_H
+
 #include "HPoisson.h"
 
 /*
@@ -17,3 +20,5 @@ public:
 	void fit(const std::vector<Sequence>& data, std::vector<double>& returned_params);
 
 };
+
+#endif
