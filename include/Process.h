@@ -58,6 +58,7 @@ public:
 //	This function returns the summation of the individual intensity upper bound on all dimensions. 
 	virtual double IntensityUpperBound(const double& t, const Sequence& data, std::vector<double>& intensity_upper_dim) = 0;
 
+//  Return the stochastic gradient on the random sample k.
 	virtual void Gradient(const unsigned &k, std::vector<double>& gradient) = 0;
 
 };
