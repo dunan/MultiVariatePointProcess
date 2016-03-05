@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <Eigen/Dense>
 #include "../include/OgataThinning.h"
 
 void OgataThinning::Simulate(IProcess& process, const std::vector<double>& vec_T, std::vector<Sequence>& sequences)
@@ -19,13 +20,13 @@ void OgataThinning::Simulate(IProcess& process, const std::vector<double>& vec_T
 
 		while(t < *i_vec_T)
 		{
-			std::vector<double> intensity_upper_dim;
+			Eigen::VectorXd intensity_upper_dim;
 
 			const double& lambda_star = process.IntensityUpperBound(t, seq, intensity_upper_dim);
 			
 			t += RNG_.GetExponential(1 / lambda_star);
 
-			std::vector<double> intensity_dim;
+			Eigen::VectorXd intensity_dim;
 			
 			const double& lambda_t = process.Intensity(t, seq, intensity_dim);
 
@@ -37,8 +38,8 @@ void OgataThinning::Simulate(IProcess& process, const std::vector<double>& vec_T
 
 				for(unsigned d = 0; d < num_dims_; ++ d)
 				{
-					cumprob[d] = p + intensity_dim[d] / lambda_t;
-					p += intensity_dim[d] / lambda_t;
+					cumprob[d] = p + intensity_dim(d) / lambda_t;
+					p += intensity_dim(d) / lambda_t;
 				}
 
 				Event event;
@@ -83,13 +84,13 @@ void OgataThinning::Simulate(IProcess& process, const unsigned& n, const unsigne
 
 		while(eventID < n)
 		{
-			std::vector<double> intensity_upper_dim;
+			Eigen::VectorXd intensity_upper_dim;
 
 			const double& lambda_star = process.IntensityUpperBound(t, seq, intensity_upper_dim);
 			
 			t += RNG_.GetExponential(1 / lambda_star);
 
-			std::vector<double> intensity_dim;
+			Eigen::VectorXd intensity_dim;
 			
 			const double& lambda_t = process.Intensity(t, seq, intensity_dim);
 
@@ -101,8 +102,8 @@ void OgataThinning::Simulate(IProcess& process, const unsigned& n, const unsigne
 
 				for(unsigned d = 0; d < num_dims_; ++ d)
 				{
-					cumprob[d] = p + intensity_dim[d] / lambda_t;
-					p += intensity_dim[d] / lambda_t;
+					cumprob[d] = p + intensity_dim(d) / lambda_t;
+					p += intensity_dim(d) / lambda_t;
 				}
 
 				Event event;

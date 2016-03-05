@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv)
 {
-
-	TestModule::TestPlainHawkes();
+	TestModule::TestHPoisson();
+	// TestModule::TestPlainHawkes();
 	return 0;
 }

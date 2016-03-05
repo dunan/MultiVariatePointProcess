@@ -332,6 +332,11 @@ void PlainHawkes::Gradient(const unsigned &k, std::vector<double>& gradient)
 void PlainHawkes::fit(const std::vector<Sequence>& data, const std::string& method)
 {
 	PlainHawkes::Initialize(data);
-	Optimizer opt;
-	opt.SGD(this, 1e-5, 500, data);
+
+	if(method == "SGD")
+	{
+		// Optimizer opt(this);
+		// opt.SGD(1e-5, 500, data);
+		// return;
+	}	
 }

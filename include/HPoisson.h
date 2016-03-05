@@ -16,7 +16,7 @@ class HPoisson : public IProcess
 protected:
 
 //  This variable is process-specific. It stores the temporal features associated with the intensity function of the homogeneous poisson process.
-	std::vector<double> intensity_features_;
+	Eigen::VectorXd intensity_features_;
 
 //	This variable is process-specific. It stores the temporal features associated with the integral intensity function of the homogeneous poisson process.
 	double intensity_itegral_features_;
@@ -27,6 +27,8 @@ protected:
 //  This function requires process-specific implementation. It initializes the temporal features used to calculate the negative loglikelihood and the gradient. 
 	void Initialize(const std::vector<Sequence>& data);
 
+	Eigen::VectorXd observation_window_T_;
+
 public:
 
 //  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
@@ -35,17 +37,19 @@ public:
 //  This virtual function requires process-specific implementation. It calculates the negative loglikelihood of the given data. This function must be called after the Initialize method to return the negative loglikelihood of the data with respect to the current parameters. 
 //	The returned negative loglikelihood is stored in the variable objvalue;
 //	The returned gradient vector wrt the current parameters is stored in the variable Gradient; 
-	virtual void NegLoglikelihood(double& objvalue, std::vector<double>& Gradient);
+	virtual void NegLoglikelihood(double& objvalue, Eigen::VectorXd& Gradient);
 
 //  This virtual function requires process-specific implementation. It returns the intensity value on each dimension in the variable intensity_dim for the given sequence stored in data and the given time t;
 //  This function returns the summation of the individual intensity function on all dimensions. 
-	virtual double Intensity(const double& t, const Sequence& data, std::vector<double>& intensity_dim);
+	virtual double Intensity(const double& t, const Sequence& data, Eigen::VectorXd& intensity_dim);
 
 //  This virtual function requires process-specific implementation. It returns the upper bound of the intensity function on each dimension at time t given the history data in the variable intensity_upper_dim;
 //	This function returns the summation of the individual intensity upper bound on all dimensions. 
-	virtual double IntensityUpperBound(const double& t, const Sequence& data, std::vector<double>& intensity_upper_dim);
+	virtual double IntensityUpperBound(const double& t, const Sequence& data, Eigen::VectorXd& intensity_upper_dim);
 
-	virtual void Gradient(const unsigned &k, std::vector<double>& gradient);
+	virtual void Gradient(const unsigned &k, Eigen::VectorXd& gradient);
+
+	void fit(const std::vector<Sequence>& data);
 
 };
 

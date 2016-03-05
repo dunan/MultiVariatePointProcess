@@ -3,25 +3,16 @@
 #include "../include/HPoisson.h"
 #include "../include/Sequence.h"
 
-double HPoisson::Intensity(const double& t, const Sequence& data, std::vector<double>& intensity_dim)
+double HPoisson::Intensity(const double& t, const Sequence& data, Eigen::VectorXd& intensity_dim)
 {
+	const Eigen::VectorXd& parameters = IProcess::GetParameters();
 
-	intensity_dim = std::vector<double>();
+	intensity_dim = Eigen::VectorXd(parameters);
 
-	double sum = 0;
-
-	const std::vector<double>& parameters = IProcess::GetParameters();
-
-	for(std::vector<double>::const_iterator i_param = parameters.begin(); i_param != parameters.end(); ++ i_param)
-	{
-		sum += *i_param;
-		intensity_dim.push_back(*i_param);
-	}
-
-	return sum;
+	return parameters.array().sum();
 }
 
-double HPoisson::IntensityUpperBound(const double& t, const Sequence& data, std::vector<double>& intensity_upper_dim)
+double HPoisson::IntensityUpperBound(const double& t, const Sequence& data, Eigen::VectorXd& intensity_upper_dim)
 {
 	return HPoisson::Intensity(t, data, intensity_upper_dim);
 }
@@ -32,7 +23,11 @@ void HPoisson::Initialize(const std::vector<Sequence>& data)
 
 	const unsigned& D = IProcess::GetNumDims();
 
-	std::vector<unsigned> event_number_by_dim(D, 0);
+	all_timestamp_per_dimension_ = std::vector<std::vector<std::vector<double> > >(num_sequences_, std::vector<std::vector<double> > (D, std::vector<double> ()));
+
+	Eigen::VectorXd event_number_by_dim = Eigen::VectorXd::Zero(D);
+
+	observation_window_T_ = Eigen::VectorXd::Zero(num_sequences_);
 
 	intensity_itegral_features_ = 0;
 
@@ -42,53 +37,58 @@ void HPoisson::Initialize(const std::vector<Sequence>& data)
 
 		for(unsigned i = 0; i < seq.size(); ++ i)
 		{
-			++ event_number_by_dim[seq[i].DimentionID];
+			++ event_number_by_dim(seq[i].DimentionID);
+			all_timestamp_per_dimension_[c][seq[i].DimentionID].push_back(seq[i].time);
 		}
 
 		intensity_itegral_features_ += data[c].GetTimeWindow();
 
+		observation_window_T_(c) = data[c].GetTimeWindow();
 	}
 
 	intensity_itegral_features_ /= double(num_sequences_);
 
-	intensity_features_ = std::vector<double>(D, 0);
-
-	for(unsigned d = 0; d < D; ++ d)
-	{
-		intensity_features_[d] = double(event_number_by_dim[d]) / double(num_sequences_);
-	}
-
+	intensity_features_ = event_number_by_dim.array() / double(num_sequences_);
 }
 
-void HPoisson::NegLoglikelihood(double& objvalue, std::vector<double>& gradient)
+void HPoisson::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 {
 	
 	const unsigned& D = IProcess::GetNumDims();
-	
-	objvalue = 0;
 
-	gradient = std::vector<double>(D, 0);
+	gradient = Eigen::VectorXd::Zero(D);
 
-	const std::vector<double>& params = IProcess::GetParameters();
+	const Eigen::VectorXd& params = IProcess::GetParameters();
+
+	objvalue = - (intensity_features_.array() * params.array().log() - intensity_itegral_features_ * params.array()).sum();
+
+	gradient = - (intensity_features_.array() / params.array() - intensity_itegral_features_);
+
+}
+
+void HPoisson::Gradient(const unsigned &c, Eigen::VectorXd& gradient)
+{
+	const unsigned& D = IProcess::GetNumDims();
+
+	const Eigen::VectorXd& params = IProcess::GetParameters();
+
+	Eigen::VectorXd event_number_by_dim = Eigen::VectorXd::Zero(D);
 
 	for(unsigned d = 0; d < D; ++ d)
 	{
-		objvalue += (intensity_features_[d] * log(params[d]) - intensity_itegral_features_ * params[d]);
-		gradient[d] =  intensity_features_[d] / params[d] - intensity_itegral_features_;
-	}	
-
-	for(unsigned d = 0; d < D; ++ d)
-	{
-		gradient[d] =  -gradient[d];
+		event_number_by_dim(d) = all_timestamp_per_dimension_[c][d].size();
 	}
 
-	objvalue = -objvalue;
-
+	gradient = - (event_number_by_dim.array() / params.array() - observation_window_T_(c));
+	
 }
 
-void HPoisson::Gradient(const unsigned &k, std::vector<double>& gradient)
+void HPoisson::fit(const std::vector<Sequence>& data)
 {
-	return;
-}
+	Initialize(data);
 
+	const unsigned& D = IProcess::GetNumDims();
+
+	IProcess::SetParameters(intensity_features_.array() / intensity_itegral_features_);
+}
 
