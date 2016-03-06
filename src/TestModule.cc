@@ -50,62 +50,50 @@ void TestModule::TestHPoisson()
 	std::cout << params.transpose() << std::endl;
 }
 
-// void TestModule::TestPlainHawkes()
-// {
-// 	// unsigned dim = 1;
+void TestModule::TestPlainHawkes()
+{
+	unsigned dim = 1;
 
-// 	// OgataThinning ot(dim);
+	OgataThinning ot(dim);
 
-// 	// std::vector<double> params;
-// 	// params.push_back(0.1);
-// 	// params.push_back(0.5);
+	Eigen::VectorXd params(2);
+	params << 0.1, 0.5;
 
-// 	// std::vector<double> beta;
-// 	// beta.push_back(1.0);
+	Eigen::MatrixXd beta(1,1);
 
-// 	// PlainHawkes hawkes(2, 1, beta);
-// 	// hawkes.SetParameters(params);
+	beta << 1.0;
 
-// 	// // Store the simulated sequences
-// 	// std::vector<Sequence> sequences;
+	PlainHawkes hawkes(2, 1, beta);
+	hawkes.SetParameters(params);
 
-// 	// // Simulate 10 events for each sequence
-// 	// unsigned n = 1000;
-// 	// // Simulate 2 sequences 
-// 	// unsigned num_sequences = 1;
-// 	// ot.Simulate(hawkes, n, num_sequences, sequences);
+	// Store the simulated sequences
+	std::vector<Sequence> sequences;
 
-// 	// // Print simulated sequences
-// 	// for(unsigned c = 0; c < sequences.size(); ++ c)
-// 	// {
-// 	// 	const std::vector<Event>& seq = sequences[c].GetEvents();
-// 	// 	for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
-// 	// 	{
-// 	// 		std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
-// 	// 	}
-// 	// 	std::cout << std::endl;
-// 	// }
+	// Simulate 10 events for each sequence
+	unsigned n = 1000;
+	// Simulate 2 sequences 
+	unsigned num_sequences = 1;
+	ot.Simulate(hawkes, n, num_sequences, sequences);
 
-// 	// PlainHawkes hawkes_new(2, 1, beta);
+	// Print simulated sequences
+	for(unsigned c = 0; c < sequences.size(); ++ c)
+	{
+		const std::vector<Event>& seq = sequences[c].GetEvents();
+		for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
+		{
+			std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
+		}
+		std::cout << std::endl;
+	}
 
-// 	// hawkes_new.fit(sequences, "SGD");
-
-// 	// const std::vector<double>& params_hat = hawkes_new.GetParameters();
-
-// 	// std::cout << "estimated : " << std::endl;
-// 	// for(unsigned d = 0; d < 2; ++ d)
-// 	// {
-// 	// 	std::cout << params_hat[d] << " ";
-// 	// }
-// 	// std::cout << std::endl;
-
-// 	// std::cout << "true : " << std::endl;
-// 	// for(unsigned d = 0; d < 2; ++ d)
-// 	// {
-// 	// 	std::cout << params[d] << " ";
-// 	// }
-// 	// std::cout << std::endl;
+	PlainHawkes hawkes_new(2, 1, beta);
+	hawkes_new.fit(sequences, "SGD");
+	
+	std::cout << "estimated : " << std::endl;
+	std::cout << hawkes_new.GetParameters().transpose() << std::endl;
+	std::cout << "true : " << std::endl;
+	std::cout << params.transpose() << std::endl;
 
 
-// }
+}
 

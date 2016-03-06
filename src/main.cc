@@ -4,7 +4,32 @@
 
 int main(int argc, char** argv)
 {
-	TestModule::TestHPoisson();
-	// TestModule::TestPlainHawkes();
+	// Eigen::VectorXd x(10);
+	// x << 10, 20, 30, 40, 50, 60, 70, 80, 90, 100;
+
+	// Eigen::Map<Eigen::MatrixXd> y = Eigen::Map<Eigen::MatrixXd>(x.segment(1,4).data(),2,2);
+	// std::cout << y << std::endl;
+
+	// y(0,1) = -1;
+	// std::cout << x << std::endl;
+
+	// Eigen::Map<Eigen::VectorXd> z = Eigen::Map<Eigen::VectorXd>(x.segment(5,5).data(),5);
+	// std::cout << z << std::endl;	
+	// z(0) = -100;
+	// std::cout << x << std::endl;	
+
+	// Eigen::VectorXd x(4);
+	// x << 10, 20, 30, 40;
+	// std::cout << x << std::endl;
+	// Eigen::Map<Eigen::MatrixXd> y = Eigen::Map<Eigen::MatrixXd>(x.data(),2,2);
+	// std::cout << y << std::endl;
+	// x(1) = 100;
+	// std::cout << y << std::endl;
+	// y(0,1) = -1;
+	// std::cout << x << std::endl;
+	// TestModule::TestHPoisson();
+	
+	TestModule::TestPlainHawkes();
+
 	return 0;
 }
