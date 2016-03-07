@@ -225,7 +225,10 @@ void Optimizer::PLBFGS(const double& LB, const double& UB)
 
 	unsigned nVars = process_->GetParameters().size();
 
-	Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
+	// Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
+
+	Eigen::VectorXd x(2);
+	x << 0.9, 0.1;
 
 	projectBounds(x, LB, UB);
 
@@ -365,7 +368,7 @@ void Optimizer::PLBFGS(const double& LB, const double& UB)
 			}
 
 			// Check whether step has become too small
-			if ((t * d).array().sum() < optTol)
+			if ((t * d).array().abs().sum() < optTol)
 			{
 				std::cout << "Line Search failed" << std::endl;
 

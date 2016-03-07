@@ -280,11 +280,19 @@ void PlainHawkes::Gradient(const unsigned &k, Eigen::VectorXd& gradient)
 void PlainHawkes::fit(const std::vector<Sequence>& data, const std::string& method)
 {
 	PlainHawkes::Initialize(data);
+	Optimizer opt(this);
 
 	if(method == "SGD")
-	{
-		Optimizer opt(this);
+	{	
 		opt.SGD(1e-5, 500, data);
 		return;
+	}
+
+	if(method == "LBFGS")
+	{	
+		opt.PLBFGS(0, 1e10);
+		return;
 	}	
+
+
 }
