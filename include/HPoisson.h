@@ -47,6 +47,10 @@ public:
 //	This function returns the summation of the individual intensity upper bound on all dimensions. 
 	virtual double IntensityUpperBound(const double& t, const Sequence& data, Eigen::VectorXd& intensity_upper_dim);
 
+//  This virtual function requires process-specific implementation. It returns the upper bound of the intensity function on each dimension at time t given the history data in the variable intensity_upper_dim;
+//	This function returns the integral of the intensity from a to b
+	virtual double IntensityIntegral(const double& lower, const double& upper, const Sequence& data);
+
 	virtual void Gradient(const unsigned &k, Eigen::VectorXd& gradient);
 
 	void fit(const std::vector<Sequence>& data);

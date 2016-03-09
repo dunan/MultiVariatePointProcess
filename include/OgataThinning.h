@@ -45,5 +45,10 @@ public:
 //	Parameter sequences stores the simulated sequences. The number of elements in sequences is the same as num_sequences;
 	virtual void Simulate(IProcess& process, const unsigned& n, const unsigned& num_sequences, std::vector<Sequence>& sequences);
 
+//  This virtual function requires process-specific implementation. It returns the next simulated event
+//	Parameter process stores the parameters of the specific process we are going to simulate from;
+//	Parameter data is the given history. 
+	virtual Event SimulateNext(IProcess& process, const Sequence& data);
+
 };
 #endif

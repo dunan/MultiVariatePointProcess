@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iomanip>
 #include <igl/slice.h>
 #include <igl/slice_into.h>
 #include "../include/Optimizer.h"
@@ -223,12 +224,10 @@ void Optimizer::lbfgs(const Eigen::VectorXd& g, const Eigen::MatrixXd& s, const 
 void Optimizer::PLBFGS(const double& LB, const double& UB)
 {
 
+	std::cout << std::setw(10) << "Iteration" << "\t" << std::setw(10) << "FunEvals" << "\t" << std::setw(10) << "Step Length" << "\t" << std::setw(10) << "Function Val" << "\t" << std::setw(10) << "Opt Cond" << std::endl;
 	unsigned nVars = process_->GetParameters().size();
 
-	// Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
-
-	Eigen::VectorXd x(2);
-	x << 0.9, 0.1;
+	Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
 
 	projectBounds(x, LB, UB);
 
@@ -399,14 +398,14 @@ void Optimizer::PLBFGS(const double& LB, const double& UB)
 		// Check optimality
 		if(working.size() == 0)
 		{
-			std::cout << i << " " << funEvals << " " << t << " " << f << " " << 0 << std::endl;
+			std::cout << std::setw(10) << i << "\t" << std::setw(10) << funEvals << "\t" << std::setw(10) << t << "\t" << std::setw(10) << f << "\t" << std::setw(10) <<  0 << std::endl;
 			std::cout << "All variables are at their bound and no further progress is possible" << std::endl;
 			break;
 		}else 
 		{
 			igl::slice(g, working, g_working);
 
-			std::cout << i << " " << funEvals << " " << t << " " << f << " " << g_working.array().abs().sum() << std::endl;
+			std::cout << std::setw(10) << i << "\t" << std::setw(10) << funEvals << "\t" << std::setw(10) << t << "\t" << std::setw(10) << f << "\t" << std::setw(10) <<  g_working.array().abs().sum() << std::endl;
 
 			if(g_working.norm() <= optTol)
 			{

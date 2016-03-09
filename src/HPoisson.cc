@@ -23,7 +23,9 @@ void HPoisson::Initialize(const std::vector<Sequence>& data)
 
 	const unsigned& D = IProcess::GetNumDims();
 
-	all_timestamp_per_dimension_ = std::vector<std::vector<std::vector<double> > >(num_sequences_, std::vector<std::vector<double> > (D, std::vector<double> ()));
+	InitializeDimension(data);
+
+	// all_timestamp_per_dimension_ = std::vector<std::vector<std::vector<double> > >(num_sequences_, std::vector<std::vector<double> > (D, std::vector<double> ()));
 
 	Eigen::VectorXd event_number_by_dim = Eigen::VectorXd::Zero(D);
 
@@ -38,7 +40,7 @@ void HPoisson::Initialize(const std::vector<Sequence>& data)
 		for(unsigned i = 0; i < seq.size(); ++ i)
 		{
 			++ event_number_by_dim(seq[i].DimentionID);
-			all_timestamp_per_dimension_[c][seq[i].DimentionID].push_back(seq[i].time);
+			// all_timestamp_per_dimension_[c][seq[i].DimentionID].push_back(seq[i].time);
 		}
 
 		intensity_itegral_features_ += data[c].GetTimeWindow();
@@ -90,5 +92,11 @@ void HPoisson::fit(const std::vector<Sequence>& data)
 	const unsigned& D = IProcess::GetNumDims();
 
 	IProcess::SetParameters(intensity_features_.array() / intensity_itegral_features_);
+}
+
+double HPoisson::IntensityIntegral(const double& lower, const double& upper, const Sequence& data)
+{
+	
+	return 0;
 }
 

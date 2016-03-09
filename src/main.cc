@@ -28,6 +28,10 @@ int main(int argc, char** argv)
 	// y(0,1) = -1;
 	// std::cout << x << std::endl;
 	// TestModule::TestHPoisson();
+
+	// Eigen::VectorXd x(4);
+	// x << 1,2,3,4;
+	// std::cout << (x.array() < 2.5).cast<int>() << std::endl;
 	
 	TestModule::TestPlainHawkes();
 

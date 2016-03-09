@@ -1,7 +1,7 @@
 #include "HPoisson.h"
 #include "OgataThinning.h"
 #include "PlainHawkes.h"
-// #include "HawkesSGDLearner.h"
+#include "Diagnosis.h"
 
 class TestModule
 {

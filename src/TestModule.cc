@@ -52,27 +52,29 @@ void TestModule::TestHPoisson()
 
 void TestModule::TestPlainHawkes()
 {
-	unsigned dim = 1;
+	unsigned dim = 2, num_params = dim * (dim + 1);
 
 	OgataThinning ot(dim);
 
-	Eigen::VectorXd params(2);
-	params << 0.1, 0.5;
+	Eigen::VectorXd params(num_params);
+	params << 0.1, 0.2, 0.5, 0.5, 0.5, 0.5; 
+			  
+	std::cout << params << std::endl;
 
-	Eigen::MatrixXd beta(1,1);
+	Eigen::MatrixXd beta(dim,dim);
+	beta << 1, 1, 1, 1;
+	std::cout << beta << std::endl;
 
-	beta << 1.0;
-
-	PlainHawkes hawkes(2, 1, beta);
+	PlainHawkes hawkes(num_params, dim, beta);
 	hawkes.SetParameters(params);
 
 	// Store the simulated sequences
 	std::vector<Sequence> sequences;
 
 	// Simulate 10 events for each sequence
-	unsigned n = 1000;
+	unsigned n = 2000;
 	// Simulate 2 sequences 
-	unsigned num_sequences = 1;
+	unsigned num_sequences = 10;
 	ot.Simulate(hawkes, n, num_sequences, sequences);
 
 	// Print simulated sequences
@@ -86,7 +88,20 @@ void TestModule::TestPlainHawkes()
 	// 	std::cout << std::endl;
 	// }
 
-	PlainHawkes hawkes_new(2, 1, beta);
+	// double avg = 0;
+	// const std::vector<Event>& seq = sequences[0].GetEvents();
+	// for(unsigned i = 0; i < 100; ++ i)
+	// {
+	// 	Event event = ot.SimulateNext(hawkes, sequences[0]);
+	// 	std::cout << i << " " << event.time << " " << event.DimentionID << std::endl;	
+	// 	avg += event.time;
+	// }
+	// std::cout << avg / 100 << std::endl;
+	// std::cout << hawkes.PredictNextEventTime(sequences[0], 100) << std::endl;
+
+	
+
+	PlainHawkes hawkes_new(num_params, dim, beta);
 	// hawkes_new.fit(sequences, "SGD");
 	hawkes_new.fit(sequences, "LBFGS");
 	
@@ -94,6 +109,35 @@ void TestModule::TestPlainHawkes()
 	std::cout << hawkes_new.GetParameters().transpose() << std::endl;
 	std::cout << "true : " << std::endl;
 	std::cout << params.transpose() << std::endl;
+
+
+	dim = 1;
+	num_params = dim * (dim + 1);
+
+	Eigen::VectorXd params1(num_params);
+	params1 << 0.1, 0.5;
+
+	Eigen::MatrixXd beta1(dim,dim);
+	beta1 << 1;
+
+	PlainHawkes hawkes1(num_params, dim, beta1);
+	hawkes1.SetParameters(params1);
+
+	OgataThinning ot1(dim);
+	sequences.clear();
+	ot1.Simulate(hawkes1, 1000, 1, sequences);
+
+	// for(unsigned c = 0; c < sequences.size(); ++ c)
+	// {
+	// 	const std::vector<Event>& seq = sequences[c].GetEvents();
+	// 	for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
+	// 	{
+	// 		std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
+	// 	}
+	// 	std::cout << std::endl;
+	// }
+
+	std::cout << Diagnosis::TimeChangeFit(hawkes1, sequences[0]) << std::endl;
 
 
 }

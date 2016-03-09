@@ -4,6 +4,7 @@
 #include "../include/PlainHawkes.h"
 #include "../include/Sequence.h"
 #include "../include/Optimizer.h"
+#include "../include/OgataThinning.h"
 
 void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 {
@@ -12,19 +13,19 @@ void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 	all_exp_kernel_recursive_sum_ = std::vector<std::vector<std::vector<Eigen::VectorXd> > >(num_sequences_, std::vector<std::vector<Eigen::VectorXd> >(
           num_dims_, std::vector<Eigen::VectorXd>(num_dims_, Eigen::VectorXd())));
 
+	// all_timestamp_per_dimension_ = std::vector<std::vector<std::vector<double> > >(num_sequences_, std::vector<std::vector<double> > (num_dims_, std::vector<double> ()));
+	// for(unsigned c = 0; c < num_sequences_; ++ c)
+	// {
+	// 	const std::vector<Event>& seq = data[c].GetEvents();
 
-	all_timestamp_per_dimension_ = std::vector<std::vector<std::vector<double> > >(num_sequences_, std::vector<std::vector<double> > (num_dims_, std::vector<double> ()));
+	// 	for(unsigned i = 0; i < seq.size(); ++ i)
+	// 	{
+	// 		all_timestamp_per_dimension_[c][seq[i].DimentionID].push_back(seq[i].time);
+	// 	}
 
-	for(unsigned c = 0; c < num_sequences_; ++ c)
-	{
-		const std::vector<Event>& seq = data[c].GetEvents();
+	// }
 
-		for(unsigned i = 0; i < seq.size(); ++ i)
-		{
-			all_timestamp_per_dimension_[c][seq[i].DimentionID].push_back(seq[i].time);
-		}
-
-	}
+	InitializeDimension(data);
 
 	for (unsigned k = 0; k < num_sequences_; ++k) 
 	{
@@ -63,6 +64,8 @@ void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 	    }
   	}
 
+	observation_window_T_ = Eigen::VectorXd::Zero(num_sequences_);
+
   	intensity_itegral_features_ = std::vector<Eigen::MatrixXd> (num_sequences_, Eigen::MatrixXd::Zero(num_dims_, num_dims_));
 
   	for (unsigned c = 0; c < num_sequences_; ++c) {
@@ -80,6 +83,7 @@ void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 	      }
 	  	}
 	}
+
 }
 
 
@@ -280,11 +284,12 @@ void PlainHawkes::Gradient(const unsigned &k, Eigen::VectorXd& gradient)
 void PlainHawkes::fit(const std::vector<Sequence>& data, const std::string& method)
 {
 	PlainHawkes::Initialize(data);
+
 	Optimizer opt(this);
 
 	if(method == "SGD")
 	{	
-		opt.SGD(1e-5, 500, data);
+		opt.SGD(1e-5, 5000, data);
 		return;
 	}
 
@@ -294,5 +299,54 @@ void PlainHawkes::fit(const std::vector<Sequence>& data, const std::string& meth
 		return;
 	}	
 
+}
 
+double PlainHawkes::PredictNextEventTime(const Sequence& data, const unsigned& num_simulations)
+{
+	OgataThinning ot(num_dims_);
+	double t = 0;
+	for(unsigned i = 0; i < num_simulations; ++ i)
+	{
+		Event event = ot.SimulateNext(*this, data);
+		t += event.time;
+	}
+	return t / num_simulations;
+}
+
+double PlainHawkes::IntensityIntegral(const double& lower, const double& upper, const Sequence& data)
+{
+	std::vector<Sequence> sequences;
+	sequences.push_back(data);
+
+	InitializeDimension(sequences);
+
+	Eigen::Map<Eigen::VectorXd> Lambda0_ = Eigen::Map<Eigen::VectorXd>(parameters_.segment(0, num_dims_).data(), num_dims_);
+
+	Eigen::Map<Eigen::MatrixXd> Alpha_ = Eigen::Map<Eigen::MatrixXd>(parameters_.segment(num_dims_, num_dims_ * num_dims_).data(), num_dims_, num_dims_);
+
+	std::vector<std::vector<double> >& timestamp_per_dimension = all_timestamp_per_dimension_[0];
+
+	double integral_value = 0;
+
+	for(unsigned n = 0; n < num_dims_; ++ n)
+	{
+		integral_value = Lambda0_(n) * (upper - lower);
+
+		for(unsigned m = 0; m < num_dims_; ++ m)
+		{
+			Eigen::Map<Eigen::VectorXd> event_dim_m = Eigen::Map<Eigen::VectorXd>(timestamp_per_dimension[m].data(), timestamp_per_dimension[m].size());
+
+			Eigen::VectorXd mask = (event_dim_m.array() < lower).cast<double>();
+			double a = (mask.array() * (((-Beta_(m,n) * (lower - event_dim_m.array())) * mask.array()).exp() - ((-Beta_(m,n) * (upper - event_dim_m.array())) * mask.array()).exp())).sum();
+
+			mask = (event_dim_m.array() >= lower && event_dim_m.array() < upper).cast<double>();
+			double b = (mask.array() * (1 - ((-Beta_(m,n) * (upper - event_dim_m.array())) * mask.array()).exp())).sum();
+
+			integral_value += (Alpha_(m,n) / Beta_(m,n)) * (a + b);
+
+		}
+	}
+
+
+	return integral_value;
 }

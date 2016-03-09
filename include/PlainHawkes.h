@@ -37,10 +37,7 @@ protected:
 public:
 
 //  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
-	PlainHawkes(const unsigned& n, const unsigned& num_dims, const Eigen::MatrixXd& Beta) : IProcess(n, num_dims), Beta_(Beta), num_sequences_(0) 
-	{
-		observation_window_T_ = Eigen::VectorXd::Zero(num_dims_);
-	}
+	PlainHawkes(const unsigned& n, const unsigned& num_dims, const Eigen::MatrixXd& Beta) : IProcess(n, num_dims), Beta_(Beta), num_sequences_(0) {}
 
 //  MLE esitmation of the parameters
 	void fit(const std::vector<Sequence>& data, const std::string& opt);
@@ -60,6 +57,13 @@ public:
 //  This virtual function requires process-specific implementation. It returns the upper bound of the intensity function on each dimension at time t given the history data in the variable intensity_upper_dim;
 //	This function returns the summation of the individual intensity upper bound on all dimensions. 
 	virtual double IntensityUpperBound(const double& t, const Sequence& data, Eigen::VectorXd& intensity_upper_dim);
+
+//  This virtual function requires process-specific implementation. It returns the upper bound of the intensity function on each dimension at time t given the history data in the variable intensity_upper_dim;
+//	This function returns the integral of the intensity from a to b
+	virtual double IntensityIntegral(const double& lower, const double& upper, const Sequence& data);
+
+//  This function predicts the next event by simulation;
+	virtual double PredictNextEventTime(const Sequence& data, const unsigned& num_simulations);
 
 };
 

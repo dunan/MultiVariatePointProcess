@@ -22,6 +22,8 @@ protected:
 
 	std::vector<std::vector<std::vector<double> > > all_timestamp_per_dimension_;
 
+	void InitializeDimension(const std::vector<Sequence>& data);
+
 public:
 
 //  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
@@ -59,6 +61,10 @@ public:
 //  This virtual function requires process-specific implementation. It returns the upper bound of the intensity function on each dimension at time t given the history data in the variable intensity_upper_dim;
 //	This function returns the summation of the individual intensity upper bound on all dimensions. 
 	virtual double IntensityUpperBound(const double& t, const Sequence& data, Eigen::VectorXd& intensity_upper_dim) = 0;
+
+//  This virtual function requires process-specific implementation. It returns the upper bound of the intensity function on each dimension at time t given the history data in the variable intensity_upper_dim;
+//	This function returns the integral of the intensity from a to b
+	virtual double IntensityIntegral(const double& lower, const double& upper, const Sequence& data) = 0;
 
 //  Return the stochastic gradient on the random sample k.
 	virtual void Gradient(const unsigned &k, Eigen::VectorXd& gradient) = 0;
