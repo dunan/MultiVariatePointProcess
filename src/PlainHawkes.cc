@@ -226,6 +226,23 @@ void PlainHawkes::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 
 	objvalue = -objvalue / num_sequences_;
 
+	if (regularizer_ == "L22")
+	{
+		gradient = gradient.array() + lambda_ * parameters_.array();
+
+		objvalue = objvalue + 0.5 * lambda_ * parameters_.squaredNorm();
+
+		return;
+	}
+
+	if(regularizer_ == "L1")
+	{
+		gradient = gradient.array() + lambda_;
+
+		objvalue += lambda_ * parameters_.array().abs().sum();
+		return;
+	}
+
 }
 
 void PlainHawkes::Gradient(const unsigned &k, Eigen::VectorXd& gradient)
@@ -281,9 +298,13 @@ void PlainHawkes::Gradient(const unsigned &k, Eigen::VectorXd& gradient)
     gradient = -gradient.array() / num_sequences_;
 }
 
-void PlainHawkes::fit(const std::vector<Sequence>& data, const std::string& method)
+void PlainHawkes::fit(const std::vector<Sequence>& data, const std::string& method, const std::string& regularizer, const double& lambda)
 {
 	PlainHawkes::Initialize(data);
+
+	regularizer_ = regularizer;
+
+	lambda_ = lambda;
 
 	Optimizer opt(this);
 
@@ -297,7 +318,43 @@ void PlainHawkes::fit(const std::vector<Sequence>& data, const std::string& meth
 	{	
 		opt.PLBFGS(0, 1e10);
 		return;
-	}	
+	}
+
+	if(method == "GROUP")
+	{
+		return;
+	}
+
+	if(method == "LOW-RANK")
+	{
+		return;
+	}
+
+	regularizer_ = "NONE";
+	lambda_ = 0;
+
+}
+
+void PlainHawkes::fit(const std::vector<Sequence>& data, const std::string& method)
+{
+	PlainHawkes::Initialize(data);
+
+	regularizer_ = "NONE";
+	lambda_ = 0;
+
+	Optimizer opt(this);
+
+	if(method == "SGD")
+	{	
+		opt.SGD(1e-5, 5000, data);
+		return;
+	}
+
+	if(method == "LBFGS")
+	{	
+		opt.PLBFGS(0, 1e10);
+		return;
+	}
 
 }
 

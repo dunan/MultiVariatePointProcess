@@ -33,13 +33,25 @@ protected:
 //  This function requires process-specific implementation. It initializes the temporal features used to calculate the negative loglikelihood and the gradient. 
 	void Initialize(const std::vector<Sequence>& data);
 
+//  Records the type of regularizer
+	std::string regularizer_;
+
+//  Regularization coefficient
+	double lambda_;
+
 
 public:
 
 //  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
-	PlainHawkes(const unsigned& n, const unsigned& num_dims, const Eigen::MatrixXd& Beta) : IProcess(n, num_dims), Beta_(Beta), num_sequences_(0) {}
+	PlainHawkes(const unsigned& n, const unsigned& num_dims, const Eigen::MatrixXd& Beta) : IProcess(n, num_dims), Beta_(Beta), num_sequences_(0) 
+	{
+		regularizer_ = "NONE";
+		lambda_ = 0;
+	}
 
 //  MLE esitmation of the parameters
+	void fit(const std::vector<Sequence>& data, const std::string& opt, const std::string& regularizer, const double& lambda);
+
 	void fit(const std::vector<Sequence>& data, const std::string& opt);
 
 //  This virtual function requires process-specific implementation. It calculates the negative loglikelihood of the given data. This function must be called after the Initialize method to return the negative loglikelihood of the data with respect to the current parameters. 
