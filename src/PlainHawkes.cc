@@ -226,21 +226,52 @@ void PlainHawkes::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 
 	objvalue = -objvalue / num_sequences_;
 
-	if (regularizer_ == "L22")
+	// Regularization for base intensity
+	switch (options_.base_intensity_regularizer)
 	{
-		gradient = gradient.array() + lambda_ * parameters_.array();
+		case L22 :
+			
+			grad_lambda0_vector = grad_lambda0_vector.array() + (options_.coefficients[LAMBDA] * grad_lambda0_vector.array());
 
-		objvalue = objvalue + 0.5 * lambda_ * parameters_.squaredNorm();
+			objvalue = objvalue + 0.5 * options_.coefficients[LAMBDA] * grad_lambda0_vector.squaredNorm();
+			
+			break;
 
-		return;
+		case L1 :
+
+			grad_lambda0_vector = grad_lambda0_vector.array() + options_.coefficients[LAMBDA];
+
+			objvalue = objvalue + options_.coefficients[LAMBDA] * grad_lambda0_vector.array().abs().sum();
+
+			break;
+
+		default:
+			break; 	
 	}
 
-	if(regularizer_ == "L1")
-	{
-		gradient = gradient.array() + lambda_;
 
-		objvalue += lambda_ * parameters_.array().abs().sum();
-		return;
+	// Regularization for excitation matrix
+	Eigen::Map<Eigen::VectorXd> grad_alpha_vector = Eigen::Map<Eigen::VectorXd>(gradient.segment(num_dims_, num_dims_ * num_dims_).data(), num_dims_ * num_dims_);
+	switch (options_.excitation_regularizer)
+	{
+		case L22 :
+
+			grad_alpha_vector = grad_alpha_vector.array() + (options_.coefficients[BETA] * grad_alpha_vector.array());
+
+			objvalue = objvalue + 0.5 * options_.coefficients[BETA] * grad_alpha_vector.squaredNorm();
+
+			break;
+
+		case L1 :
+
+			grad_alpha_vector = grad_alpha_vector.array() + options_.coefficients[BETA];
+
+			objvalue = objvalue + options_.coefficients[BETA] * grad_alpha_vector.array().abs().sum();
+
+			break;
+
+		default:
+			break;
 	}
 
 }
@@ -298,63 +329,27 @@ void PlainHawkes::Gradient(const unsigned &k, Eigen::VectorXd& gradient)
     gradient = -gradient.array() / num_sequences_;
 }
 
-void PlainHawkes::fit(const std::vector<Sequence>& data, const std::string& method, const std::string& regularizer, const double& lambda)
+void PlainHawkes::fit(const std::vector<Sequence>& data, const OPTION& options)
 {
 	PlainHawkes::Initialize(data);
 
-	regularizer_ = regularizer;
-
-	lambda_ = lambda;
+	options_ = options;
 
 	Optimizer opt(this);
 
-	if(method == "SGD")
-	{	
-		opt.SGD(1e-5, 5000, data);
-		return;
-	}
-
-	if(method == "LBFGS")
-	{	
-		opt.PLBFGS(0, 1e10);
-		return;
-	}
-
-	if(method == "GROUP")
+	switch (options.method)
 	{
-		return;
+		case SGD:
+			opt.SGD(1e-5, 5000, data);
+			return;
+
+		case PLBFGS:
+			opt.PLBFGS(0, 1e10);
+			return;
 	}
 
-	if(method == "LOW-RANK")
-	{
-		return;
-	}
 
-	regularizer_ = "NONE";
-	lambda_ = 0;
-
-}
-
-void PlainHawkes::fit(const std::vector<Sequence>& data, const std::string& method)
-{
-	PlainHawkes::Initialize(data);
-
-	regularizer_ = "NONE";
-	lambda_ = 0;
-
-	Optimizer opt(this);
-
-	if(method == "SGD")
-	{	
-		opt.SGD(1e-5, 5000, data);
-		return;
-	}
-
-	if(method == "LBFGS")
-	{	
-		opt.PLBFGS(0, 1e10);
-		return;
-	}
+	RestoreOptionToDefault();
 
 }
 
@@ -406,4 +401,13 @@ double PlainHawkes::IntensityIntegral(const double& lower, const double& upper, 
 
 
 	return integral_value;
+}
+
+void PlainHawkes::RestoreOptionToDefault()
+{
+	options_.method = PLBFGS;
+	options_.base_intensity_regularizer = NONE;
+	options_.excitation_regularizer = NONE;
+	options_.coefficients[LAMBDA] = 0;
+	options_.coefficients[BETA] = 0;
 }

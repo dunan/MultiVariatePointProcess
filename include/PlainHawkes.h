@@ -2,8 +2,13 @@
 #define PLAIN_HAWKES_H
 #include <vector>
 #include <string>
+#include <map>
 #include "Process.h"
+#include "Optimizer.h"
 
+enum OptMethod {SGD, PLBFGS};
+enum Regularizer {L1, L22, L1_NUCLEAR, NUCLEAR, NONE};
+enum RegCoef {LAMBDA, BETA};
 
 /*
 	
@@ -33,26 +38,34 @@ protected:
 //  This function requires process-specific implementation. It initializes the temporal features used to calculate the negative loglikelihood and the gradient. 
 	void Initialize(const std::vector<Sequence>& data);
 
-//  Records the type of regularizer
-	std::string regularizer_;
-
-//  Regularization coefficient
-	double lambda_;
+	void RestoreOptionToDefault();
 
 
 public:
 
+	//  Records the options
+
+	struct OPTION
+	{
+		OptMethod method;
+		Regularizer base_intensity_regularizer;
+		Regularizer excitation_regularizer;
+		std::map<RegCoef, double> coefficients;	
+	} options_;
+
+
 //  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
 	PlainHawkes(const unsigned& n, const unsigned& num_dims, const Eigen::MatrixXd& Beta) : IProcess(n, num_dims), Beta_(Beta), num_sequences_(0) 
 	{
-		regularizer_ = "NONE";
-		lambda_ = 0;
+		options_.method = PLBFGS;
+		options_.base_intensity_regularizer = NONE;
+		options_.excitation_regularizer = NONE;
+		options_.coefficients[LAMBDA] = 0;
+		options_.coefficients[BETA] = 0;
 	}
 
 //  MLE esitmation of the parameters
-	void fit(const std::vector<Sequence>& data, const std::string& opt, const std::string& regularizer, const double& lambda);
-
-	void fit(const std::vector<Sequence>& data, const std::string& opt);
+	void fit(const std::vector<Sequence>& data, const OPTION& options);
 
 //  This virtual function requires process-specific implementation. It calculates the negative loglikelihood of the given data. This function must be called after the Initialize method to return the negative loglikelihood of the data with respect to the current parameters. 
 //	The returned negative loglikelihood is stored in the variable objvalue;

@@ -99,17 +99,19 @@ void TestModule::TestPlainHawkes()
 	// std::cout << avg / 100 << std::endl;
 	// std::cout << hawkes.PredictNextEventTime(sequences[0], 100) << std::endl;
 
-	
-
 	PlainHawkes hawkes_new(num_params, dim, beta);
 	// hawkes_new.fit(sequences, "SGD");
-	hawkes_new.fit(sequences, "LBFGS");
+	PlainHawkes::OPTION options;
+	options.method = PLBFGS;
+	options.base_intensity_regularizer = NONE;
+	options.excitation_regularizer = NONE;
+	
+	hawkes_new.fit(sequences, options);
 	
 	std::cout << "estimated : " << std::endl;
 	std::cout << hawkes_new.GetParameters().transpose() << std::endl;
 	std::cout << "true : " << std::endl;
 	std::cout << params.transpose() << std::endl;
-
 
 	dim = 1;
 	num_params = dim * (dim + 1);
