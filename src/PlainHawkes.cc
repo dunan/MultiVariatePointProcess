@@ -258,7 +258,7 @@ void PlainHawkes::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 
 			grad_alpha_vector = grad_alpha_vector.array() + (options_.coefficients[BETA] * grad_alpha_vector.array());
 
-			objvalue = objvalue + 0.5 * options_.coefficients[BETA] * grad_alpha_vector.squaredNorm();
+			objvalue = objvalue + 0.5 * options_.coefficients[BETA] * parameters_.squaredNorm();
 
 			break;
 
@@ -266,7 +266,7 @@ void PlainHawkes::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 
 			grad_alpha_vector = grad_alpha_vector.array() + options_.coefficients[BETA];
 
-			objvalue = objvalue + options_.coefficients[BETA] * grad_alpha_vector.array().abs().sum();
+			objvalue = objvalue + options_.coefficients[BETA] * parameters_.array().abs().sum();
 
 			break;
 

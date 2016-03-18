@@ -1,34 +1,38 @@
-#ifndef PLAIN_HAWKES_H
-#define PLAIN_HAWKES_H
+#ifndef PLAIN_TERMINATING_H
+#define PLAIN_TERMINATING_H
+
 #include <vector>
 #include <string>
 #include <map>
 #include "Process.h"
 #include "Optimizer.h"
 
-enum OptMethod {SGD, PLBFGS};
-enum Regularizer {L1, L22, L1_NUCLEAR, NUCLEAR, NONE};
-enum RegCoef {LAMBDA, BETA};
 
-/*
-	
-	This class defines the Hawkes process which implements the general process internface IPorcess.
-	 
-*/
-
-class PlainHawkes : public IProcess
+class PlainTerminating : public IProcess
 {
+
+public:
+
+	enum OptMethod {SGD, PLBFGS};
+	enum Regularizer {L1, NONE};
+	enum RegCoef {LAMBDA};
+
+	//  Records the options
+
+	struct OPTION
+	{
+		OptMethod method;
+		Regularizer excitation_regularizer;
+		std::map<RegCoef, double> coefficients;	
+	};
 
 protected:
 
-	Eigen::MatrixXd Beta_;
+// Temporal features associated with the intensity
+	std::vector<Eigen::MatrixXd> arrayK;
 
-//  This variable is process-specific. It stores the temporal features associated with the intensity function of the multivariate hawkes process.
-//  for each sequence c, given a pair of dimension n and m, and a point t^n{c,i} on the dimension n, all_exp_kernel_recursive_sum_[c][m][n][i] stores the exponential sum of all the past events t^m_{c,j} < t^n_{c,i} on the dimension m in the sequence c
-	std::vector<std::vector<std::vector<Eigen::VectorXd> > > all_exp_kernel_recursive_sum_;
-
-//	This variable is process-specific. It stores the temporal features associated with the integral intensity function of the multivariate hawkes process. intensity_itegral_features_[c][m][n] stores the summation \sum_{t^m_{c,i} < T_c} (1 - exp(-\beta^mn(T_c - t^m_{c,i})))
-	std::vector<Eigen::MatrixXd> intensity_itegral_features_;
+// Intergral of the intensity 
+	std::vector<Eigen::MatrixXd> arrayG;
 
 	Eigen::VectorXd observation_window_T_;
 
@@ -38,35 +42,19 @@ protected:
 //  This function requires process-specific implementation. It initializes the temporal features used to calculate the negative loglikelihood and the gradient. 
 	void Initialize(const std::vector<Sequence>& data);
 
-	void RestoreOptionToDefault();
-
-public:
-
-	//  Records the options
-
-	struct OPTION
-	{
-		OptMethod method;
-		Regularizer base_intensity_regularizer;
-		Regularizer excitation_regularizer;
-		std::map<RegCoef, double> coefficients;	
-	};
-
-protected:
+	void PostProcessing();
 
 	OPTION options_;
 
+
 public:
 
-
 //  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
-	PlainHawkes(const unsigned& n, const unsigned& num_dims, const Eigen::MatrixXd& Beta) : IProcess(n, num_dims), Beta_(Beta), num_sequences_(0) 
+	PlainTerminating(const unsigned& n, const unsigned& num_dims) : IProcess(n, num_dims), num_sequences_(0) 
 	{
 		options_.method = PLBFGS;
-		options_.base_intensity_regularizer = NONE;
 		options_.excitation_regularizer = NONE;
 		options_.coefficients[LAMBDA] = 0;
-		options_.coefficients[BETA] = 0;
 	}
 
 //  MLE esitmation of the parameters

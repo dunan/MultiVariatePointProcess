@@ -105,7 +105,7 @@ void TestModule::TestPlainHawkes()
 	options.method = PLBFGS;
 	options.base_intensity_regularizer = NONE;
 	options.excitation_regularizer = NONE;
-	
+
 	hawkes_new.fit(sequences, options);
 	
 	std::cout << "estimated : " << std::endl;
@@ -140,7 +140,31 @@ void TestModule::TestPlainHawkes()
 	// }
 
 	std::cout << Diagnosis::TimeChangeFit(hawkes1, sequences[0]) << std::endl;
-
-
 }
 
+
+void TestModule::TestMultivariateTerminating()
+{
+	std::vector<Sequence> data;
+	ImportFromExistingCascades("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10", 6,  data);
+
+	unsigned dim = 6, num_params = dim * dim;
+
+	// Eigen::VectorXd alpha = Eigen::VectorXd::Constant(dim * dim, 1);
+
+	PlainTerminating terminating(num_params, dim);
+	
+	PlainTerminating::OPTION options;
+	options.method = PlainTerminating::PLBFGS;
+	options.excitation_regularizer = PlainTerminating::L1;
+	options.coefficients[PlainTerminating::LAMBDA] = 0.01;
+
+	terminating.fit(data, options);
+
+	Eigen::VectorXd result = terminating.GetParameters();
+
+	Eigen::Map<Eigen::MatrixXd> alpha_matrix = Eigen::Map<Eigen::MatrixXd>(result.data(), dim, dim);
+
+	std::cout << alpha_matrix << std::endl;
+
+}

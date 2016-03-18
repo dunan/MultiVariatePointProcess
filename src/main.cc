@@ -33,7 +33,9 @@ int main(int argc, char** argv)
 	// x << 1,2,3,4;
 	// std::cout << (x.array() < 2.5).cast<int>() << std::endl;
 	
-	TestModule::TestPlainHawkes();
+	// TestModule::TestPlainHawkes();
+
+	TestModule::TestMultivariateTerminating();
 
 	return 0;
 }
