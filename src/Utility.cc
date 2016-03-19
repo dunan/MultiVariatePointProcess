@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include "../include/Utility.h"
 
-std::vector<std::string> seperateLineWordsVector(const std::string &lineStr, const std::string& splitter)
+std::vector<std::string> SeperateLineWordsVector(const std::string &lineStr, const std::string& splitter)
 {
     std::string::size_type pos = 0;
     std::string::size_type prePos = 0;
@@ -41,7 +41,7 @@ std::vector<std::string> seperateLineWordsVector(const std::string &lineStr, con
     return temp;
 }
 
-void ImportFromExistingCascades(const std::string& filename, const unsigned& number_of_nodes,  std::vector<Sequence>& data)
+void ImportFromExistingCascades(const std::string& filename, const unsigned& number_of_nodes, const double& T, std::vector<Sequence>& data)
 {
 	std::ifstream fin(filename.c_str());
 	std::string str;
@@ -52,9 +52,9 @@ void ImportFromExistingCascades(const std::string& filename, const unsigned& num
 		if((++ line) > number_of_nodes + 1)
 		{
 
-			std::vector<std::string> parts = seperateLineWordsVector(str, ",");
+			std::vector<std::string> parts = SeperateLineWordsVector(str, ",");
 
-			Sequence seq;
+			Sequence seq(T);
 
 			for(unsigned i = 0; i < parts.size(); i += 2)
 			{

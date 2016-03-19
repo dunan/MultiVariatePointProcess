@@ -4,6 +4,7 @@
 #include "Diagnosis.h"
 #include "Utility.h"
 #include "PlainTerminating.h"
+#include "Graph.h"
 
 class TestModule
 {

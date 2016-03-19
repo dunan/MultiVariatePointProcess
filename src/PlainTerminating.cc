@@ -60,6 +60,54 @@ void PlainTerminating::Initialize(const std::vector<Sequence>& data)
 	}
 }
 
+void PlainTerminating::InitializeWithGraph(const std::vector<Sequence>& data)
+{
+
+	InitializeDimension(data);
+
+	num_sequences_ = data.size();
+
+	for(unsigned i = 0; i < num_dims_; ++ i)
+	{
+		Eigen::MatrixXd matrixK = Eigen::MatrixXd::Zero(num_sequences_, num_dims_);
+		Eigen::MatrixXd matrixG = Eigen::MatrixXd::Zero(num_sequences_, num_dims_);
+
+		for(unsigned c = 0; c < num_sequences_; ++ c)
+		{
+			const std::vector<Event>& seq = data[c].GetEvents();
+			
+			if(all_timestamp_per_dimension_[c][i].size() > 0) // if infected
+			{
+
+				const double& i_time = all_timestamp_per_dimension_[c][i][0];
+
+				for(std::set<unsigned>::const_iterator i_parent = graph_->nodes[i].parents.begin(); i_parent != graph_->nodes[i].parents.end(); ++ i_parent)
+				{
+					if((all_timestamp_per_dimension_[c][*i_parent].size() > 0) && (all_timestamp_per_dimension_[c][*i_parent][0] < i_time))
+					{
+						matrixG(c, *i_parent) = i_time - all_timestamp_per_dimension_[c][*i_parent][0];
+						matrixK(c, *i_parent) = 1;
+					}
+				}
+
+			}else // if survival
+			{
+				for(std::set<unsigned>::const_iterator i_parent = graph_->nodes[i].parents.begin(); i_parent != graph_->nodes[i].parents.end(); ++ i_parent)
+				{
+					if(all_timestamp_per_dimension_[c][*i_parent].size() > 0)
+					{
+						matrixG(c, *i_parent) = data[c].GetTimeWindow() - all_timestamp_per_dimension_[c][*i_parent][0];
+						matrixK(c, *i_parent) = 1;
+					}
+				}
+			}	
+		}
+
+		arrayK.push_back(matrixK);
+		arrayG.push_back(matrixG);
+	}
+}
+
 void PlainTerminating::PostProcessing()
 {
 	Eigen::Map<Eigen::MatrixXd> alpha_matrix = Eigen::Map<Eigen::MatrixXd>(parameters_.data(), num_dims_, num_dims_);
@@ -88,7 +136,14 @@ void PlainTerminating::PostProcessing()
 //  MLE esitmation of the parameters
 void PlainTerminating::fit(const std::vector<Sequence>& data, const OPTION& options)
 {
-	PlainTerminating::Initialize(data);
+
+	if(graph_ == NULL)
+	{
+		PlainTerminating::Initialize(data);	
+	}else
+	{
+		PlainTerminating::InitializeWithGraph(data);
+	}
 
 	options_ = options;
 
@@ -168,6 +223,14 @@ void PlainTerminating::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradi
 			gradient = gradient.array() + options_.coefficients[LAMBDA];
 
 			objvalue += options_.coefficients[LAMBDA] * parameters_.array().abs().sum();
+
+			return;
+
+		case L22 :
+
+			gradient = gradient.array() + options_.coefficients[LAMBDA] * parameters_.array();
+
+			objvalue = objvalue + 0.5 * options_.coefficients[LAMBDA] * parameters_.squaredNorm();
 
 			return;
 

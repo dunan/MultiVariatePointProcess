@@ -6,7 +6,7 @@
 #include <map>
 #include "Process.h"
 #include "Optimizer.h"
-
+#include "Graph.h"
 
 class PlainTerminating : public IProcess
 {
@@ -14,7 +14,7 @@ class PlainTerminating : public IProcess
 public:
 
 	enum OptMethod {SGD, PLBFGS};
-	enum Regularizer {L1, NONE};
+	enum Regularizer {L1, L22, NONE};
 	enum RegCoef {LAMBDA};
 
 	//  Records the options
@@ -42,20 +42,34 @@ protected:
 //  This function requires process-specific implementation. It initializes the temporal features used to calculate the negative loglikelihood and the gradient. 
 	void Initialize(const std::vector<Sequence>& data);
 
+//  This function requires process-specific implementation. It initializes the temporal features used to calculate the negative loglikelihood and the gradient when the network structure is known.
+	void InitializeWithGraph(const std::vector<Sequence>& data);
+
 	void PostProcessing();
 
 	OPTION options_;
+
+	const Graph* graph_;
 
 
 public:
 
 //  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
-	PlainTerminating(const unsigned& n, const unsigned& num_dims) : IProcess(n, num_dims), num_sequences_(0) 
+	PlainTerminating(const unsigned& n, const unsigned& num_dims) : IProcess(n, num_dims), num_sequences_(0), graph_(NULL) 
 	{
 		options_.method = PLBFGS;
 		options_.excitation_regularizer = NONE;
 		options_.coefficients[LAMBDA] = 0;
 	}
+
+//  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
+	PlainTerminating(const unsigned& n, const unsigned& num_dims, const Graph* graph) : IProcess(n, num_dims), num_sequences_(0), graph_(graph)
+	{
+		options_.method = PLBFGS;
+		options_.excitation_regularizer = NONE;
+		options_.coefficients[LAMBDA] = 0;
+	}
+
 
 //  MLE esitmation of the parameters
 	void fit(const std::vector<Sequence>& data, const OPTION& options);
