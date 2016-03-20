@@ -62,6 +62,8 @@ protected:
 
 	void PostProcessing();
 
+	void GetNegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient);
+
 	OPTION options_;
 
 	const Graph* graph_;

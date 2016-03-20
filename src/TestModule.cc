@@ -174,6 +174,34 @@ void TestModule::TestMultivariateTerminating()
 
 	std::cout << alpha_matrix << std::endl;
 
-	
+}
+
+void TestModule::TestTerminatingProcessLearningTriggeringKernel()
+{
+	std::vector<Sequence> data;
+	unsigned N = 6;
+	// double T = 8.2315;
+	double T = 0;
+	ImportFromExistingCascades("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10", N, T, data);
+
+	unsigned dim = N, num_basis = 50, num_params = num_basis * dim * dim;
+
+	Eigen::VectorXd tau = Eigen::VectorXd::LinSpaced(num_basis, 0, 10);
+	Eigen::VectorXd sigma = Eigen::VectorXd::Constant(tau.size(), 0.5);
+
+	std::cout << tau.transpose() << std::endl;
+	std::cout << sigma.transpose() << std::endl;
+
+	Graph G("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10_network", N);
+	G.LoadWeibullFormatNetwork(",", false);
+	G.PrintWblNetwork();
+
+	TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, &G, tau, sigma);
+
+	TerminatingProcessLearningTriggeringKernel::OPTION options;
+	options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::L22;
+	options.coefficients[TerminatingProcessLearningTriggeringKernel::LAMBDA] = 0.5;
+
+	terminating.fit(data, options);
 
 }

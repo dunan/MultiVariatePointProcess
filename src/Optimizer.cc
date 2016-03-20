@@ -258,7 +258,7 @@ void Optimizer::PLBFGS(const double& LB, const double& UB)
 
 	unsigned i = 1, funEvals = 1;
 
-	unsigned maxIter = 100;
+	unsigned maxIter = maxIter_;
 
 	unsigned corrections = 100;
 	Eigen::MatrixXd old_dirs(nVars, 0);
@@ -434,6 +434,80 @@ void Optimizer::PLBFGS(const double& LB, const double& UB)
 		}
 
 		++ i;
+
+	}
+
+}
+
+void Optimizer::ProximalGroup(const double& gamma0, const unsigned& ini_max_iter, const unsigned& group_size, const double& lambda)
+{
+
+	unsigned nVars = process_->GetParameters().size();
+
+	Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
+	process_->SetParameters(x);
+
+	Eigen::VectorXd gradient;
+
+	unsigned num_dims = process_->GetNumDims();
+
+	std::cout << std::setw(10) << "Iteration" << "\t" << std::setw(10) << "Step Length" << "\t" << std::setw(10) << "Function Val" << "\t" << std::setw(10) << "Opt Cond" << std::endl;
+
+	double threshold = gamma0 * lambda;
+
+	double f_old, f_new;
+	process_->NegLoglikelihood(f_old, gradient);
+
+	std::cout << std::setw(10) << 0 << "\t" << std::setw(10) << gamma0 << "\t" << std::setw(10) << f_old << "\t" << std::setw(10) <<  gradient.array().abs().sum() << std::endl;
+
+	for(unsigned iter = 1; iter < ini_max_iter; ++ iter)
+	{
+		
+		x = process_->GetParameters();
+
+		for(unsigned i = 0; i < num_dims; ++ i)
+		{
+			Eigen::Map<Eigen::MatrixXd> MatrixAlpha = Eigen::Map<Eigen::MatrixXd>(x.segment(i * group_size * num_dims, group_size * num_dims).data(), group_size, num_dims);
+			
+			Eigen::Map<Eigen::MatrixXd> GradMatrixAlpha = Eigen::Map<Eigen::MatrixXd>(gradient.segment(i * group_size * num_dims, group_size * num_dims).data(), group_size, num_dims);
+
+			for(unsigned j = 0; j < num_dims; ++ j)
+			{
+				Eigen::VectorXd valid_group_identifier = MatrixAlpha.array().abs().colwise().sum();
+				if(valid_group_identifier(j) != 0)
+				{
+
+					MatrixAlpha.col(j) = MatrixAlpha.col(j) - gamma0 * GradMatrixAlpha.col(j);
+
+					// proximal mapping
+					if(MatrixAlpha.col(j).norm() > threshold)
+					{
+						// first shrink it
+						MatrixAlpha.col(j) = MatrixAlpha.col(j) - threshold * MatrixAlpha.col(j).normalized();
+
+						// then, make projections
+						MatrixAlpha.col(j) = (MatrixAlpha.col(j).array() > 0).select(MatrixAlpha.col(j), 0);
+
+					}else
+					{
+						MatrixAlpha.col(j) = Eigen::VectorXd::Zero(group_size);
+					}
+				}
+			}
+		}
+
+		process_->SetParameters(x);
+		process_->NegLoglikelihood(f_new, gradient);
+
+		if (std::fabs(f_new - f_old) < optTol)
+		{
+			std::cout << "Function value changing by less than optTol" << std::endl;
+			break;	
+		}
+
+		std::cout << std::setw(10) << iter << "\t" << std::setw(10) << gamma0 << "\t" << std::setw(10) << f_new << "\t" << std::setw(10) <<  gradient.array().abs().sum() << std::endl;
+
+		f_old = f_new;
 
 	}
 

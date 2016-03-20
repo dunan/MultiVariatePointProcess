@@ -28,17 +28,22 @@ private:
 
 	void projectBounds(Eigen::VectorXd& params, double LB, double UB);
 
+	unsigned maxIter_;
+
 public:
 
 	Optimizer(IProcess* process) : process_(process)
 	{
 		RNG_.SetState(0, 0);
 		optTol = 1e-10;
+		maxIter_ = 500;
 	}
 
 	void SGD(const double& gamma0, const unsigned& ini_max_iter, const std::vector<Sequence>& data);
 
 	void PLBFGS(const double& LB, const double& UB);
+
+	void ProximalGroup(const double& gamma0, const unsigned& ini_max_iter, const unsigned& group_size, const double& lambda);
 
 
 };

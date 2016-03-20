@@ -90,7 +90,7 @@ void TerminatingProcessLearningTriggeringKernel::InitializeWithGraph(const std::
 					if((all_timestamp_per_dimension_[c][*i_parent].size() > 0) && (all_timestamp_per_dimension_[c][*i_parent][0] < i_time))
 					{
 						const int& j = *i_parent;
-						const double& j_time = all_timestamp_per_dimension_[c][*i_parent][0];
+						const double& j_time = all_timestamp_per_dimension_[c][j][0];
 
 						double deltaT_ji = i_time - j_time;
 
@@ -108,7 +108,7 @@ void TerminatingProcessLearningTriggeringKernel::InitializeWithGraph(const std::
 					if(all_timestamp_per_dimension_[c][*i_parent].size() > 0)
 					{
 						const int& j = *i_parent;
-						const double& j_time = all_timestamp_per_dimension_[c][*i_parent][0];
+						const double& j_time = all_timestamp_per_dimension_[c][j][0];
 
 						double deltaT_ji = data[c].GetTimeWindow() - j_time;
 
@@ -129,7 +129,32 @@ void TerminatingProcessLearningTriggeringKernel::InitializeWithGraph(const std::
 void TerminatingProcessLearningTriggeringKernel::PostProcessing()
 {
 	
+	std::vector<Eigen::Map<Eigen::MatrixXd> > MatrixAlpha;
+	for(unsigned i = 0; i < num_dims_; ++ i)
+	{
+		MatrixAlpha.push_back(Eigen::Map<Eigen::MatrixXd>(parameters_.segment(i * num_rbfs_ * num_dims_, num_rbfs_ * num_dims_).data(), num_rbfs_, num_dims_));
+	}
 
+	for(unsigned i = 0; i < num_dims_; ++ i)
+	{
+		MatrixAlpha[i].col(i) = Eigen::VectorXd::Zero(num_rbfs_);
+		Eigen::VectorXd parents = Eigen::VectorXd::Zero(num_dims_);
+		for(unsigned c = 0; c < num_sequences_; ++ c)
+		{
+			parents = parents.array() + arrayK[i][c].array().abs().rowwise().sum();
+		}
+
+		for(unsigned j = 0; j < num_dims_; ++ j)
+		{
+			if(parents(j) == 0)
+			{
+				MatrixAlpha[i].col(j) = Eigen::VectorXd::Zero(num_rbfs_);
+			}
+		}
+
+		std::cout << MatrixAlpha[i] << std::endl << std::endl;
+
+	}
 }
 
 //  MLE esitmation of the parameters
@@ -144,21 +169,30 @@ void TerminatingProcessLearningTriggeringKernel::fit(const std::vector<Sequence>
 		TerminatingProcessLearningTriggeringKernel::InitializeWithGraph(data);
 	}
 
+	options_ = options;
+	
+	Optimizer opt(this);
+
+	switch (options_.excitation_regularizer)
+	{
+		case GROUP :
+
+
+
+			break;
+
+		default :			
+			opt.PLBFGS(0, 1e10);
+			break;
+	}
+
+	TerminatingProcessLearningTriggeringKernel::PostProcessing();
 
 	return;
 }
 
-//  This virtual function requires process-specific implementation. It calculates the negative loglikelihood of the given data. This function must be called after the Initialize method to return the negative loglikelihood of the data with respect to the current parameters. 
-//	The returned negative loglikelihood is stored in the variable objvalue;
-//	The returned gradient vector wrt the current parameters is stored in the variable Gradient; 
-void TerminatingProcessLearningTriggeringKernel::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
+void TerminatingProcessLearningTriggeringKernel::GetNegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 {
-	if(all_timestamp_per_dimension_.size() == 0)
-	{
-		std::cout << "Process is uninitialzed with any data." << std::endl;
-		return;
-	}
-
 	gradient = Eigen::VectorXd::Zero(num_rbfs_ * num_dims_ * num_dims_);
 
 	std::vector<Eigen::Map<Eigen::MatrixXd> > MatrixAlpha;
@@ -177,7 +211,7 @@ void TerminatingProcessLearningTriggeringKernel::NegLoglikelihood(double& objval
 
 	for(unsigned i = 0; i < num_dims_; ++ i)
 	{
-		if((MatrixAlpha[i].array() != 0).any()) // at least has one valid parent
+		if((MatrixAlpha[i].colwise().sum().array() != 0).any()) // at least has one valid parent
 		{
 			double local_obj = 0;
 
@@ -190,13 +224,15 @@ void TerminatingProcessLearningTriggeringKernel::NegLoglikelihood(double& objval
 				if(all_timestamp_per_dimension_[c][i].size() > 0) // if infected
 				{
 
-					if(((arrayK[i][c].array() != 0).any()) && (intensity_c > 0)) // not a source node
+					Eigen::VectorXd source_identifier = arrayK[i][c].array().abs().rowwise().sum();
+
+					if(((source_identifier.array() != 0).any()) && (intensity_c > 0)) // not a source node
 					{
 						GradMatrixAlpha[i] = GradMatrixAlpha[i].array() + arrayK[i][c].transpose().array() / intensity_c - arrayG[i][c].transpose().array();
 
 						local_obj += (log(intensity_c) - intensity_integral_c);
 
-					}else if (((arrayK[i][c].array() != 0).any()) && (intensity_c == 0))
+					}else if (((source_identifier.array() != 0).any()) && (intensity_c == 0))
 					{
 						MatrixAlpha[i] = Eigen::MatrixXd::Zero(num_rbfs_, num_dims_);
 					}
@@ -216,6 +252,20 @@ void TerminatingProcessLearningTriggeringKernel::NegLoglikelihood(double& objval
 	gradient = -gradient.array() / num_sequences_;
 
 	objvalue = -objvalue / num_sequences_;
+}
+
+//  This virtual function requires process-specific implementation. It calculates the negative loglikelihood of the given data. This function must be called after the Initialize method to return the negative loglikelihood of the data with respect to the current parameters. 
+//	The returned negative loglikelihood is stored in the variable objvalue;
+//	The returned gradient vector wrt the current parameters is stored in the variable Gradient; 
+void TerminatingProcessLearningTriggeringKernel::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
+{
+	if(all_timestamp_per_dimension_.size() == 0)
+	{
+		std::cout << "Process is uninitialzed with any data." << std::endl;
+		return;
+	}
+
+	TerminatingProcessLearningTriggeringKernel::GetNegLoglikelihood(objvalue, gradient);
 
 	switch (options_.excitation_regularizer)
 	{

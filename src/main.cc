@@ -35,7 +35,9 @@ int main(int argc, char** argv)
 	
 	// TestModule::TestPlainHawkes();
 
-	TestModule::TestMultivariateTerminating();
+	// TestModule::TestMultivariateTerminating();
+
+	TestModule::TestTerminatingProcessLearningTriggeringKernel();
 
 	return 0;
 }
