@@ -147,21 +147,19 @@ void TestModule::TestMultivariateTerminating()
 {
 	std::vector<Sequence> data;
 	unsigned N = 6;
-	double T = 8.2315;
-	// double T = 0;
+	// double T = 8.2315;
+	double T = 0;
 	ImportFromExistingCascades("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10", N, T, data);
 
 	unsigned dim = N, num_params = dim * dim;
 
 	// Eigen::VectorXd alpha = Eigen::VectorXd::Constant(dim * dim, 1);
+	PlainTerminating terminating(num_params, dim);
 
-	// PlainTerminating terminating(num_params, dim);
-
-	Graph G("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10_network", 6);
-	G.LoadWeibullFormatNetwork(",", false);
-	G.PrintWblNetwork();
-
-	PlainTerminating terminating(num_params, dim, &G);	
+	// Graph G("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10_network", 6);
+	// G.LoadWeibullFormatNetwork(",", false);
+	// G.PrintWblNetwork();
+	// PlainTerminating terminating(num_params, dim, &G);	
 	
 	PlainTerminating::OPTION options;
 	options.method = PlainTerminating::PLBFGS;

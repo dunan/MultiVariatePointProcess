@@ -198,6 +198,10 @@ void PlainTerminating::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradi
 						grad_alpha_matrix.col(i) = grad_alpha_matrix.col(i).array() + arrayK[i].row(c).transpose().array() / intensity_per_seq(c) - arrayG[i].row(c).transpose().array();
 				
 						local_obj = local_obj + log(intensity_per_seq(c)) - intensity_integral_per_seq(c);
+
+					}else if ((source_identifier(c) != 0) && (intensity_per_seq(c) == 0))
+					{
+						alpha.col(i) = Eigen::VectorXd::Zero(num_dims_);
 					}
 				}else // survival
 				{
