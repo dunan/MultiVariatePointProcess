@@ -192,15 +192,19 @@ void TestModule::TestTerminatingProcessLearningTriggeringKernel()
 	std::cout << tau.transpose() << std::endl;
 	std::cout << sigma.transpose() << std::endl;
 
-	Graph G("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10_network", N);
-	G.LoadWeibullFormatNetwork(",", false);
-	G.PrintWblNetwork();
+	// Graph G("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10_network", N);
+	// G.LoadWeibullFormatNetwork(",", false);
+	// G.PrintWblNetwork();
 
-	TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, &G, tau, sigma);
+	// TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, &G, tau, sigma);
+	// TerminatingProcessLearningTriggeringKernel::OPTION options;
+	// options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::L22;
+	// options.coefficients[TerminatingProcessLearningTriggeringKernel::LAMBDA] = 0.5;
 
+	TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, tau, sigma);
 	TerminatingProcessLearningTriggeringKernel::OPTION options;
-	options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::L22;
-	options.coefficients[TerminatingProcessLearningTriggeringKernel::LAMBDA] = 0.5;
+	options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::GROUP;
+	options.coefficients[TerminatingProcessLearningTriggeringKernel::LAMBDA] = 1;
 
 	terminating.fit(data, options);
 

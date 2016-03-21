@@ -439,7 +439,7 @@ void Optimizer::PLBFGS(const double& LB, const double& UB)
 
 }
 
-void Optimizer::ProximalGroup(const double& gamma0, const unsigned& ini_max_iter, const unsigned& group_size, const double& lambda)
+void Optimizer::ProximalGroupLasso(const double& gamma0, const double& lambda, const unsigned& ini_max_iter, const unsigned& group_size)
 {
 
 	unsigned nVars = process_->GetParameters().size();

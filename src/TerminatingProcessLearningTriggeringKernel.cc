@@ -177,7 +177,7 @@ void TerminatingProcessLearningTriggeringKernel::fit(const std::vector<Sequence>
 	{
 		case GROUP :
 
-
+			opt.ProximalGroupLasso(1e-1, options_.coefficients[LAMBDA], 500, num_rbfs_);
 
 			break;
 

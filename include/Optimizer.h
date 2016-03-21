@@ -43,7 +43,7 @@ public:
 
 	void PLBFGS(const double& LB, const double& UB);
 
-	void ProximalGroup(const double& gamma0, const unsigned& ini_max_iter, const unsigned& group_size, const double& lambda);
+	void ProximalGroupLasso(const double& gamma0, const double& lambda, const unsigned& ini_max_iter, const unsigned& group_size);
 
 
 };
