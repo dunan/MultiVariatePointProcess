@@ -287,7 +287,7 @@ void TerminatingProcessLearningTriggeringKernel::NegLoglikelihood(double& objval
 
 }
 
-	//  Return the stochastic gradient on the random sample k.
+//  Return the stochastic gradient on the random sample k.
 void TerminatingProcessLearningTriggeringKernel::Gradient(const unsigned &k, Eigen::VectorXd& gradient)
 {
 	return;

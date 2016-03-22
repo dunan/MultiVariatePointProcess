@@ -45,6 +45,8 @@ public:
 
 	void ProximalGroupLasso(const double& gamma0, const double& lambda, const unsigned& ini_max_iter, const unsigned& group_size);
 
+	void ProximalGroupLassoForHawkes(const double& gamma0, const double& lambda, const unsigned& ini_max_iter, const unsigned& group_size);
+
 
 };
 

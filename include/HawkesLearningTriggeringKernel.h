@@ -1,27 +1,27 @@
-#ifndef TERMINATING_PROCESS_LEARNING_TRIGGERING_KERNEL_H
-#define TERMINATING_PROCESS_LEARNING_TRIGGERING_KERNEL_H
+#ifndef HAWKES_LEARNING_TRIGGERING_KERNEL_H
+#define HAWKES_LEARNING_TRIGGERING_KERNEL_H
 
 #include <vector>
 #include <cmath>
 #include <string>
-#include <functional>
 #include <map>
 #include "Process.h"
 #include "Optimizer.h"
 #include "Graph.h"
 
-class TerminatingProcessLearningTriggeringKernel : public IProcess
+class HawkesLearningTriggeringKernel : IProcess
 {
 
 public:
 
 	enum Regularizer {L22, GROUP, NONE};
-	enum RegCoef {LAMBDA};
+	enum RegCoef {LAMBDA0, LAMBDA};
 
 	//  Records the options
 
 	struct OPTION
 	{
+		Regularizer base_intensity_regularizer;
 		Regularizer excitation_regularizer;
 		std::map<RegCoef, double> coefficients;	
 	};
@@ -40,11 +40,10 @@ protected:
 	Eigen::VectorXd sigma_;
 	Eigen::VectorXd sqrt2sigma_;
 	Eigen::VectorXd sqrt2PIsigma_;
-	Eigen::VectorXd erfctau_sigma_;
-
+	Eigen::VectorXd erfctau_sigma_;	
 
 // Temporal features associated with the intensity function
-	std::vector<std::vector<Eigen::MatrixXd> > arrayK;
+	std::vector<std::vector<std::vector<Eigen::MatrixXd> > > arrayK;
 
 // Temporal features derived from the integral of the intensity 
 	std::vector<std::vector<Eigen::MatrixXd> > arrayG;
@@ -60,6 +59,8 @@ protected:
 //  This function requires process-specific implementation. It initializes the temporal features used to calculate the negative loglikelihood and the gradient when the network structure is known.
 	void InitializeWithGraph(const std::vector<Sequence>& data);
 
+	void InitializeConstants();
+
 	void PostProcessing();
 
 	void GetNegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient);
@@ -70,29 +71,16 @@ protected:
 
 public:
 
-//  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
-	TerminatingProcessLearningTriggeringKernel(const unsigned& n, const unsigned& num_dims, const Eigen::VectorXd& tau, const Eigen::VectorXd& sigma) : IProcess(n, num_dims), num_sequences_(0), graph_(NULL), tau_(tau), sigma_(sigma)
+	//  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
+	HawkesLearningTriggeringKernel(const unsigned& n, const unsigned& num_dims, const Eigen::VectorXd& tau, const Eigen::VectorXd& sigma) : IProcess(n, num_dims), num_sequences_(0), graph_(NULL), tau_(tau), sigma_(sigma)
 	{
-		options_.excitation_regularizer = NONE;
-		options_.coefficients[LAMBDA] = 0;
-		num_rbfs_ = tau_.size();
-
-		sqrt2sigma_ = sqrt(2) * sigma_.array();
-		sqrt2PIsigma_ = 0.5 * sqrt(2 * PI) * sigma_.array();
-		erfctau_sigma_ = (tau_.array() / sqrt2sigma_.array()).unaryExpr(std::ptr_fun(erfc));
-
+		HawkesLearningTriggeringKernel::InitializeConstants();
 	}
 
 //  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process; graph is the pointer to the given network structure;
-	TerminatingProcessLearningTriggeringKernel(const unsigned& n, const unsigned& num_dims, const Graph* graph, const Eigen::VectorXd& tau, const Eigen::VectorXd& sigma) : IProcess(n, num_dims), num_sequences_(0), graph_(graph), tau_(tau), sigma_(sigma)
+	HawkesLearningTriggeringKernel(const unsigned& n, const unsigned& num_dims, const Graph* graph, const Eigen::VectorXd& tau, const Eigen::VectorXd& sigma) : IProcess(n, num_dims), num_sequences_(0), graph_(graph), tau_(tau), sigma_(sigma)
 	{
-		options_.excitation_regularizer = NONE;
-		options_.coefficients[LAMBDA] = 0;
-		num_rbfs_ = tau_.size();
-
-		sqrt2sigma_ = sqrt(2) * sigma_.array();
-		sqrt2PIsigma_ = 0.5 * sqrt(2 * PI) * sigma_.array();
-		erfctau_sigma_ = (tau_.array() / sqrt2sigma_.array()).unaryExpr(std::ptr_fun(erfc));
+		HawkesLearningTriggeringKernel::InitializeConstants();
 	}
 
 	//  MLE esitmation of the parameters

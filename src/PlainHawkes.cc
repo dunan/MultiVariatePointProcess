@@ -231,9 +231,9 @@ void PlainHawkes::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 	{
 		case L22 :
 			
-			grad_lambda0_vector = grad_lambda0_vector.array() + (options_.coefficients[LAMBDA] * grad_lambda0_vector.array());
+			grad_lambda0_vector = grad_lambda0_vector.array() + (options_.coefficients[LAMBDA] * Lambda0_.array());
 
-			objvalue = objvalue + 0.5 * options_.coefficients[LAMBDA] * grad_lambda0_vector.squaredNorm();
+			objvalue = objvalue + 0.5 * options_.coefficients[LAMBDA] * Lambda0_.squaredNorm();
 			
 			break;
 
@@ -241,7 +241,7 @@ void PlainHawkes::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 
 			grad_lambda0_vector = grad_lambda0_vector.array() + options_.coefficients[LAMBDA];
 
-			objvalue = objvalue + options_.coefficients[LAMBDA] * grad_lambda0_vector.array().abs().sum();
+			objvalue = objvalue + options_.coefficients[LAMBDA] * Lambda0_.array().abs().sum();
 
 			break;
 
@@ -252,13 +252,14 @@ void PlainHawkes::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 
 	// Regularization for excitation matrix
 	Eigen::Map<Eigen::VectorXd> grad_alpha_vector = Eigen::Map<Eigen::VectorXd>(gradient.segment(num_dims_, num_dims_ * num_dims_).data(), num_dims_ * num_dims_);
+	Eigen::Map<Eigen::VectorXd> alpha_vector = Eigen::Map<Eigen::VectorXd>(parameters_.segment(num_dims_, num_dims_ * num_dims_).data(), num_dims_ * num_dims_);
 	switch (options_.excitation_regularizer)
 	{
 		case L22 :
 
-			grad_alpha_vector = grad_alpha_vector.array() + (options_.coefficients[BETA] * parameters_.array());
+			grad_alpha_vector = grad_alpha_vector.array() + (options_.coefficients[BETA] * alpha_vector.array());
 
-			objvalue = objvalue + 0.5 * options_.coefficients[BETA] * parameters_.squaredNorm();
+			objvalue = objvalue + 0.5 * options_.coefficients[BETA] * alpha_vector.squaredNorm();
 
 			break;
 
@@ -266,7 +267,7 @@ void PlainHawkes::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 
 			grad_alpha_vector = grad_alpha_vector.array() + options_.coefficients[BETA];
 
-			objvalue = objvalue + options_.coefficients[BETA] * parameters_.array().abs().sum();
+			objvalue = objvalue + options_.coefficients[BETA] * alpha_vector.array().abs().sum();
 
 			break;
 
