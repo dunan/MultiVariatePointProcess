@@ -3,6 +3,7 @@
 #include "Process.h"
 #include <string>
 #include <vector>
+#include <Eigen/Dense>
 
 
 
@@ -15,7 +16,11 @@
 
 void ImportFromExistingCascades(const std::string& filename, const unsigned& number_of_nodes, const double& T, std::vector<Sequence>& data);
 
+void ImportFromExistingUserItemSequences(const std::string& filename, const unsigned& num_users, const unsigned& num_items, std::vector<Sequence>& data);
+
 std::vector<std::string> SeperateLineWordsVector(const std::string &lineStr, const std::string& splitter);
+
+void LoadEigenMatrixFromTxt(const std::string& filename, const unsigned& num_rows, const unsigned& num_cols, Eigen::MatrixXd& mat);
 
 
 #endif

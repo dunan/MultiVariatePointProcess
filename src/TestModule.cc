@@ -294,6 +294,26 @@ void TestModule::TestPlainHawkesNuclear()
 	std::cout << "true : " << std::endl;
 	std::cout << params.transpose() << std::endl;
 
+}
 
+void TestModule::TestLowRankHawkes()
+{
+	unsigned num_users = 64, num_items = 64;
+	std::vector<Sequence> data;
+	ImportFromExistingUserItemSequences("/Users/nandu/Development/Recommendation/sampled_entries_events", num_users, num_items, data);
+	unsigned dim = num_users * num_items, num_params = 2 * dim;
+	Eigen::VectorXd beta = Eigen::VectorXd::Constant(dim, 1.0);
+	LowRankHawkesProcess low_rank_hawkes(num_users, num_items, beta);
+	LowRankHawkesProcess::OPTION options;
+	options.coefficients[LowRankHawkesProcess::LAMBDA0] = 0;
+	options.coefficients[LowRankHawkesProcess::LAMBDA] = 0;
 
+	Eigen::MatrixXd TrueLambda0, TrueAlpha;
+	LoadEigenMatrixFromTxt("/Users/nandu/Development/Recommendation/truth-syn-Lambda0", num_users, num_items, TrueLambda0);
+	LoadEigenMatrixFromTxt("/Users/nandu/Development/Recommendation/truth-syn-Alpha", num_users, num_items, TrueAlpha);
+	Eigen::MatrixXd temp;
+	LoadEigenMatrixFromTxt("/Users/nandu/Development/Recommendation/truth-syn-X0", 2 * num_users * num_items, 1, temp);
+	Eigen::VectorXd X0 = temp;
+	low_rank_hawkes.debugfit(data, options, TrueLambda0, TrueAlpha, X0);
+	
 }

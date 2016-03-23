@@ -6,6 +6,7 @@
 #include "PlainTerminating.h"
 #include "TerminatingProcessLearningTriggeringKernel.h"
 #include "Graph.h"
+#include "LowRankHawkesProcess.h"
 
 class TestModule
 {
@@ -21,5 +22,7 @@ public:
 	static void TestTerminatingProcessLearningTriggeringKernel();
 
 	static void TestPlainHawkesNuclear();
+
+	static void TestLowRankHawkes();
 
 };

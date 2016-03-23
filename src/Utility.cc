@@ -82,3 +82,60 @@ void ImportFromExistingCascades(const std::string& filename, const unsigned& num
 
 	std::cout << data.size() << std::endl;
 }
+
+void ImportFromExistingUserItemSequences(const std::string& filename, const unsigned& num_users, const unsigned& num_items, std::vector<Sequence>& data)
+{
+    std::ifstream fin(filename.c_str());
+    std::string str;
+    unsigned seqID = 0;
+    while(std::getline(fin, str))
+    {
+        std::vector<std::string> parts = SeperateLineWordsVector(str, "\t");
+        unsigned i = atoi(parts[0].c_str()) - 1;
+        unsigned j = atoi(parts[1].c_str()) - 1;
+        unsigned dim_id = i + j * num_users;
+
+        std::vector<std::string> timings = SeperateLineWordsVector(parts[2], " ");
+
+        Sequence seq;
+
+        for(std::vector<std::string>::const_iterator i_timing = timings.begin(); i_timing != timings.end(); ++ i_timing)
+        {
+            unsigned eventID = 0;
+
+            Event event;
+            event.EventID = (eventID ++);
+            event.SequenceID = seqID;
+            event.DimentionID = dim_id;
+            event.time = atof(i_timing->c_str());
+            event.marker = -1;
+            seq.Add(event);
+        }
+
+        data.push_back(seq);
+        ++ seqID;
+
+        // std::cout << dim_id << " " << seq.GetEvents().size() << " " << seq.GetTimeWindow() << std::endl;
+
+    }
+    fin.close();
+}
+
+void LoadEigenMatrixFromTxt(const std::string& filename, const unsigned& num_rows, const unsigned& num_cols, Eigen::MatrixXd& mat)
+{
+    std::ifstream fin(filename.c_str());
+    std::string str;
+
+    std::vector<double> elements;
+
+    while(std::getline(fin, str))
+    {
+        elements.push_back(atof(str.c_str()));
+    }
+
+    fin.close();
+
+    mat = Eigen::Map<Eigen::MatrixXd>(elements.data(), num_rows, num_cols);  
+    
+}
+

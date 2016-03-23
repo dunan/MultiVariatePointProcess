@@ -56,9 +56,9 @@ int main(int argc, char** argv)
 
 	// std::cout << svdfull.matrixU() * S * svdfull.matrixV().transpose() << std::endl;
 
-	TestModule::TestPlainHawkesNuclear();
+	// TestModule::TestPlainHawkesNuclear();
 
-
+	TestModule::TestLowRankHawkes();
 
 
 	return 0;
