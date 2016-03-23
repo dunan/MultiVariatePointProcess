@@ -209,3 +209,91 @@ void TestModule::TestTerminatingProcessLearningTriggeringKernel()
 	terminating.fit(data, options);
 
 }
+
+void TestModule::TestPlainHawkesNuclear()
+{
+
+	unsigned dim = 5, num_params = dim * (dim + 1);
+
+	Eigen::MatrixXd B1 = (Eigen::MatrixXd::Random(dim,2).array() + 1) / 2;
+	Eigen::MatrixXd B2 = (Eigen::MatrixXd::Random(dim,2).array() + 1) / 2;
+
+	Eigen::MatrixXd B = B1 * B2.transpose() / 8;
+
+	std::cout << B << std::endl << std::endl;
+
+	Eigen::EigenSolver<Eigen::MatrixXd> es(B);
+
+	std::cout << es.eigenvalues() << std::endl;
+
+	OgataThinning ot(dim);
+
+	Eigen::VectorXd params(num_params);
+	
+	Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(params.segment(0, dim).data(), dim);
+	Eigen::Map<Eigen::MatrixXd> A = Eigen::Map<Eigen::MatrixXd>(params.segment(dim, dim * dim).data(), dim, dim);
+
+	Lambda0 = Eigen::VectorXd::Constant(dim, 0.1);
+	A = B;	
+
+	std::cout << params << std::endl;
+
+	Eigen::MatrixXd beta = Eigen::MatrixXd::Constant(dim,dim,1.0);
+	
+	std::cout << beta << std::endl;
+
+	PlainHawkes hawkes(num_params, dim, beta);
+	hawkes.SetParameters(params);
+
+	// Store the simulated sequences
+	std::vector<Sequence> sequences;
+
+	// Simulate 10 events for each sequence
+	unsigned n = 1000;
+	// Simulate 2 sequences 
+	unsigned num_sequences = 10;
+	ot.Simulate(hawkes, n, num_sequences, sequences);
+
+	// Print simulated sequences
+	
+	for(unsigned c = 0; c < sequences.size(); ++ c)
+	{
+		std::map<unsigned, unsigned> dim2count;
+		const std::vector<Event>& seq = sequences[c].GetEvents();
+		for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
+		{
+			// std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
+			if(dim2count.find(i_event -> DimentionID) == dim2count.end())
+			{
+				dim2count[i_event -> DimentionID] = 1;
+			}else
+			{
+				++ dim2count[i_event -> DimentionID];
+			}
+		}
+
+		for(std::map<unsigned, unsigned>::const_iterator m = dim2count.begin(); m != dim2count.end(); ++ m)
+		{
+			std::cout << m->first << " " << m->second << std::endl;
+		}
+
+		std::cout << std::endl;
+	}
+
+	PlainHawkes hawkes_new(num_params, dim, beta);
+	
+	PlainHawkes::OPTION options;
+	options.method = PLBFGS;
+	options.base_intensity_regularizer = NONE;
+	options.excitation_regularizer = NONE;
+
+	hawkes_new.debugfit(sequences, options, params);
+	
+	std::cout << "estimated : " << std::endl;
+	std::cout << hawkes_new.GetParameters().transpose() << std::endl;
+	std::cout << "true : " << std::endl;
+	std::cout << params.transpose() << std::endl;
+
+
+
+}

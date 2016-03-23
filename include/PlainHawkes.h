@@ -7,7 +7,7 @@
 #include "Optimizer.h"
 
 enum OptMethod {SGD, PLBFGS};
-enum Regularizer {L1, L22, L1_NUCLEAR, NUCLEAR, NONE};
+enum Regularizer {L1, L22, NUCLEAR, NONE};
 enum RegCoef {LAMBDA, BETA};
 
 /*
@@ -71,6 +71,8 @@ public:
 
 //  MLE esitmation of the parameters
 	void fit(const std::vector<Sequence>& data, const OPTION& options);
+
+	void debugfit(const std::vector<Sequence>& data, const OPTION& options, const Eigen::VectorXd& trueparameters);
 
 //  This virtual function requires process-specific implementation. It calculates the negative loglikelihood of the given data. This function must be called after the Initialize method to return the negative loglikelihood of the data with respect to the current parameters. 
 //	The returned negative loglikelihood is stored in the variable objvalue;

@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Process.h"
 #include "SimpleRNG.h"
+#include "RedSVD.h"
 
 
 class Optimizer
@@ -47,6 +48,9 @@ public:
 
 	void ProximalGroupLassoForHawkes(const double& gamma0, const double& lambda, const unsigned& ini_max_iter, const unsigned& group_size);
 
+	void ProximalNuclear(const double& lambda, const double& rho, const unsigned& ini_max_iter, const Eigen::VectorXd& trueparameters);
+
+	void ProximalFrankWolfe(const double& lambda, const double& rho, const unsigned& ini_max_iter, const Eigen::VectorXd& trueparameters);
 
 };
 

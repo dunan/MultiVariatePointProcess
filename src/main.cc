@@ -1,7 +1,6 @@
 #include <iostream>
 #include "../include/TestModule.h"
 
-
 int main(int argc, char** argv)
 {
 	// Eigen::VectorXd x(10);
@@ -37,7 +36,30 @@ int main(int argc, char** argv)
 
 	// TestModule::TestMultivariateTerminating();
 
-	TestModule::TestTerminatingProcessLearningTriggeringKernel();
+	// TestModule::TestTerminatingProcessLearningTriggeringKernel();
+
+	// Eigen::MatrixXd A = (Eigen::MatrixXd::Random(10,10).array() + 1) / 2;
+	// std::cout << A << std::endl;
+
+	// RedSVD::RedSVD<Eigen::MatrixXd> svd;
+	// svd.compute(A,2);
+	// std::cout << svd.singularValues() << std::endl << std::endl;
+	// std::cout << svd.matrixU() << std::endl << std::endl;
+	// std::cout << svd.matrixV() << std::endl << std::endl;
+
+	// Eigen::JacobiSVD<Eigen::MatrixXd> svdfull(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+	// Eigen::MatrixXd S = svdfull.singularValues().asDiagonal();
+	// std::cout <<  S << std::endl << std::endl;
+
+	// std::cout << svdfull.matrixU() << std::endl << std::endl;
+	// std::cout << svdfull.matrixV() << std::endl << std::endl;
+
+	// std::cout << svdfull.matrixU() * S * svdfull.matrixV().transpose() << std::endl;
+
+	TestModule::TestPlainHawkesNuclear();
+
+
+
 
 	return 0;
 }

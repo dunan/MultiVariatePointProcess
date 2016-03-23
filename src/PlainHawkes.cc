@@ -219,6 +219,7 @@ void PlainHawkes::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 	      grad_lambda0_vector(n) -= observation_window_T_(k);
 
 	      objvalue += obj_n;
+
 	    }
   	}
 
@@ -338,16 +339,42 @@ void PlainHawkes::fit(const std::vector<Sequence>& data, const OPTION& options)
 
 	Optimizer opt(this);
 
-	switch (options.method)
-	{
-		case SGD:
-			opt.SGD(1e-5, 5000, data);
-			return;
+	// switch (options.method)
+	// {
+	// 	case SGD:
+	// 		opt.SGD(1e-5, 5000, data);
+	// 		return;
 
-		case PLBFGS:
-			opt.PLBFGS(0, 1e10);
-			return;
-	}
+	// 	case PLBFGS:
+	// 		opt.PLBFGS(0, 1e10);
+	// 		return;
+	// }
+
+
+	RestoreOptionToDefault();
+
+}
+
+void PlainHawkes::debugfit(const std::vector<Sequence>& data, const OPTION& options, const Eigen::VectorXd& trueparameters)
+{
+	PlainHawkes::Initialize(data);
+
+	options_ = options;
+
+	Optimizer opt(this);
+
+	opt.ProximalFrankWolfe(0.1, 1, 1000, trueparameters);
+
+	// switch (options.method)
+	// {
+	// 	case SGD:
+	// 		opt.SGD(1e-5, 5000, data);
+	// 		return;
+
+	// 	case PLBFGS:
+	// 		opt.PLBFGS(0, 1e10);
+	// 		return;
+	// }
 
 
 	RestoreOptionToDefault();

@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iomanip>
+#include <algorithm>
 #include <igl/slice.h>
 #include <igl/slice_into.h>
 #include "../include/Optimizer.h"
@@ -593,4 +594,151 @@ void Optimizer::ProximalGroupLassoForHawkes(const double& gamma0, const double& 
 
 		f_old = f_new;
 	}
+}
+
+void Optimizer::ProximalNuclear(const double& lambda, const double& rho, const unsigned& ini_max_iter, const Eigen::VectorXd& trueparameters)
+{
+	unsigned nVars = process_->GetParameters().size();
+
+	Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
+	process_->SetParameters(x);
+
+	Eigen::VectorXd gradient;
+
+	unsigned num_dims = process_->GetNumDims();
+
+	double f_old, f_new;
+	process_->NegLoglikelihood(f_old, gradient);
+
+	Eigen::Map<Eigen::VectorXd> Y_Lambda0 = Eigen::Map<Eigen::VectorXd>(x.segment(0, num_dims).data(), num_dims);
+	Eigen::Map<Eigen::VectorXd> Y_grad_lambda0_vector = Eigen::Map<Eigen::VectorXd>(gradient.segment(0, num_dims).data(), num_dims);
+	Eigen::Map<Eigen::MatrixXd> Y_MatrixAlpha = Eigen::Map<Eigen::MatrixXd>(x.segment(num_dims, num_dims * num_dims).data(), num_dims, num_dims);
+	Eigen::Map<Eigen::MatrixXd> Y_GradMatrixAlpha = Eigen::Map<Eigen::MatrixXd>(gradient.segment(num_dims, num_dims * num_dims).data(), num_dims, num_dims);
+	Eigen::MatrixXd Y_Z = Y_MatrixAlpha;
+
+	Eigen::VectorXd X_Lambda0 = Y_Lambda0;
+	Eigen::MatrixXd X_MatrixAlpha = Y_MatrixAlpha;
+	Eigen::MatrixXd X_Z = X_MatrixAlpha;
+
+	Eigen::VectorXd U_Lambda0 = Y_Lambda0;
+	Eigen::MatrixXd U_MatrixAlpha = Y_MatrixAlpha;
+	Eigen::MatrixXd U_Z = U_MatrixAlpha;
+
+	for(unsigned iter = 1; iter < ini_max_iter; ++ iter)
+	{
+
+		double eta = std::min(1e-5 * (iter + 1), 10.0);
+		double delta = 2.0 / double(iter + 1);
+
+		Y_Lambda0 = (1 - delta) * X_Lambda0.array() + delta * U_Lambda0.array();
+		Y_MatrixAlpha = (1 - delta) * X_MatrixAlpha.array() + delta * U_MatrixAlpha.array();
+		Y_Z = (1 - delta) * X_Z.array() + delta * U_Z.array();
+
+		process_->SetParameters(x);
+		process_->NegLoglikelihood(f_new, gradient);
+		Y_GradMatrixAlpha = Y_GradMatrixAlpha.array() + rho * (Y_MatrixAlpha.array() - Y_Z.array());
+
+		// Proximal Update
+		U_Lambda0 = Y_Lambda0.array() - eta * Y_grad_lambda0_vector.array();
+		U_Lambda0 = (U_Lambda0.array() > 0).select(U_Lambda0, 0);
+
+		U_MatrixAlpha = Y_MatrixAlpha.array() - eta * Y_GradMatrixAlpha.array();
+		U_MatrixAlpha = (U_MatrixAlpha.array() > 0).select(U_MatrixAlpha, 0);
+
+		X_Lambda0 = (1 - delta) * X_Lambda0.array() + delta * U_Lambda0.array();
+		X_MatrixAlpha = (1 - delta) * X_MatrixAlpha.array() + delta * U_MatrixAlpha.array();
+
+		// Proximal Update for Z
+		Eigen::JacobiSVD<Eigen::MatrixXd> svdfull(Y_Z.array() + eta * rho * (Y_MatrixAlpha.array() - Y_Z.array()),Eigen::ComputeThinU | Eigen::ComputeThinV);
+		Eigen::VectorXd singular_values = svdfull.singularValues();
+		singular_values = singular_values.array() - eta * lambda;
+		U_Z = svdfull.matrixU() * singular_values.asDiagonal() * svdfull.matrixV().transpose();
+
+		X_Z = (1 - delta) * X_Z.array() + delta * U_Z.array();
+
+		Eigen::VectorXd x_new(nVars);
+		Eigen::Map<Eigen::VectorXd> Lambda0_new = Eigen::Map<Eigen::VectorXd>(x_new.segment(0, num_dims).data(), num_dims);
+		Eigen::Map<Eigen::MatrixXd> MatrixAlpha_new = Eigen::Map<Eigen::MatrixXd>(x_new.segment(num_dims, num_dims * num_dims).data(), num_dims, num_dims);
+		Lambda0_new = X_Lambda0;
+		MatrixAlpha_new = X_MatrixAlpha;
+
+		std::cout << std::setw(10) << iter << "\t" << std::setw(10) << delta << "\t" << std::setw(10) << f_new << "\t" << std::setw(10) <<  gradient.array().abs().sum() <<"\t" << (x_new - trueparameters).array().abs().mean() << std::endl;
+	}
+}
+
+void Optimizer::ProximalFrankWolfe(const double& lambda, const double& rho, const unsigned& ini_max_iter, const Eigen::VectorXd& trueparameters)
+{
+	unsigned nVars = process_->GetParameters().size();
+
+	Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
+	process_->SetParameters(x);
+
+	Eigen::VectorXd gradient;
+
+	unsigned num_dims = process_->GetNumDims();
+
+	double f_old, f_new;
+	process_->NegLoglikelihood(f_old, gradient);
+
+	Eigen::Map<Eigen::VectorXd> Y_Lambda0 = Eigen::Map<Eigen::VectorXd>(x.segment(0, num_dims).data(), num_dims);
+	Eigen::Map<Eigen::VectorXd> Y_grad_lambda0_vector = Eigen::Map<Eigen::VectorXd>(gradient.segment(0, num_dims).data(), num_dims);
+	Eigen::Map<Eigen::MatrixXd> Y_MatrixAlpha = Eigen::Map<Eigen::MatrixXd>(x.segment(num_dims, num_dims * num_dims).data(), num_dims, num_dims);
+	Eigen::Map<Eigen::MatrixXd> Y_GradMatrixAlpha = Eigen::Map<Eigen::MatrixXd>(gradient.segment(num_dims, num_dims * num_dims).data(), num_dims, num_dims);
+	Eigen::MatrixXd Y_Z = Y_MatrixAlpha;
+
+	Eigen::VectorXd X_Lambda0 = Y_Lambda0;
+	Eigen::MatrixXd X_MatrixAlpha = Y_MatrixAlpha;
+	Eigen::MatrixXd X_Z = X_MatrixAlpha;
+
+	Eigen::VectorXd U_Lambda0 = Y_Lambda0;
+	Eigen::MatrixXd U_MatrixAlpha = Y_MatrixAlpha;
+	Eigen::MatrixXd U_Z = U_MatrixAlpha;
+
+	double upper = 1;
+
+	RedSVD::RedSVD<Eigen::MatrixXd> svd;
+
+	for(unsigned iter = 1; iter < ini_max_iter; ++ iter)
+	{
+
+		double eta = std::min(5e-5 * (iter + 1), 10.0);
+		double delta = 2.0 / double(iter + 1);
+
+		Y_Lambda0 = (1 - delta) * X_Lambda0.array() + delta * U_Lambda0.array();
+		Y_MatrixAlpha = (1 - delta) * X_MatrixAlpha.array() + delta * U_MatrixAlpha.array();
+		Y_Z = (1 - delta) * X_Z.array() + delta * U_Z.array();
+
+		process_->SetParameters(x);
+		process_->NegLoglikelihood(f_new, gradient);
+		Y_GradMatrixAlpha = Y_GradMatrixAlpha.array() + rho * (Y_MatrixAlpha.array() - Y_Z.array());
+
+		// Proximal Update
+		U_Lambda0 = Y_Lambda0.array() - eta * Y_grad_lambda0_vector.array();
+		U_Lambda0 = (U_Lambda0.array() > 0).select(U_Lambda0, 0);
+
+		U_MatrixAlpha = Y_MatrixAlpha.array() - eta * Y_GradMatrixAlpha.array();
+		U_MatrixAlpha = (U_MatrixAlpha.array() > 0).select(U_MatrixAlpha, 0);
+
+		X_Lambda0 = (1 - delta) * X_Lambda0.array() + delta * U_Lambda0.array();
+		X_MatrixAlpha = (1 - delta) * X_MatrixAlpha.array() + delta * U_MatrixAlpha.array();
+
+		// FrankWolfe Update for Z
+		svd.compute(rho * (Y_MatrixAlpha.array() - Y_Z.array()),1);
+		U_Z = svd.matrixU() * svd.matrixV().transpose();
+
+		double alpha_Z = (rho * ((Y_MatrixAlpha.array() - (1 - delta) * Y_Z.array()) * U_Z.array()).sum() - lambda) / (rho * U_Z.squaredNorm());
+		alpha_Z = std::fmin(upper, std::fmax(alpha_Z / delta, 0.0));
+
+		U_Z = alpha_Z * U_Z.array();
+		
+		X_Z = (1 - delta) * X_Z.array() + delta * U_Z.array();
+
+		Eigen::VectorXd x_new(nVars);
+		Eigen::Map<Eigen::VectorXd> Lambda0_new = Eigen::Map<Eigen::VectorXd>(x_new.segment(0, num_dims).data(), num_dims);
+		Eigen::Map<Eigen::MatrixXd> MatrixAlpha_new = Eigen::Map<Eigen::MatrixXd>(x_new.segment(num_dims, num_dims * num_dims).data(), num_dims, num_dims);
+		Lambda0_new = X_Lambda0;
+		MatrixAlpha_new = X_MatrixAlpha;
+
+		std::cout << std::setw(10) << iter << "\t" << std::setw(10) << delta << "\t" << std::setw(10) << f_new << "\t" << std::setw(10) <<  gradient.array().abs().sum() <<"\t" << (x_new - trueparameters).array().abs().mean() << std::endl;
+	}	
 }

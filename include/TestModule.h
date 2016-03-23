@@ -20,4 +20,6 @@ public:
 
 	static void TestTerminatingProcessLearningTriggeringKernel();
 
+	static void TestPlainHawkesNuclear();
+
 };
