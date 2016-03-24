@@ -1,40 +1,40 @@
-/*
-
-Implementation of the Graph Class.  
-
-Author : Nan Du (dunan@gatech.edu)
-
-*/
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <utility>
 #include <cstdlib>
+#include <iomanip>
 
 #include "../include/Graph.h"
 #include "../include/Utility.h"
 
-Graph::Graph(std::string g_filename, unsigned numNodes)
-{
-	filename = g_filename;
-	N = numNodes;
-	RNG.SetState(0, 0);
-}
 
-
-void Graph::PrintWblNetwork()
+void Graph::PrintWeibullFormatNetwork()
 {
-	for (unsigned i = 0; i < nodes.size(); ++ i) 
+	if(edge_parameter.size() > 0)
 	{
-		for (std::set<unsigned>::iterator u = nodes[i].children.begin(); u != nodes[i].children.end(); ++ u) 
+		for (unsigned i = 0; i < nodes.size(); ++ i) 
 		{
-			// std::cout << i << "\t" << *u << "\t" << edge_parameter[i][*u].scale << "\t" <<edge_parameter[i][*u].shape<< std::endl;
-			std::cout << i << "\t" << *u << std::endl;
+			for (std::set<unsigned>::iterator u = nodes[i].children.begin(); u != nodes[i].children.end(); ++ u) 
+			{
+				std::cout << i << "\t" << *u << "\t" << std::fixed << std::setprecision(4) << std::setw(5) << edge_parameter[i][*u].scale << "\t" <<std::setprecision(4) << std::setw(5) << edge_parameter[i][*u].shape<< std::endl;
+			}
+		}
+	}else
+	{
+		std::cout << "No edge parameters. Only print the network structure." << std::endl;
+
+		for (unsigned i = 0; i < nodes.size(); ++ i) 
+		{
+			for (std::set<unsigned>::iterator u = nodes[i].children.begin(); u != nodes[i].children.end(); ++ u) 
+			{
+				std::cout << i << "\t" << *u << std::endl;
+			}
 		}
 	}
 }
 
-void Graph::LoadWeibullFormatNetwork(std::string splitter, bool reverse)
+void Graph::LoadWeibullFormatNetwork(const std::string& filename, std::string splitter, bool reverse)
 {
 
 	nodes.reserve(N);
@@ -124,7 +124,7 @@ void Graph::SampleEdgeWeightWbl()
 			
 			const Parameter &param = edge_parameter[i][*c];
 
-			edge_weight[i][*c] = RNG.GetWeibull(param.shape, param.scale);
+			edge_weight[i][*c] = RNG_.GetWeibull(param.shape, param.scale);
 			
 		}
 

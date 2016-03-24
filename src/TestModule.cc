@@ -317,3 +317,11 @@ void TestModule::TestLowRankHawkes()
 	low_rank_hawkes.debugfit(data, options, TrueLambda0, TrueAlpha, X0);
 	
 }
+
+void TestModule::TestGraph()
+{
+	// Graph G("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10_network", 6, false);
+	Graph G("/Users/nandu/Development/ConTinEst/std_weibull_DAG_core-1024-1-network.txt", 1024, false);
+	
+	G.PrintWeibullFormatNetwork();
+}

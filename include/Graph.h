@@ -1,11 +1,3 @@
-/*
-
-Definition of the Graph Class.  
-
-Author : Nan Du (dunan@gatech.edu)
-
-*/
-
 #ifndef GRAPH_H
 #define GRAPH_H
 #include <vector>
@@ -32,16 +24,18 @@ public:
 
 	unsigned N;
 	
-	Graph(std::string g_filename, unsigned numNodes);
-	~Graph(){};
+	Graph(const std::string& graph_filename, unsigned num_nodes, bool reverse) : N(num_nodes)
+	{
+		RNG_.SetState(0, 0);
+		LoadWeibullFormatNetwork(graph_filename, ",", reverse);
+	}
+	~Graph(){}
 
 	std::vector<Node> nodes;
 	std::map<unsigned, std::map<unsigned, float> > edge_weight;
 	std::map<unsigned, std::map<unsigned, Parameter> > edge_parameter;
 
-	void PrintWblNetwork();
-
-	void LoadWeibullFormatNetwork(std::string splitter, bool reverse);
+	void PrintWeibullFormatNetwork();
 
 	void SampleEdgeWeightWbl();
 
@@ -49,9 +43,9 @@ public:
 
 private:
 
-	std::string filename;
+	SimpleRNG RNG_;
 
-	SimpleRNG RNG;
+	void LoadWeibullFormatNetwork(const std::string& filename, std::string splitter, bool reverse);
 
 };
 

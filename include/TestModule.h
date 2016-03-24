@@ -25,4 +25,6 @@ public:
 
 	static void TestLowRankHawkes();
 
+	static void TestGraph();
+
 };

@@ -58,8 +58,9 @@ int main(int argc, char** argv)
 
 	// TestModule::TestPlainHawkesNuclear();
 
-	TestModule::TestLowRankHawkes();
+	// TestModule::TestLowRankHawkes();
 
+	TestModule::TestGraph();
 
 	return 0;
 }
