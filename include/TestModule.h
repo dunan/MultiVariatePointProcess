@@ -7,6 +7,7 @@
 #include "TerminatingProcessLearningTriggeringKernel.h"
 #include "Graph.h"
 #include "LowRankHawkesProcess.h"
+#include "ContinEst.h"
 
 class TestModule
 {
