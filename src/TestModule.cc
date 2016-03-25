@@ -381,3 +381,29 @@ void TestModule::TestGraph()
 		std::cout << std::endl;
 	}
 }
+
+void TestModule::TestPlot()
+{
+	unsigned dim = 1;
+	unsigned num_params = dim * (dim + 1);
+
+	Eigen::VectorXd params1(num_params);
+	params1 << 0.1, 0.5;
+
+	Eigen::MatrixXd beta1(dim,dim);
+	beta1 << 1;
+
+	std::vector<Sequence> sequences;
+
+	PlainHawkes hawkes1(num_params, dim, beta1);
+	hawkes1.SetParameters(params1);
+
+	OgataThinning ot1(dim);
+	sequences.clear();
+	ot1.Simulate(hawkes1, 20, 1, sequences);
+
+	hawkes1.PlotIntensityFunction(sequences[0], 0);
+
+	
+
+}

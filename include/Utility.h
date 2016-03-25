@@ -22,5 +22,6 @@ std::vector<std::string> SeperateLineWordsVector(const std::string &lineStr, con
 
 void LoadEigenMatrixFromTxt(const std::string& filename, const unsigned& num_rows, const unsigned& num_cols, Eigen::MatrixXd& mat);
 
+void wait_for_key();
 
 #endif

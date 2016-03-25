@@ -28,4 +28,6 @@ public:
 
 	static void TestGraph();
 
+	static void TestPlot();
+
 };

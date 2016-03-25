@@ -60,7 +60,9 @@ int main(int argc, char** argv)
 
 	// TestModule::TestLowRankHawkes();
 
-	TestModule::TestGraph();
+	// TestModule::TestGraph()
 
+	TestModule::TestPlot();
+	
 	return 0;
 }
