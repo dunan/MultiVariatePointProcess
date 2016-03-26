@@ -130,13 +130,15 @@ void TerminatingProcessLearningTriggeringKernel::InitializeWithGraph(const std::
 
 void TerminatingProcessLearningTriggeringKernel::PostProcessing()
 {
-	
+	double epsilon = 5e-2;
 	std::vector<Eigen::Map<Eigen::MatrixXd> > MatrixAlpha;
 	for(unsigned i = 0; i < num_dims_; ++ i)
 	{
 		MatrixAlpha.push_back(Eigen::Map<Eigen::MatrixXd>(parameters_.segment(i * num_rbfs_ * num_dims_, num_rbfs_ * num_dims_).data(), num_rbfs_, num_dims_));
 	}
 
+
+	Eigen::MatrixXd Alpha = Eigen::MatrixXd::Zero(num_dims_, num_dims_);
 	for(unsigned i = 0; i < num_dims_; ++ i)
 	{
 		MatrixAlpha[i].col(i) = Eigen::VectorXd::Zero(num_rbfs_);
@@ -154,11 +156,32 @@ void TerminatingProcessLearningTriggeringKernel::PostProcessing()
 			}
 		}
 
-		std::cout << MatrixAlpha[i] << std::endl << std::endl;
+		for(unsigned j = 0; j < num_dims_; ++ j)
+		{
+			Alpha(j,i) = MatrixAlpha[i].col(j).norm();
+		}
+
+		// std::cout << MatrixAlpha[i] << std::endl << std::endl;
 
 	}
 
+	Eigen::VectorXd colsum = Alpha.colwise().sum();
+	colsum = (colsum.array() > 0).select(colsum, 1);
+	Alpha = Alpha.array().rowwise() / colsum.transpose().array();
+	Alpha = (Alpha.array() < epsilon).select(0, Alpha);
+	Alpha = (Alpha.array() >= epsilon).select(1, Alpha);
+	std::cout << Alpha.cast<unsigned>() << std::endl;
 
+	for(unsigned i = 0; i < num_dims_; ++ i)
+	{
+		for(unsigned j = 0; j < num_dims_; ++ j)
+		{
+			if(Alpha.cast<unsigned>()(i,j) == 0)
+			{
+				MatrixAlpha[j].col(i) = Eigen::VectorXd::Zero(num_rbfs_);
+			}
+		}
+	}
 }
 
 //  MLE esitmation of the parameters
@@ -179,7 +202,7 @@ void TerminatingProcessLearningTriggeringKernel::fit(const std::vector<Sequence>
 	{
 		case GROUP :
 
-			opt.ProximalGroupLasso(1e-1, options_.coefficients[LAMBDA], 500, num_rbfs_);
+			opt.ProximalGroupLasso(1e-1, options_.coefficients[LAMBDA], 1000, num_rbfs_);
 
 			break;
 
@@ -350,7 +373,7 @@ void TerminatingProcessLearningTriggeringKernel::PlotTriggeringKernel(const unsi
 		gp_y[i] = y(i);
 	}
 	
-	Plot plot("time", "intensity", "TriggeringKernel");
+	Plot plot("wxt size 640, 400","time", "intensity", "TriggeringKernel");
 	plot.PlotScatterLine(gp_x, gp_y);
 	
 }

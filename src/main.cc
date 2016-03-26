@@ -34,9 +34,9 @@ int main(int argc, char** argv)
 	
 	// TestModule::TestPlainHawkes();
 
-	TestModule::TestMultivariateTerminating();
+	// TestModule::TestMultivariateTerminating();
 
-	// TestModule::TestTerminatingProcessLearningTriggeringKernel();
+	TestModule::TestTerminatingProcessLearningTriggeringKernel();
 
 	// Eigen::MatrixXd A = (Eigen::MatrixXd::Random(10,10).array() + 1) / 2;
 	// std::cout << A << std::endl;

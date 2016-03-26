@@ -494,7 +494,7 @@ void PlainHawkes::PlotIntensityFunction(const Sequence& data, const unsigned& di
 		gp_y[i] = y(i);
 	}
 
-	Plot plot("time", "intensity", "Intensity Function");
+	Plot plot("wxt size 640, 400", "time", "intensity", "Intensity Function");
 	plot.PlotLinePoint(gp_x, gp_y, gp_x_point, gp_y_point, "events");
 	
 

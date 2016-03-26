@@ -5,7 +5,9 @@
 
 void Plot::PlotLinePoint(const std::vector<double>& gp_x, const std::vector<double>& gp_y, const std::vector<double>& gp_point_x, const std::vector<double>& gp_point_y, const std::string& point_title)
 {
-	Gnuplot::set_terminal_std("wxt size 1280, 800");
+	// Gnuplot::set_terminal_std("wxt size 1280, 800");
+
+	Gnuplot::set_terminal_std(driver_);
 
 	Gnuplot g1("lines");
 
@@ -18,7 +20,7 @@ void Plot::PlotLinePoint(const std::vector<double>& gp_x, const std::vector<doub
 
 void Plot::PlotScatterLine(const std::vector<double>& gp_x, const std::vector<double>& gp_y)
 {
-	Gnuplot::set_terminal_std("wxt size 1280, 800");
+	Gnuplot::set_terminal_std(driver_);
 
 	Gnuplot g1("lines");
 

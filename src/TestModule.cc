@@ -197,15 +197,15 @@ void TestModule::TestTerminatingProcessLearningTriggeringKernel()
 	Graph G("../data/example_network", N, false);
 	G.PrintWeibullFormatNetwork();
 
-	TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, &G, tau, sigma);
-	TerminatingProcessLearningTriggeringKernel::OPTION options;
-	options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::L22;
-	options.coefficients[TerminatingProcessLearningTriggeringKernel::LAMBDA] = 1;
-
-	// TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, tau, sigma);
+	// TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, &G, tau, sigma);
 	// TerminatingProcessLearningTriggeringKernel::OPTION options;
-	// options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::GROUP;
+	// options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::L22;
 	// options.coefficients[TerminatingProcessLearningTriggeringKernel::LAMBDA] = 1;
+
+	TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, tau, sigma);
+	TerminatingProcessLearningTriggeringKernel::OPTION options;
+	options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::GROUP;
+	options.coefficients[TerminatingProcessLearningTriggeringKernel::LAMBDA] = 1;
 
 	terminating.fit(data, options);
 
