@@ -41,12 +41,15 @@ std::vector<std::string> SeperateLineWordsVector(const std::string &lineStr, con
     return temp;
 }
 
-void ImportFromExistingCascades(const std::string& filename, const unsigned& number_of_nodes, const double& T, std::vector<Sequence>& data)
+void ImportFromExistingCascades(const std::string& filename, const unsigned& number_of_nodes, double& T, std::vector<Sequence>& data)
 {
 	std::ifstream fin(filename.c_str());
 	std::string str;
 	unsigned line = 0;
 	unsigned seqID = 0;
+
+    double maxT = 0;
+
 	while(std::getline(fin, str))
 	{
 		if((++ line) > number_of_nodes + 1)
@@ -54,7 +57,7 @@ void ImportFromExistingCascades(const std::string& filename, const unsigned& num
 
 			std::vector<std::string> parts = SeperateLineWordsVector(str, ",");
 
-			Sequence seq(T);
+			Sequence seq;
 
 			for(unsigned i = 0; i < parts.size(); i += 2)
 			{
@@ -67,20 +70,28 @@ void ImportFromExistingCascades(const std::string& filename, const unsigned& num
 				event.time = std::atof(parts[i+1].c_str());
 				event.marker = -1;
 
+                if(maxT < event.time)
+                {
+                    maxT = event.time;
+                }
 				seq.Add(event);
 			}
 
 			data.push_back(seq);
 			++ seqID;
 
-			std::cout << seq.GetEvents().size() << " " << seq.GetTimeWindow() << std::endl;
-
 		}
 		
 	}
 	fin.close();
 
-	std::cout << data.size() << std::endl;
+	for(unsigned c = 0; c < data.size(); ++ c)
+    {
+        data[c].SetTimeWindow(maxT);
+        // std::cout << data[c].GetEvents().size() << " " << data[c].GetTimeWindow() << std::endl;
+    }
+
+    T = maxT;
 }
 
 void ImportFromExistingUserItemSequences(const std::string& filename, const unsigned& num_users, const unsigned& num_items, std::vector<Sequence>& data)

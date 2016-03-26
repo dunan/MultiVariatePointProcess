@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 	
 	// TestModule::TestPlainHawkes();
 
-	// TestModule::TestMultivariateTerminating();
+	TestModule::TestMultivariateTerminating();
 
 	// TestModule::TestTerminatingProcessLearningTriggeringKernel();
 
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 
 	// TestModule::TestGraph()
 
-	TestModule::TestPlot();
+	// TestModule::TestPlot();
 	
 	return 0;
 }

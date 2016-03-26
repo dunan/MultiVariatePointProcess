@@ -3,6 +3,8 @@
 #include <functional>
 #include <iostream>
 #include "../include/TerminatingProcessLearningTriggeringKernel.h"
+#include "../include/Utility.h"
+#include "../include/GNUPlotWrapper.h"
 
 void TerminatingProcessLearningTriggeringKernel::Initialize(const std::vector<Sequence>& data)
 {
@@ -76,7 +78,7 @@ void TerminatingProcessLearningTriggeringKernel::InitializeWithGraph(const std::
 	{
 		std::vector<Eigen::MatrixXd> MatrixK(num_sequences_, Eigen::MatrixXd::Zero(num_dims_, num_rbfs_));
 		std::vector<Eigen::MatrixXd> MatrixG(num_sequences_, Eigen::MatrixXd::Zero(num_dims_, num_rbfs_));
-
+		
 		for(unsigned c = 0; c < num_sequences_; ++ c)
 		{
 			const std::vector<Event>& seq = data[c].GetEvents();
@@ -155,12 +157,13 @@ void TerminatingProcessLearningTriggeringKernel::PostProcessing()
 		std::cout << MatrixAlpha[i] << std::endl << std::endl;
 
 	}
+
+
 }
 
 //  MLE esitmation of the parameters
 void TerminatingProcessLearningTriggeringKernel::fit(const std::vector<Sequence>& data, const OPTION& options)
 {
-
 	if(graph_ == NULL)
 	{
 		TerminatingProcessLearningTriggeringKernel::Initialize(data);	
@@ -168,7 +171,6 @@ void TerminatingProcessLearningTriggeringKernel::fit(const std::vector<Sequence>
 	{
 		TerminatingProcessLearningTriggeringKernel::InitializeWithGraph(data);
 	}
-
 	options_ = options;
 	
 	Optimizer opt(this);
@@ -181,12 +183,14 @@ void TerminatingProcessLearningTriggeringKernel::fit(const std::vector<Sequence>
 
 			break;
 
-		default :			
+		default :		
+			std::cout << options_.coefficients[LAMBDA] << std::endl;
 			opt.PLBFGS(0, 1e10);
 			break;
 	}
 
 	TerminatingProcessLearningTriggeringKernel::PostProcessing();
+
 
 	return;
 }
@@ -217,7 +221,7 @@ void TerminatingProcessLearningTriggeringKernel::GetNegLoglikelihood(double& obj
 
 			for(unsigned c = 0; c < num_sequences_; ++ c)
 			{
-				double intensity_c = (arrayK[i][c] * MatrixAlpha[i]).trace();
+				double intensity_c = (arrayK[i][c] * MatrixAlpha[i]).trace() + 1e-4; // to make optimization stable since we do not have a base intensity 
 
 				double intensity_integral_c = (arrayG[i][c] * MatrixAlpha[i]).trace();
 
@@ -226,15 +230,12 @@ void TerminatingProcessLearningTriggeringKernel::GetNegLoglikelihood(double& obj
 
 					Eigen::VectorXd source_identifier = arrayK[i][c].array().abs().rowwise().sum();
 
-					if(((source_identifier.array() != 0).any()) && (intensity_c > 0)) // not a source node
+					if((source_identifier.array() != 0).any()) // not a source node
 					{
 						GradMatrixAlpha[i] = GradMatrixAlpha[i].array() + arrayK[i][c].transpose().array() / intensity_c - arrayG[i][c].transpose().array();
 
 						local_obj += (log(intensity_c) - intensity_integral_c);
 
-					}else if (((source_identifier.array() != 0).any()) && (intensity_c == 0))
-					{
-						MatrixAlpha[i] = Eigen::MatrixXd::Zero(num_rbfs_, num_dims_);
 					}
 
 				}else // survival
@@ -246,12 +247,14 @@ void TerminatingProcessLearningTriggeringKernel::GetNegLoglikelihood(double& obj
 			}
 
 			objvalue += local_obj;
+
 		}
 	}
 
 	gradient = -gradient.array() / num_sequences_;
 
 	objvalue = -objvalue / num_sequences_;
+
 }
 
 //  This virtual function requires process-specific implementation. It calculates the negative loglikelihood of the given data. This function must be called after the Initialize method to return the negative loglikelihood of the data with respect to the current parameters. 
@@ -265,7 +268,8 @@ void TerminatingProcessLearningTriggeringKernel::NegLoglikelihood(double& objval
 		return;
 	}
 
-	TerminatingProcessLearningTriggeringKernel::GetNegLoglikelihood(objvalue, gradient);
+	GetNegLoglikelihood(objvalue, gradient);
+	
 
 	switch (options_.excitation_regularizer)
 	{
@@ -320,3 +324,33 @@ double TerminatingProcessLearningTriggeringKernel::PredictNextEventTime(const Se
 	return 0;
 }
 
+void TerminatingProcessLearningTriggeringKernel::PlotTriggeringKernel(const unsigned& dim_m, const unsigned& dim_n, const double& T, const double& delta)
+{
+	unsigned num_points = T / delta;
+	Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(num_points, 0, T);
+	Eigen::VectorXd y = Eigen::VectorXd::Zero(num_points);
+
+	std::vector<Eigen::Map<Eigen::MatrixXd> > MatrixAlpha;
+	for(unsigned i = 0; i < num_dims_; ++ i)
+	{
+		MatrixAlpha.push_back(Eigen::Map<Eigen::MatrixXd>(parameters_.segment(i * num_rbfs_ * num_dims_, num_rbfs_ * num_dims_).data(), num_rbfs_, num_dims_));
+	}
+
+	for(unsigned i = 0; i < num_points; ++ i)
+	{
+		y(i) = ((-((x(i) - tau_.array()) / sqrt2sigma_.array()).square()).exp()).matrix().transpose() * MatrixAlpha[dim_n].col(dim_m);
+	}
+
+	std::vector<double> gp_x(num_points,0);
+	std::vector<double> gp_y(num_points,0);
+
+	for(unsigned i = 0; i < num_points; ++ i)
+	{
+		gp_x[i] = x(i);
+		gp_y[i] = y(i);
+	}
+	
+	Plot plot("time", "intensity", "TriggeringKernel");
+	plot.PlotScatterLine(gp_x, gp_y);
+	
+}

@@ -43,6 +43,8 @@ public:
 //  Return the observation window;
 	double GetTimeWindow() const {return T_;}
 
+	void SetTimeWindow(const double& T) {T_ = T;}
+
 };
 
 #endif

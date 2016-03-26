@@ -5,8 +5,8 @@
 #include "../include/Sequence.h"
 #include "../include/Optimizer.h"
 #include "../include/OgataThinning.h"
-#include "../include/gnuplot/gnuplot_i.h"
 #include "../include/Utility.h"
+#include "../include/GNUPlotWrapper.h"
 
 void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 {
@@ -485,10 +485,6 @@ void PlainHawkes::PlotIntensityFunction(const Sequence& data, const unsigned& di
 
 	}
 
-	Gnuplot::set_terminal_std("wxt size 1280, 800");
-
-	Gnuplot g1("lines");
-
 	std::vector<double> gp_x(num_points, 0);
 	std::vector<double> gp_y(num_points, 0);
 
@@ -497,10 +493,9 @@ void PlainHawkes::PlotIntensityFunction(const Sequence& data, const unsigned& di
 		gp_x[i] = t(i);
 		gp_y[i] = y(i);
 	}
-	g1.set_xlabel("time").set_ylabel("intensity");
-	g1.set_style("lines lw 2").plot_xy(gp_x,gp_y,"intensity function");
-	g1.set_style("points ps 2 pt 7").plot_xy(gp_x_point,gp_y_point,"events");
 
-	wait_for_key();
+	Plot plot("time", "intensity", "Intensity Function");
+	plot.PlotLinePoint(gp_x, gp_y, gp_x_point, gp_y_point, "events");
+	
 
 }

@@ -354,8 +354,9 @@ void Optimizer::PLBFGS(const double& LB, const double& UB)
 		{
 			double temp = t;
 
-			std::cout << "Halving Step Size" << std::endl;
-			t = 0.5 * t;
+			std::cout << "Reduce Step Size" << std::endl;
+			// t = 0.5 * t;
+			t = 0.1 * t;
 
 			// Adjust if change is too small
 			if (t < temp * 1e-3)

@@ -14,7 +14,7 @@
 // }
 
 
-void ImportFromExistingCascades(const std::string& filename, const unsigned& number_of_nodes, const double& T, std::vector<Sequence>& data);
+void ImportFromExistingCascades(const std::string& filename, const unsigned& number_of_nodes, double& T, std::vector<Sequence>& data);
 
 void ImportFromExistingUserItemSequences(const std::string& filename, const unsigned& num_users, const unsigned& num_items, std::vector<Sequence>& data);
 

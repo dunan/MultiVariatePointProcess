@@ -180,33 +180,36 @@ void TestModule::TestTerminatingProcessLearningTriggeringKernel()
 {
 	std::vector<Sequence> data;
 	unsigned N = 6;
-	// double T = 8.2315;
-	double T = 0;
-	ImportFromExistingCascades("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10", N, T, data);
+	
+	double T;
+	ImportFromExistingCascades("../data/example_network_cascade", N, T, data);
 
-	unsigned dim = N, num_basis = 50, num_params = num_basis * dim * dim;
+	std::cout << T << std::endl;
 
-	Eigen::VectorXd tau = Eigen::VectorXd::LinSpaced(num_basis, 0, 10);
-	Eigen::VectorXd sigma = Eigen::VectorXd::Constant(tau.size(), 0.5);
+	unsigned dim = N, num_basis = 100, num_params = num_basis * dim * dim;
+
+	Eigen::VectorXd tau = Eigen::VectorXd::LinSpaced(num_basis, 0, T);
+	Eigen::VectorXd sigma = Eigen::VectorXd::Constant(tau.size(), 1.0);
 
 	std::cout << tau.transpose() << std::endl;
-	std::cout << sigma.transpose() << std::endl;
+	// std::cout << sigma.transpose() << std::endl;
 
-	// Graph G("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10_network", N);
-	// G.LoadWeibullFormatNetwork(",", false);
-	// G.PrintWblNetwork();
+	Graph G("../data/example_network", N, false);
+	G.PrintWeibullFormatNetwork();
 
-	// TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, &G, tau, sigma);
-	// TerminatingProcessLearningTriggeringKernel::OPTION options;
-	// options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::L22;
-	// options.coefficients[TerminatingProcessLearningTriggeringKernel::LAMBDA] = 0.5;
-
-	TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, tau, sigma);
+	TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, &G, tau, sigma);
 	TerminatingProcessLearningTriggeringKernel::OPTION options;
-	options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::GROUP;
+	options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::L22;
 	options.coefficients[TerminatingProcessLearningTriggeringKernel::LAMBDA] = 1;
 
+	// TerminatingProcessLearningTriggeringKernel terminating(num_params, dim, tau, sigma);
+	// TerminatingProcessLearningTriggeringKernel::OPTION options;
+	// options.excitation_regularizer = TerminatingProcessLearningTriggeringKernel::GROUP;
+	// options.coefficients[TerminatingProcessLearningTriggeringKernel::LAMBDA] = 1;
+
 	terminating.fit(data, options);
+
+	terminating.PlotTriggeringKernel(0, 1, T, 0.01);
 
 }
 
@@ -404,6 +407,6 @@ void TestModule::TestPlot()
 
 	hawkes1.PlotIntensityFunction(sequences[0], 0);
 
-	
+
 
 }
