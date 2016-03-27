@@ -276,20 +276,35 @@ void TestModule::TestHawkesLearningTriggeringKernel()
 	std::vector<Sequence> data;
 	
 	unsigned dim = 1, num_params = dim * (dim + 1);
+	Eigen::VectorXd params(num_params);
+	params << 0.5, 0.9;
+	Eigen::MatrixXd beta = Eigen::MatrixXd::Constant(dim,dim,1);
+	
+	PlainHawkes hawkes(num_params, dim, beta);
+	hawkes.SetParameters(params);
 
-	Sequence seq;
+	OgataThinning ot(dim);
+	ot.Simulate(hawkes, 1000, 50, data);
+	
+	double T = 0;
+	for(unsigned c = 0; c < data.size(); ++ c)
+	{
+		T = (T < data[c].GetTimeWindow() ? data[c].GetTimeWindow() : T);
+	}
 
-	ImportFromExistingSingleSequence("/Users/nandu/Downloads/LearningTriggeringKernel/events0", seq);
+	std::cout << T << std::endl;
 
-	std::cout << seq.GetEvents().size() << std::endl;
-	std::cout << seq.GetTimeWindow() << std::endl;
-
-	data.push_back(seq);
+	// Sequence seq;
+	// ImportFromExistingSingleSequence("/Users/nandu/Downloads/LearningTriggeringKernel/events2_2", seq);
+	// std::cout << seq.GetEvents().size() << std::endl;
+	// std::cout << seq.GetTimeWindow() << std::endl;
+	// data.push_back(seq);
+	// T = seq.GetTimeWindow();
 	
 	unsigned num_basis = 100, num_params_new = dim + num_basis * dim * dim;
 
 	Eigen::VectorXd tau(num_basis);
-	tau = Eigen::VectorXd::LinSpaced(num_basis + 1, 0, seq.GetTimeWindow()).segment(0, num_basis);
+	tau = Eigen::VectorXd::LinSpaced(num_basis + 1, 0, T).segment(0, num_basis);
 	std::cout << tau.transpose() << std::endl;
 	Eigen::VectorXd sigma = Eigen::VectorXd::Constant(tau.size(), 2.0);
 
@@ -301,7 +316,7 @@ void TestModule::TestHawkesLearningTriggeringKernel()
 	options.coefficients[HawkesLearningTriggeringKernel::LAMBDA] = 100;
 
 	hawkes_learning_kernel.fit(data, options);
-	hawkes_learning_kernel.PlotTriggeringKernel(0,0,seq.GetTimeWindow(),0.01);
+	hawkes_learning_kernel.PlotTriggeringKernel(0,0,T,0.01);
 
 }
 
