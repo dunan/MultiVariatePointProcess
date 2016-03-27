@@ -9,7 +9,7 @@
 #include "Optimizer.h"
 #include "Graph.h"
 
-class HawkesLearningTriggeringKernel : IProcess
+class HawkesLearningTriggeringKernel : public IProcess
 {
 
 public:
@@ -109,6 +109,7 @@ public:
 //  This function predicts the next event by simulation;
 	virtual double PredictNextEventTime(const Sequence& data, const unsigned& num_simulations);
 
+	void PlotTriggeringKernel(const unsigned& dim_m, const unsigned& dim_n, const double& T, const double& delta);
 
 };
 

@@ -8,6 +8,7 @@
 #include "Graph.h"
 #include "LowRankHawkesProcess.h"
 #include "ContinEst.h"
+#include "HawkesLearningTriggeringKernel.h"
 
 class TestModule
 {
@@ -29,5 +30,7 @@ public:
 	static void TestGraph();
 
 	static void TestPlot();
+
+	static void TestHawkesLearningTriggeringKernel();
 
 };

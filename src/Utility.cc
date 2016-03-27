@@ -94,6 +94,28 @@ void ImportFromExistingCascades(const std::string& filename, const unsigned& num
     T = maxT;
 }
 
+void ImportFromExistingSingleSequence(const std::string& filename, Sequence& seq)
+{
+    std::ifstream fin(filename.c_str());
+    std::string str;
+    unsigned seqID = 0;
+    std::getline(fin, str);
+    std::vector<std::string> parts = SeperateLineWordsVector(str, ",");
+    unsigned eventID = 0;
+    for(std::vector<std::string>::const_iterator i_timing = parts.begin(); i_timing != parts.end(); ++ i_timing)
+    {
+        Event event;
+        event.EventID = (eventID ++);
+        event.SequenceID = seqID;
+        event.DimentionID = 0;
+        event.time = atof(i_timing->c_str());
+        event.marker = -1;
+        seq.Add(event);
+    }
+    
+    fin.close();
+}
+
 void ImportFromExistingUserItemSequences(const std::string& filename, const unsigned& num_users, const unsigned& num_items, std::vector<Sequence>& data)
 {
     std::ifstream fin(filename.c_str());

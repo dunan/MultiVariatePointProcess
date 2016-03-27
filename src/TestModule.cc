@@ -213,6 +213,98 @@ void TestModule::TestTerminatingProcessLearningTriggeringKernel()
 
 }
 
+void TestModule::TestHawkesLearningTriggeringKernel()
+{
+	// std::vector<Sequence> data;
+	
+	// unsigned dim = 6, num_params = dim * (dim + 1);
+
+	// OgataThinning ot(dim);
+
+	// Eigen::VectorXd params(num_params);
+	// params << 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 
+	// 		  0.5, 0.0, 0.0, 0.0, 0.0, 0.0,
+	// 		  0.5, 0.0, 0.0, 0.0, 0.0, 0.0,
+	// 		  0.8, 0.2, 0.0, 0.0, 0.0, 0.0,
+	// 		  0.0, 0.5, 0.0, 0.0, 0.0, 0.0,
+	// 		  0.0, 0.0, 0.0, 0.0, 0.5, 0.0,
+	// 		  0.0, 0.0, 0.5, 0.0, 0.5, 0.8;
+			  
+	// Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(params.segment(0, dim).data(), dim);
+	
+	// Eigen::Map<Eigen::MatrixXd> A = Eigen::Map<Eigen::MatrixXd>(params.segment(dim, dim * dim).data(), dim, dim);
+	
+	// std::cout << A << std::endl;
+
+	// Eigen::MatrixXd beta = Eigen::MatrixXd::Constant(dim,dim,1);
+
+	// PlainHawkes hawkes(num_params, dim, beta);
+	// hawkes.SetParameters(params);
+
+	// // Store the simulated sequences
+	// std::vector<Sequence> sequences;
+
+	// // Simulate 10 events for each sequence
+	// unsigned n = 1000;
+	// unsigned num_sequences = 10;
+	// ot.Simulate(hawkes, n, num_sequences, sequences);
+
+	// for(unsigned c = 0; c < sequences.size(); ++ c)
+	// {
+	// 	std::map<unsigned, unsigned> dim2count;
+	// 	const std::vector<Event>& seq = sequences[c].GetEvents();
+	// 	for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
+	// 	{
+	// 		// std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
+	// 		if(dim2count.find(i_event -> DimentionID) == dim2count.end())
+	// 		{
+	// 			dim2count[i_event -> DimentionID] = 1;
+	// 		}else
+	// 		{
+	// 			++ dim2count[i_event -> DimentionID];
+	// 		}
+	// 	}
+
+	// 	for(std::map<unsigned, unsigned>::const_iterator m = dim2count.begin(); m != dim2count.end(); ++ m)
+	// 	{
+	// 		std::cout << m->first << " " << m->second << std::endl;
+	// 	}
+
+	// 	std::cout << std::endl;
+	// }
+
+	std::vector<Sequence> data;
+	
+	unsigned dim = 1, num_params = dim * (dim + 1);
+
+	Sequence seq;
+
+	ImportFromExistingSingleSequence("/Users/nandu/Downloads/LearningTriggeringKernel/events0", seq);
+
+	std::cout << seq.GetEvents().size() << std::endl;
+	std::cout << seq.GetTimeWindow() << std::endl;
+
+	data.push_back(seq);
+	
+	unsigned num_basis = 100, num_params_new = dim + num_basis * dim * dim;
+
+	Eigen::VectorXd tau(num_basis);
+	tau = Eigen::VectorXd::LinSpaced(num_basis + 1, 0, seq.GetTimeWindow()).segment(0, num_basis);
+	std::cout << tau.transpose() << std::endl;
+	Eigen::VectorXd sigma = Eigen::VectorXd::Constant(tau.size(), 2.0);
+
+	HawkesLearningTriggeringKernel hawkes_learning_kernel(num_params_new, dim, tau, sigma);
+
+	HawkesLearningTriggeringKernel::OPTION options;
+	options.excitation_regularizer = HawkesLearningTriggeringKernel::L22;
+	options.coefficients[HawkesLearningTriggeringKernel::LAMBDA0] = 0;
+	options.coefficients[HawkesLearningTriggeringKernel::LAMBDA] = 100;
+
+	hawkes_learning_kernel.fit(data, options);
+	hawkes_learning_kernel.PlotTriggeringKernel(0,0,seq.GetTimeWindow(),0.01);
+
+}
+
 void TestModule::TestPlainHawkesNuclear()
 {
 

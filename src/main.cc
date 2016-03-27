@@ -36,7 +36,9 @@ int main(int argc, char** argv)
 
 	// TestModule::TestMultivariateTerminating();
 
-	TestModule::TestTerminatingProcessLearningTriggeringKernel();
+	// TestModule::TestTerminatingProcessLearningTriggeringKernel();
+
+	TestModule::TestHawkesLearningTriggeringKernel();
 
 	// Eigen::MatrixXd A = (Eigen::MatrixXd::Random(10,10).array() + 1) / 2;
 	// std::cout << A << std::endl;
@@ -63,6 +65,6 @@ int main(int argc, char** argv)
 	// TestModule::TestGraph()
 
 	// TestModule::TestPlot();
-	
+
 	return 0;
 }

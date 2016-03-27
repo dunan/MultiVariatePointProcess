@@ -229,7 +229,8 @@ void Optimizer::PLBFGS(const double& LB, const double& UB)
 	std::cout << std::setw(10) << "Iteration" << "\t" << std::setw(10) << "FunEvals" << "\t" << std::setw(10) << "Step Length" << "\t" << std::setw(10) << "Function Val" << "\t" << std::setw(10) << "Opt Cond" << std::endl;
 	unsigned nVars = process_->GetParameters().size();
 
-	Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
+	// Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
+	Eigen::VectorXd x = Eigen::VectorXd::Constant(nVars, 0.1);
 
 	projectBounds(x, LB, UB);
 

@@ -3,9 +3,11 @@
 #include <functional>
 #include <iostream>
 #include "../include/HawkesLearningTriggeringKernel.h"
+#include "../include/GNUPlotWrapper.h"
 
 void HawkesLearningTriggeringKernel::InitializeConstants()
 {
+	options_.base_intensity_regularizer = NONE;
 	options_.excitation_regularizer = NONE;
 	options_.coefficients[LAMBDA0] = 0;
 	options_.coefficients[LAMBDA] = 0;
@@ -76,6 +78,13 @@ void HawkesLearningTriggeringKernel::Initialize(const std::vector<Sequence>& dat
 		arrayK.push_back(MatrixK);
 		arrayG.push_back(MatrixG);
 	}
+
+	observation_window_T_ = Eigen::VectorXd::Zero(num_sequences_);
+	for(unsigned c = 0; c < num_sequences_; ++ c)
+	{
+		observation_window_T_(c) = data[c].GetTimeWindow();
+	}
+
 }
 
 void HawkesLearningTriggeringKernel::InitializeWithGraph(const std::vector<Sequence>& data)
@@ -124,6 +133,7 @@ void HawkesLearningTriggeringKernel::InitializeWithGraph(const std::vector<Seque
 			}
 
 			// survival terms
+			
 			for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
 			{
 				const int& j = i_event->DimentionID;
@@ -143,10 +153,71 @@ void HawkesLearningTriggeringKernel::InitializeWithGraph(const std::vector<Seque
 		arrayG.push_back(MatrixG);
 
 	}
+
+	observation_window_T_ = Eigen::VectorXd::Zero(num_sequences_);
+	for(unsigned c = 0; c < num_sequences_; ++ c)
+	{
+		observation_window_T_(c) = data[c].GetTimeWindow();
+	}
 }
 
 void HawkesLearningTriggeringKernel::PostProcessing()
 {
+	Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(parameters_.segment(0, num_dims_).data(), num_dims_);
+	std::cout << Lambda0.transpose() << std::endl;
+
+	std::vector<Eigen::Map<Eigen::MatrixXd> > MatrixAlpha;
+	for(unsigned i = 0; i < num_dims_; ++ i)
+	{
+		MatrixAlpha.push_back(Eigen::Map<Eigen::MatrixXd>(parameters_.segment(num_dims_ + i * num_rbfs_ * num_dims_, num_rbfs_ * num_dims_).data(), num_rbfs_, num_dims_));
+	}
+
+	// Eigen::MatrixXd Alpha = Eigen::MatrixXd::Zero(num_dims_, num_dims_);
+	// for(unsigned i = 0; i < num_dims_; ++ i)
+	// {
+	// 	MatrixAlpha[i].col(i) = Eigen::VectorXd::Zero(num_rbfs_);
+	// 	Eigen::VectorXd parents = Eigen::VectorXd::Zero(num_dims_);
+	// 	for(unsigned c = 0; c < num_sequences_; ++ c)
+	// 	{
+	// 		parents = parents.array() + arrayG[i][c].array().abs().rowwise().sum();
+	// 	}
+
+	// 	for(unsigned j = 0; j < num_dims_; ++ j)
+	// 	{
+	// 		if(parents(j) == 0)
+	// 		{
+	// 			MatrixAlpha[i].col(j) = Eigen::VectorXd::Zero(num_rbfs_);
+	// 		}
+	// 	}
+
+	// 	for(unsigned j = 0; j < num_dims_; ++ j)
+	// 	{
+	// 		Alpha(j,i) = MatrixAlpha[i].col(j).norm();
+	// 	}
+
+	// 	// std::cout << MatrixAlpha[i] << std::endl << std::endl;
+
+	// }
+
+	std::cout << MatrixAlpha[0] << std::endl << std::endl;
+
+	// Eigen::VectorXd colsum = Alpha.colwise().sum();
+	// colsum = (colsum.array() > 0).select(colsum, 1);
+	// Alpha = Alpha.array().rowwise() / colsum.transpose().array();
+	// Alpha = (Alpha.array() < epsilon).select(0, Alpha);
+	// Alpha = (Alpha.array() >= epsilon).select(1, Alpha);
+	// std::cout << Alpha.cast<unsigned>() << std::endl;
+
+	// for(unsigned i = 0; i < num_dims_; ++ i)
+	// {
+	// 	for(unsigned j = 0; j < num_dims_; ++ j)
+	// 	{
+	// 		if(Alpha.cast<unsigned>()(i,j) == 0)
+	// 		{
+	// 			MatrixAlpha[j].col(i) = Eigen::VectorXd::Zero(num_rbfs_);
+	// 		}
+	// 	}
+	// }
 
 }
 
@@ -177,6 +248,8 @@ void HawkesLearningTriggeringKernel::fit(const std::vector<Sequence>& data, cons
 			opt.PLBFGS(0, 1e10);
 			break;
 	}
+
+	HawkesLearningTriggeringKernel::PostProcessing();
 
 	return;
 
@@ -230,10 +303,9 @@ void HawkesLearningTriggeringKernel::GetNegLoglikelihood(double& objvalue, Eigen
 			// survival terms
 
 			GradMatrixAlpha[i] = GradMatrixAlpha[i].array() - arrayG[i][c].transpose().array();
-
 			grad_lambda0_vector(i) -= observation_window_T_(c);
 
-			local_obj -= observation_window_T_(c) * grad_lambda0_vector(i);
+			local_obj -= observation_window_T_(c) * Lambda0_(i);
 			local_obj -= (arrayG[i][c] * MatrixAlpha[i]).trace();
 
 		}
@@ -339,4 +411,35 @@ double HawkesLearningTriggeringKernel::IntensityIntegral(const double& lower, co
 double HawkesLearningTriggeringKernel::PredictNextEventTime(const Sequence& data, const unsigned& num_simulations)
 {
 	return 0;
+}
+
+void HawkesLearningTriggeringKernel::PlotTriggeringKernel(const unsigned& dim_m, const unsigned& dim_n, const double& T, const double& delta)
+{
+	unsigned num_points = T / delta;
+	Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(num_points, 0, T);
+	Eigen::VectorXd y = Eigen::VectorXd::Zero(num_points);
+
+	std::vector<Eigen::Map<Eigen::MatrixXd> > MatrixAlpha;
+	for(unsigned i = 0; i < num_dims_; ++ i)
+	{
+		MatrixAlpha.push_back(Eigen::Map<Eigen::MatrixXd>(parameters_.segment(num_dims_ + i * num_rbfs_ * num_dims_, num_rbfs_ * num_dims_).data(), num_rbfs_, num_dims_));
+	}
+
+	for(unsigned i = 0; i < num_points; ++ i)
+	{
+		y(i) = ((-((x(i) - tau_.array()) / sqrt2sigma_.array()).square()).exp()).matrix().transpose() * MatrixAlpha[dim_n].col(dim_m);
+	}
+
+	std::vector<double> gp_x(num_points,0);
+	std::vector<double> gp_y(num_points,0);
+
+	for(unsigned i = 0; i < num_points; ++ i)
+	{
+		gp_x[i] = x(i);
+		gp_y[i] = y(i);
+	}
+	
+	Plot plot("wxt size 640, 400","time", "intensity", "TriggeringKernel");
+	plot.PlotScatterLine(gp_x, gp_y);
+	
 }
