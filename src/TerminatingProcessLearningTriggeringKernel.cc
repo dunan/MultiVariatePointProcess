@@ -165,12 +165,14 @@ void TerminatingProcessLearningTriggeringKernel::PostProcessing()
 
 	}
 
+	// std::cout << Alpha << std::endl;
+
 	Eigen::VectorXd colsum = Alpha.colwise().sum();
 	colsum = (colsum.array() > 0).select(colsum, 1);
 	Alpha = Alpha.array().rowwise() / colsum.transpose().array();
 	Alpha = (Alpha.array() < epsilon).select(0, Alpha);
 	Alpha = (Alpha.array() >= epsilon).select(1, Alpha);
-	std::cout << Alpha.cast<unsigned>() << std::endl;
+	std::cout << std::endl << "Recovered Structure" << std::endl << Alpha.cast<unsigned>() << std::endl << std::endl;
 
 	for(unsigned i = 0; i < num_dims_; ++ i)
 	{
@@ -194,6 +196,7 @@ void TerminatingProcessLearningTriggeringKernel::fit(const std::vector<Sequence>
 	{
 		TerminatingProcessLearningTriggeringKernel::InitializeWithGraph(data);
 	}
+
 	options_ = options;
 	
 	Optimizer opt(this);
@@ -207,12 +210,15 @@ void TerminatingProcessLearningTriggeringKernel::fit(const std::vector<Sequence>
 			break;
 
 		default :		
-			std::cout << options_.coefficients[LAMBDA] << std::endl;
+			
 			opt.PLBFGS(0, 1e10);
 			break;
 	}
 
-	TerminatingProcessLearningTriggeringKernel::PostProcessing();
+	if(graph_ == NULL) 
+	{
+		TerminatingProcessLearningTriggeringKernel::PostProcessing();
+	}
 
 
 	return;

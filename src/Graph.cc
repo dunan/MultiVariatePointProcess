@@ -65,10 +65,11 @@ void Graph::LoadWeibullFormatNetwork(const std::string& filename, std::string sp
 				str4 = line[3];	
 			}
 			
-			if(str1 == str2)
-			{
-				std::cout <<str<<std::endl;
-			}else 
+			// if(str1 == str2)
+			// {
+			// 	std::cout <<str<<std::endl;
+			// }
+			// else 
 			{
 				
 				int idx1, idx2;

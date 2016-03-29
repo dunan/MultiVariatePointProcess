@@ -32,6 +32,7 @@ void OgataThinning::Simulate(IProcess& process, const std::vector<double>& vec_T
 
 			if(RNG_.GetUniform() <= (lambda_t / lambda_star) && (t < *i_vec_T))
 			{
+
 				std::vector<double> cumprob(num_dims_,0);
 
 				double p = 0;
@@ -47,9 +48,10 @@ void OgataThinning::Simulate(IProcess& process, const std::vector<double>& vec_T
 				++ eventID;
 				event.SequenceID = sequenceID;
 
+				double D = RNG_.GetUniform();
 				for(unsigned d = 0; d < num_dims_; ++ d)
 				{
-					if(RNG_.GetUniform() <= cumprob[d])
+					if(D <= cumprob[d])
 					{
 						event.DimentionID = d;
 						break;
@@ -111,9 +113,10 @@ void OgataThinning::Simulate(IProcess& process, const unsigned& n, const unsigne
 				++ eventID;
 				event.SequenceID = sequenceID;
 
+				double D = RNG_.GetUniform();
 				for(unsigned d = 0; d < num_dims_; ++ d)
 				{
-					if(RNG_.GetUniform() <= cumprob[d])
+					if(D <= cumprob[d])
 					{
 						event.DimentionID = d;
 						break;
@@ -126,6 +129,8 @@ void OgataThinning::Simulate(IProcess& process, const unsigned& n, const unsigne
 				seq.Add(event);
 			}	
 		}
+
+		seq.PopBack();
 
 		sequences.push_back(seq);	
 
@@ -171,9 +176,10 @@ Event OgataThinning::SimulateNext(IProcess& process, const Sequence& seq)
 				++ eventID;
 				event.SequenceID = -1;
 
+				double D = RNG_.GetUniform();
 				for(unsigned d = 0; d < num_dims_; ++ d)
 				{
-					if(RNG_.GetUniform() <= cumprob[d])
+					if(D <= cumprob[d])
 					{
 						event.DimentionID = d;
 						break;

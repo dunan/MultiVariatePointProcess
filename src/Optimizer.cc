@@ -229,8 +229,8 @@ void Optimizer::PLBFGS(const double& LB, const double& UB)
 	std::cout << std::setw(10) << "Iteration" << "\t" << std::setw(10) << "FunEvals" << "\t" << std::setw(10) << "Step Length" << "\t" << std::setw(10) << "Function Val" << "\t" << std::setw(10) << "Opt Cond" << std::endl;
 	unsigned nVars = process_->GetParameters().size();
 
-	// Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
-	Eigen::VectorXd x = Eigen::VectorXd::Constant(nVars, 0.1);
+	Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
+	// Eigen::VectorXd x = Eigen::VectorXd::Constant(nVars, 0.1);
 
 	projectBounds(x, LB, UB);
 
@@ -441,6 +441,8 @@ void Optimizer::PLBFGS(const double& LB, const double& UB)
 
 	}
 
+	std::cout << std::endl;
+
 }
 
 void Optimizer::ProximalGroupLasso(const double& gamma0, const double& lambda, const unsigned& ini_max_iter, const unsigned& group_size)
@@ -517,87 +519,116 @@ void Optimizer::ProximalGroupLasso(const double& gamma0, const double& lambda, c
 
 }
 
-void Optimizer::ProximalGroupLassoForHawkes(const double& gamma0, const double& lambda, const unsigned& ini_max_iter, const unsigned& group_size)
+void ProximalMapping(const double& gamma0, const double& threshold, const unsigned& num_dims, const unsigned& group_size, Eigen::VectorXd& x, Eigen::VectorXd& gradient, Eigen::VectorXd& x_new)
+{
+	Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(x.segment(0, num_dims).data(), num_dims);
+
+	Eigen::Map<Eigen::VectorXd> grad_lambda0_vector = Eigen::Map<Eigen::VectorXd>(gradient.segment(0, num_dims).data(), num_dims);
+
+	Eigen::Map<Eigen::VectorXd> Lambda0_new = Eigen::Map<Eigen::VectorXd>(x_new.segment(0, num_dims).data(), num_dims);
+
+	// update the base intensity by proximal gradient
+	Lambda0_new = Lambda0.array() - gamma0 * grad_lambda0_vector.array();
+
+	// then, make projections
+	Lambda0_new = (Lambda0.array() > 0).select(Lambda0, 0);
+
+	// Upate excitation matrices
+	for(unsigned i = 0; i < num_dims; ++ i)
+	{
+		Eigen::Map<Eigen::MatrixXd> MatrixAlpha = Eigen::Map<Eigen::MatrixXd>(x.segment(num_dims + i * group_size * num_dims, group_size * num_dims).data(), group_size, num_dims);
+
+		Eigen::Map<Eigen::MatrixXd> MatrixAlpha_new = Eigen::Map<Eigen::MatrixXd>(x_new.segment(num_dims + i * group_size * num_dims, group_size * num_dims).data(), group_size, num_dims);
+
+		MatrixAlpha_new = Eigen::MatrixXd::Zero(group_size, num_dims);
+		
+		Eigen::Map<Eigen::MatrixXd> GradMatrixAlpha = Eigen::Map<Eigen::MatrixXd>(gradient.segment(num_dims + i * group_size * num_dims, group_size * num_dims).data(), group_size, num_dims);
+
+		for(unsigned j = 0; j < num_dims; ++ j)
+		{
+			Eigen::VectorXd valid_group_identifier = MatrixAlpha.array().abs().colwise().sum();
+			if(valid_group_identifier(j) != 0)
+			{
+
+				MatrixAlpha_new.col(j) = MatrixAlpha.col(j) - gamma0 * GradMatrixAlpha.col(j);
+
+				// proximal mapping
+				if(MatrixAlpha_new.col(j).norm() > threshold)
+				{
+					// first shrink it
+					MatrixAlpha_new.col(j) = MatrixAlpha_new.col(j) - threshold * MatrixAlpha_new.col(j).normalized();
+
+					// then, make projections
+					MatrixAlpha_new.col(j) = (MatrixAlpha_new.col(j).array() > 0).select(MatrixAlpha_new.col(j), 0);
+
+				}else
+				{
+					MatrixAlpha_new.col(j) = Eigen::VectorXd::Zero(group_size);
+				}
+			}
+		}
+	}
+}
+
+void Optimizer::ProximalGroupLassoForHawkes(const double& gamma_ini, const double& lambda, const unsigned& ini_max_iter, const unsigned& group_size)
 {
 	unsigned nVars = process_->GetParameters().size();
 
 	Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
 	process_->SetParameters(x);
 
-	Eigen::VectorXd gradient;
+	Eigen::VectorXd g, g_new;
 
 	unsigned num_dims = process_->GetNumDims();
 
 	std::cout << std::setw(10) << "Iteration" << "\t" << std::setw(10) << "Step Length" << "\t" << std::setw(10) << "Function Val" << "\t" << std::setw(10) << "Opt Cond" << std::endl;
 
-	double threshold = gamma0 * lambda;
+	double f, f_new;
+	process_->NegLoglikelihood(f, g);
 
-	double f_old, f_new;
-	process_->NegLoglikelihood(f_old, gradient);
+	std::cout << std::setw(10) << 0 << "\t" << std::setw(10) << gamma_ini << "\t" << std::setw(10) << f << "\t" << std::setw(10) <<  g.array().abs().sum() << std::endl;
 
-	std::cout << std::setw(10) << 0 << "\t" << std::setw(10) << gamma0 << "\t" << std::setw(10) << f_old << "\t" << std::setw(10) <<  gradient.array().abs().sum() << std::endl;
+	Eigen::VectorXd x_new = Eigen::VectorXd::Zero(nVars);
+
+	double suffDec = 1e-4;
 
 	for(unsigned iter = 1; iter < ini_max_iter; ++ iter)
 	{
-		
-		x = process_->GetParameters();
+		// Select Initial Guess to step length
+		double gamma0 = gamma_ini;
 
-		Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(x.segment(0, num_dims).data(), num_dims);
+		ProximalMapping(gamma0, gamma0 * lambda, num_dims, group_size, x, g, x_new);
+		process_->SetParameters(x_new);
+		process_->NegLoglikelihood(f_new, g_new);
 
-		Eigen::Map<Eigen::VectorXd> grad_lambda0_vector = Eigen::Map<Eigen::VectorXd>(gradient.segment(0, num_dims).data(), num_dims);
-
-		// update the base intensity by proximal gradient
-		Lambda0 = Lambda0.array() - gamma0 * grad_lambda0_vector.array();
-		
-		// then, make projections
-		Lambda0 = (Lambda0.array() > 0).select(Lambda0, 0);
-
-		// Upate excitation matrices
-		for(unsigned i = 0; i < num_dims; ++ i)
+		// Backtracking Line Search
+		while ((f_new > f + suffDec * g.transpose() * (x_new - x)) || std::isnan(f_new))
 		{
-			Eigen::Map<Eigen::MatrixXd> MatrixAlpha = Eigen::Map<Eigen::MatrixXd>(x.segment(num_dims + i * group_size * num_dims, group_size * num_dims).data(), group_size, num_dims);
-			
-			Eigen::Map<Eigen::MatrixXd> GradMatrixAlpha = Eigen::Map<Eigen::MatrixXd>(gradient.segment(num_dims + i * group_size * num_dims, group_size * num_dims).data(), group_size, num_dims);
 
-			for(unsigned j = 0; j < num_dims; ++ j)
-			{
-				Eigen::VectorXd valid_group_identifier = MatrixAlpha.array().abs().colwise().sum();
-				if(valid_group_identifier(j) != 0)
-				{
+			std::cout << "Reduce Step Size" << std::endl;
 
-					MatrixAlpha.col(j) = MatrixAlpha.col(j) - gamma0 * GradMatrixAlpha.col(j);
+			gamma0 = 0.1 * gamma0;
 
-					// proximal mapping
-					if(MatrixAlpha.col(j).norm() > threshold)
-					{
-						// first shrink it
-						MatrixAlpha.col(j) = MatrixAlpha.col(j) - threshold * MatrixAlpha.col(j).normalized();
-
-						// then, make projections
-						MatrixAlpha.col(j) = (MatrixAlpha.col(j).array() > 0).select(MatrixAlpha.col(j), 0);
-
-					}else
-					{
-						MatrixAlpha.col(j) = Eigen::VectorXd::Zero(group_size);
-					}
-				}
-			}
+			ProximalMapping(gamma0, gamma0 * lambda, num_dims, group_size, x, g, x_new);
+			process_->SetParameters(x_new);
+			process_->NegLoglikelihood(f_new, g_new);
 		}
 
-		process_->SetParameters(x);
-		process_->NegLoglikelihood(f_new, gradient);
+		std::cout << std::setw(10) << iter << "\t" << std::setw(10) << gamma0 << "\t" << std::setw(10) << f_new << "\t" << std::setw(10) <<  g_new.array().abs().sum() << std::endl;
 
-		if (std::fabs(f_new - f_old) < optTol)
+		if (std::fabs(f_new - f) < optTol)
 		{
 			std::cout << "Function value changing by less than optTol" << std::endl;
 			break;	
 		}
 
-		std::cout << std::setw(10) << iter << "\t" << std::setw(10) << gamma0 << "\t" << std::setw(10) << f_new << "\t" << std::setw(10) <<  gradient.array().abs().sum() << std::endl;
-
-		f_old = f_new;
+		x = x_new;
+		f = f_new;
+		g = g_new;
 	}
 }
+
+
 
 void Optimizer::ProximalNuclear(const double& lambda, const double& rho, const unsigned& ini_max_iter, const Eigen::VectorXd& trueparameters)
 {

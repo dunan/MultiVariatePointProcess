@@ -21,7 +21,13 @@ public:
 
 	static void TestMultivariateTerminating();
 
+	static void TestMultivariateTerminatingWithUnknownStructure();
+
 	static void TestTerminatingProcessLearningTriggeringKernel();
+
+	static void TestTerminatingProcessLearningTriggeringKernelWithUnknownStructure();
+
+	static void TestSparsePlainHawkes();
 
 	static void TestPlainHawkesNuclear();
 
@@ -32,5 +38,7 @@ public:
 	static void TestPlot();
 
 	static void TestHawkesLearningTriggeringKernel();
+
+	static void TestHawkesLearningTriggeringKernelUnknownStructure();
 
 };

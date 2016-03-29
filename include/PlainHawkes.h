@@ -99,6 +99,7 @@ public:
 
 	void PlotIntensityFunction(const Sequence& data, const unsigned& dim_id);
 
+
 };
 
 #endif

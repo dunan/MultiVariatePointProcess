@@ -45,6 +45,10 @@ public:
 
 	void SetTimeWindow(const double& T) {T_ = T;}
 
+	void PopBack(){
+		sequence_.pop_back();
+	};
+
 };
 
 #endif

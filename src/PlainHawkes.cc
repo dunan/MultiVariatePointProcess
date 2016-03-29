@@ -341,16 +341,18 @@ void PlainHawkes::fit(const std::vector<Sequence>& data, const OPTION& options)
 
 	Optimizer opt(this);
 
-	// switch (options.method)
-	// {
-	// 	case SGD:
-	// 		opt.SGD(1e-5, 5000, data);
-	// 		return;
+	switch (options.method)
+	{
+		case SGD:
+			opt.SGD(1e-5, 5000, data);
+			
+			break;
 
-	// 	case PLBFGS:
-	// 		opt.PLBFGS(0, 1e10);
-	// 		return;
-	// }
+		case PLBFGS:
+			opt.PLBFGS(0, 1e10);
+
+			break;
+	}
 
 
 	RestoreOptionToDefault();
@@ -499,3 +501,5 @@ void PlainHawkes::PlotIntensityFunction(const Sequence& data, const unsigned& di
 	
 
 }
+
+

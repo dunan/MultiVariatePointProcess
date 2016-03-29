@@ -28,7 +28,7 @@ public:
 	OgataThinning(const unsigned& num_dims) : Simulator(), num_dims_(num_dims)
 	{
 		// Initialze the random generator;
-		RNG_.SetState(0, 0);
+		RNG_.SetState(314, 314);
 	}
 
 

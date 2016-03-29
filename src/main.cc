@@ -3,7 +3,39 @@
 
 int main(int argc, char** argv)
 {
-	// Eigen::VectorXd x(10);
+
+	// 1.
+	// TestModule::TestMultivariateTerminating();
+
+	// 2.
+	// TestModule::TestMultivariateTerminatingWithUnknownStructure();
+
+	// 3. 
+	// TestModule::TestTerminatingProcessLearningTriggeringKernelWithUnknownStructure();
+
+	// 4.
+	// TestModule::TestTerminatingProcessLearningTriggeringKernel();
+
+	// 5.
+	// TestModule::TestSparsePlainHawkes();
+
+	// 6.
+	// TestModule::TestPlainHawkes();
+	// TestModule::TestPlot();
+
+	// 7.
+	// TestModule::TestPlainHawkesNuclear();
+
+	// 8. 
+	// TestModule::TestLowRankHawkes();
+
+	// 9. 
+	// TestModule::TestHawkesLearningTriggeringKernel();
+
+	return 0;
+}
+
+// Eigen::VectorXd x(10);
 	// x << 10, 20, 30, 40, 50, 60, 70, 80, 90, 100;
 
 	// Eigen::Map<Eigen::MatrixXd> y = Eigen::Map<Eigen::MatrixXd>(x.segment(1,4).data(),2,2);
@@ -34,11 +66,14 @@ int main(int argc, char** argv)
 	
 	// TestModule::TestPlainHawkes();
 
-	// TestModule::TestMultivariateTerminating();
+	
 
-	// TestModule::TestTerminatingProcessLearningTriggeringKernel();
+	// 
 
-	TestModule::TestHawkesLearningTriggeringKernel();
+	// TestModule::TestHawkesLearningTriggeringKernel();
+
+	// TestModule::TestHawkesLearningTriggeringKernelUnknownStructure();
+
 
 	// Eigen::MatrixXd A = (Eigen::MatrixXd::Random(10,10).array() + 1) / 2;
 	// std::cout << A << std::endl;
@@ -65,6 +100,3 @@ int main(int argc, char** argv)
 	// TestModule::TestGraph()
 
 	// TestModule::TestPlot();
-
-	return 0;
-}
