@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 	// TestModule::TestTerminatingProcessLearningTriggeringKernel();
 
 	// 5.
-	// TestModule::TestSparsePlainHawkes();
+	TestModule::TestSparsePlainHawkes();
 
 	// 6.
 	// TestModule::TestPlainHawkes();
@@ -31,6 +31,9 @@ int main(int argc, char** argv)
 
 	// 9. 
 	// TestModule::TestHawkesLearningTriggeringKernel();
+
+	// 10. 
+	// TestModule::TestInfluenceEstimation();
 
 	return 0;
 }

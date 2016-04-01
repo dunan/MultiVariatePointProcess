@@ -87,7 +87,7 @@ double LowRankHawkesProcess::Intensity(const double& t, const Sequence& data, Ei
 	return 0;
 }
 
-double LowRankHawkesProcess::IntensityUpperBound(const double& t, const Sequence& data, Eigen::VectorXd& intensity_upper_dim)
+double LowRankHawkesProcess::IntensityUpperBound(const double& t, const double& L, const Sequence& data, Eigen::VectorXd& intensity_upper_dim)
 {
 	return 0;
 }

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip> 
 #include "../include/TestModule.h"
 
 void TestModule::TestHPoisson()
@@ -88,8 +89,8 @@ void TestModule::TestPlainHawkes()
 	std::cout << "True Parameters : " << std::endl;
 	std::cout << params.transpose() << std::endl;
 
-	// dim = 1;
-	// num_params = dim * (dim + 1);
+	// unsigned dim = 1;
+	// unsigned num_params = dim * (dim + 1);
 
 	// Eigen::VectorXd params1(num_params);
 	// params1 << 0.1, 0.5;
@@ -100,16 +101,18 @@ void TestModule::TestPlainHawkes()
 	// PlainHawkes hawkes1(num_params, dim, beta1);
 	// hawkes1.SetParameters(params1);
 
+	// std::vector<Sequence> sequences;
 	// OgataThinning ot1(dim);
 	// sequences.clear();
 	// ot1.Simulate(hawkes1, 1000, 1, sequences);
-
+	
 	// for(unsigned c = 0; c < sequences.size(); ++ c)
 	// {
 	// 	const std::vector<Event>& seq = sequences[c].GetEvents();
 	// 	for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
 	// 	{
-	// 		std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
+	// 		// std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
+	// 		std::cout << std::setprecision(16) << i_event -> time << " ";
 	// 	}
 	// 	std::cout << std::endl;
 	// }
@@ -396,10 +399,10 @@ void TestModule::TestHawkesLearningTriggeringKernelUnknownStructure()
 
 	hawkes_learning_kernel.fit(data, options);
 
-	// // for(unsigned i = 0; i < dim; ++ i)
-	// // {
-	// // 	hawkes_learning_kernel.PlotTriggeringKernel(i,i,T,0.01);	
-	// // }
+	for(unsigned i = 0; i < dim; ++ i)
+	{
+		hawkes_learning_kernel.PlotTriggeringKernel(i,i,T,0.01);	
+	}
 }
 
 void TestModule::TestHawkesLearningTriggeringKernel()
@@ -607,7 +610,7 @@ void TestModule::TestLowRankHawkes()
 	
 }
 
-void TestModule::TestGraph()
+void TestModule::TestInfluenceEstimation()
 {
 	unsigned N = 1024;
 	// Graph G("/Users/nandu/Development/exp_fit_graph/example_cascade_exp_10_network", 6, false);

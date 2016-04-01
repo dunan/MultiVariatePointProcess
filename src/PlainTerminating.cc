@@ -259,7 +259,7 @@ double PlainTerminating::Intensity(const double& t, const Sequence& data, Eigen:
 
 //  This virtual function requires process-specific implementation. It returns the upper bound of the intensity function on each dimension at time t given the history data in the variable intensity_upper_dim;
 //	This function returns the summation of the individual intensity upper bound on all dimensions. 
-double PlainTerminating::IntensityUpperBound(const double& t, const Sequence& data, Eigen::VectorXd& intensity_upper_dim)
+double PlainTerminating::IntensityUpperBound(const double& t, const double& L, const Sequence& data, Eigen::VectorXd& intensity_upper_dim)
 {
 	return 0;
 }

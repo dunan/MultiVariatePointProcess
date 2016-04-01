@@ -33,7 +33,7 @@ public:
 
 	static void TestLowRankHawkes();
 
-	static void TestGraph();
+	static void TestInfluenceEstimation();
 
 	static void TestPlot();
 

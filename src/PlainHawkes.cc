@@ -124,7 +124,7 @@ double PlainHawkes::Intensity(const double& t, const Sequence& data, Eigen::Vect
 	
 }
 
-double PlainHawkes::IntensityUpperBound(const double& t, const Sequence& data, Eigen::VectorXd& intensity_upper_dim)
+double PlainHawkes::IntensityUpperBound(const double& t, const double& L, const Sequence& data, Eigen::VectorXd& intensity_upper_dim)
 {
 
 	intensity_upper_dim = Eigen::VectorXd::Zero(num_dims_);

@@ -22,17 +22,28 @@ void OgataThinning::Simulate(IProcess& process, const std::vector<double>& vec_T
 		{
 			Eigen::VectorXd intensity_upper_dim;
 
-			const double& lambda_star = process.IntensityUpperBound(t, seq, intensity_upper_dim);
+			const double& lambda_star = process.IntensityUpperBound(t, step_, seq, intensity_upper_dim);
 			
-			t += RNG_.GetExponential(1 / lambda_star);
+			double s = RNG_.GetExponential(1 / lambda_star);
 
 			Eigen::VectorXd intensity_dim;
 			
-			const double& lambda_t = process.Intensity(t, seq, intensity_dim);
+			const double& lambda_t = process.Intensity(t + s, seq, intensity_dim);
 
-			if(RNG_.GetUniform() <= (lambda_t / lambda_star) && (t < *i_vec_T))
+			if(s > step_)
 			{
 
+				t += step_;
+
+			}
+			else if ((t + s > *i_vec_T) || (RNG_.GetUniform() > (lambda_t / lambda_star)))
+			{
+
+				t += s;
+
+			}
+			else
+			{
 				std::vector<double> cumprob(num_dims_,0);
 
 				double p = 0;
@@ -58,11 +69,15 @@ void OgataThinning::Simulate(IProcess& process, const std::vector<double>& vec_T
 					}
 				}
 
+				t += s;
+
 				event.time = t;
 				event.marker = 0;
 
 				seq.Add(event);
-			}	
+
+			}
+
 		}
 
 		sequences.push_back(seq);
@@ -84,19 +99,31 @@ void OgataThinning::Simulate(IProcess& process, const unsigned& n, const unsigne
 
 		unsigned eventID = 0;
 
-		while(eventID < n)
+		while(eventID <= n)
 		{
 			Eigen::VectorXd intensity_upper_dim;
 
-			const double& lambda_star = process.IntensityUpperBound(t, seq, intensity_upper_dim);
+			const double& lambda_star = process.IntensityUpperBound(t, step_, seq, intensity_upper_dim);
 			
-			t += RNG_.GetExponential(1 / lambda_star);
+			double s = RNG_.GetExponential(1 / lambda_star);
 
 			Eigen::VectorXd intensity_dim;
 			
-			const double& lambda_t = process.Intensity(t, seq, intensity_dim);
+			const double& lambda_t = process.Intensity(t + s, seq, intensity_dim);
 
-			if(RNG_.GetUniform() <= (lambda_t / lambda_star))
+			if(s > step_)
+			{
+
+				t += step_;
+
+			}
+			else if (RNG_.GetUniform() > (lambda_t / lambda_star))
+			{
+
+				t += s;
+
+			}
+			else
 			{
 				std::vector<double> cumprob(num_dims_,0);
 
@@ -123,19 +150,23 @@ void OgataThinning::Simulate(IProcess& process, const unsigned& n, const unsigne
 					}
 				}
 
+				t += s;
+
 				event.time = t;
 				event.marker = 0;
 
 				seq.Add(event);
-			}	
+			}
 		}
 
 		seq.PopBack();
 
-		sequences.push_back(seq);	
+		sequences.push_back(seq);
 
 	}
 }
+
+
 
 Event OgataThinning::SimulateNext(IProcess& process, const Sequence& seq)
 {
@@ -151,15 +182,27 @@ Event OgataThinning::SimulateNext(IProcess& process, const Sequence& seq)
 		{
 			Eigen::VectorXd intensity_upper_dim;
 
-			const double& lambda_star = process.IntensityUpperBound(t, seq, intensity_upper_dim);
+			const double& lambda_star = process.IntensityUpperBound(t, step_, seq, intensity_upper_dim);
 			
-			t += RNG_.GetExponential(1 / lambda_star);
+			double s = RNG_.GetExponential(1 / lambda_star);
 
 			Eigen::VectorXd intensity_dim;
 			
-			const double& lambda_t = process.Intensity(t, seq, intensity_dim);
+			const double& lambda_t = process.Intensity(t + s, seq, intensity_dim);
 
-			if(RNG_.GetUniform() <= (lambda_t / lambda_star))
+			if(s > step_)
+			{
+
+				t += step_;
+
+			}
+			else if (RNG_.GetUniform() > (lambda_t / lambda_star))
+			{
+
+				t += s;
+
+			}
+			else
 			{
 				std::vector<double> cumprob(num_dims_,0);
 
@@ -186,18 +229,19 @@ Event OgataThinning::SimulateNext(IProcess& process, const Sequence& seq)
 					}
 				}
 
+				t += s;
+
 				event.time = t;
 				event.marker = 0;
 
 				return event;
-			}	
+			}
 		}
-
 	}
 	
 	Eigen::VectorXd intensity_upper_dim;
 
-	const double& lambda_star = process.IntensityUpperBound(0, seq, intensity_upper_dim);
+	const double& lambda_star = process.IntensityUpperBound(0, step_, seq, intensity_upper_dim);
 
 	Event event;
 	event.EventID = 0;

@@ -11,13 +11,16 @@
 	 
 */
 
-class OgataThinning : Simulator
+class OgataThinning : public Simulator
 {
 
 private:
 
 //	Records the number of dimensions for internal use;
 	unsigned num_dims_;
+
+//  Step we simulate into the future;
+	double step_;
 
 // 	Internal implementation for random number generator;
 	SimpleRNG RNG_;
@@ -27,10 +30,11 @@ public:
 //  Constructor : num_dims is the number of dimensions we are going to simulate;
 	OgataThinning(const unsigned& num_dims) : Simulator(), num_dims_(num_dims)
 	{
+		step_ = 1.0;
+
 		// Initialze the random generator;
 		RNG_.SetState(314, 314);
 	}
-
 
 //  This virtual function requires process-specific implementation. It simulates collection of sequences before the observation window in vec_T;
 //  Parameter process stores the parameters of the specific process we are going to simulate from;

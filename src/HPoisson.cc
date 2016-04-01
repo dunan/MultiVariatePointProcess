@@ -12,7 +12,7 @@ double HPoisson::Intensity(const double& t, const Sequence& data, Eigen::VectorX
 	return parameters.array().sum();
 }
 
-double HPoisson::IntensityUpperBound(const double& t, const Sequence& data, Eigen::VectorXd& intensity_upper_dim)
+double HPoisson::IntensityUpperBound(const double& t, const double& L, const Sequence& data, Eigen::VectorXd& intensity_upper_dim)
 {
 	return HPoisson::Intensity(t, data, intensity_upper_dim);
 }
