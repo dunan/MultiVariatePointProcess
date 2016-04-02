@@ -9,6 +9,7 @@
 #include "LowRankHawkesProcess.h"
 #include "ContinEst.h"
 #include "HawkesLearningTriggeringKernel.h"
+#include "SelfInhibitingProcess.h"
 
 class TestModule
 {
@@ -40,5 +41,7 @@ public:
 	static void TestHawkesLearningTriggeringKernel();
 
 	static void TestHawkesLearningTriggeringKernelUnknownStructure();
+
+	static void TestSelfInhibiting();
 
 };

@@ -697,3 +697,47 @@ void TestModule::TestPlot()
 	hawkes1.PlotIntensityFunction(sequences[0], 0);
 
 }
+
+void TestModule::TestSelfInhibiting()
+{
+	unsigned dim = 2;
+	unsigned num_params = dim * (dim + 1);
+
+	Eigen::VectorXd params(num_params);
+	params << 1, 1, 0.1, 0.1, 0.1, 0.1;
+	// params << 1, 0.1;
+
+	std::vector<Sequence> sequences;
+
+	SelfInhibitingProcess inhibiting(num_params, dim);
+	inhibiting.SetParameters(params);
+
+	std::vector<double> vec_T(1, 100);
+
+	OgataThinning ot(dim);
+	ot.Simulate(inhibiting, vec_T, sequences);
+
+	const std::vector<Event>& seq = sequences[0].GetEvents();
+	for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
+	{
+		// std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
+		std::cout << std::setprecision(16) << i_event -> time << " ";
+	}
+	std::cout << std::endl;
+
+	SelfInhibitingProcess::OPTION options;
+	options.base_intensity_regularizer = SelfInhibitingProcess::NONE;
+	options.excitation_regularizer = SelfInhibitingProcess::NONE;
+	options.coefficients[SelfInhibitingProcess::LAMBDA0] = 0;
+	options.coefficients[SelfInhibitingProcess::LAMBDA] = 0;
+
+	SelfInhibitingProcess inhibiting_new(num_params, dim);
+
+	inhibiting_new.fit(sequences, options);
+
+	std::cout << "Estimated Parameters : " << std::endl;
+	std::cout << inhibiting_new.GetParameters().transpose() << std::endl;
+	std::cout << "True Parameters : " << std::endl;
+	std::cout << params.transpose() << std::endl;
+
+}
