@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 #include "../include/SelfInhibitingProcess.h"
 #include "../include/Sequence.h"
 #include "../include/Optimizer.h"
@@ -177,14 +178,8 @@ double SelfInhibitingProcess::IntensityUpperBound(const double& t, const double&
 	return intensity_upper_dim.array().sum();
 }
 
-void SelfInhibitingProcess::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
+void SelfInhibitingProcess::GetNegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 {
-	if(all_timestamp_per_dimension_.size() == 0)
-	{
-		std::cout << "Process is uninitialzed with any data." << std::endl;
-		return;
-	}
-
 	gradient = Eigen::VectorXd::Zero(num_dims_ * (1 + num_dims_));
 
 	Eigen::Map<Eigen::VectorXd> grad_lambda0_vector = Eigen::Map<Eigen::VectorXd>(gradient.segment(0, num_dims_).data(), num_dims_);
@@ -267,7 +262,68 @@ void SelfInhibitingProcess::NegLoglikelihood(double& objvalue, Eigen::VectorXd& 
 
 	objvalue = -objvalue / num_sequences_;
 
-	gradient = - gradient.array() / num_sequences_;
+	gradient = - gradient.array() / num_sequences_;	
+}
+
+void SelfInhibitingProcess::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
+{
+	if(all_timestamp_per_dimension_.size() == 0)
+	{
+		std::cout << "Process is uninitialzed with any data." << std::endl;
+		return;
+	}
+
+	GetNegLoglikelihood(objvalue, gradient);
+
+	Eigen::Map<Eigen::VectorXd> Lambda0_ = Eigen::Map<Eigen::VectorXd>(parameters_.segment(0, num_dims_).data(), num_dims_);
+	Eigen::Map<Eigen::VectorXd> grad_lambda0_vector = Eigen::Map<Eigen::VectorXd>(gradient.segment(0, num_dims_).data(), num_dims_);
+
+	// Regularization for base intensity
+	switch (options_.base_intensity_regularizer)
+	{
+		case L22 :
+			
+			grad_lambda0_vector = grad_lambda0_vector.array() + (options_.coefficients[LAMBDA0] * Lambda0_.array());
+
+			objvalue = objvalue + 0.5 * options_.coefficients[LAMBDA0] * Lambda0_.squaredNorm();
+			
+			break;
+
+		case NONE :
+
+			break;
+
+		default:
+			break; 	
+	}
+
+	// Regularization for excitation matrix
+	Eigen::Map<Eigen::VectorXd> grad_beta_vector = Eigen::Map<Eigen::VectorXd>(gradient.segment(num_dims_, num_dims_ * num_dims_).data(), num_dims_ * num_dims_);
+
+	Eigen::Map<Eigen::VectorXd> beta_vector = Eigen::Map<Eigen::VectorXd>(parameters_.segment(num_dims_, num_dims_ * num_dims_).data(), num_dims_ * num_dims_);
+
+	// Regularization for excitation matrix
+	switch (options_.excitation_regularizer)
+	{
+		case L1 :
+
+			grad_beta_vector = grad_beta_vector.array() + options_.coefficients[LAMBDA];
+
+			objvalue += options_.coefficients[LAMBDA] * beta_vector.array().abs().sum();
+
+			return;
+
+		case L22 :
+
+			grad_beta_vector = grad_beta_vector.array() + options_.coefficients[LAMBDA] * beta_vector.array();
+
+			objvalue = objvalue + 0.5 * options_.coefficients[LAMBDA] * beta_vector.squaredNorm();
+
+			return;
+
+		case NONE :
+			return;
+	}
 
 
 }
@@ -313,6 +369,29 @@ void SelfInhibitingProcess::fit(const std::vector<Sequence>& data, const OPTION&
 
 	opt.PLBFGS(0, 1e10);
 
+	PostProcessing();
+
+
+}
+
+void SelfInhibitingProcess::PostProcessing()
+{
+	Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(parameters_.segment(0, num_dims_).data(), num_dims_);
+	Eigen::Map<Eigen::MatrixXd> Beta = Eigen::Map<Eigen::MatrixXd>(parameters_.segment(num_dims_, num_dims_ * num_dims_).data(), num_dims_, num_dims_);
+
+	Eigen::MatrixXd Alpha = Beta;
+	double epsilon = 5e-2;
+	Eigen::VectorXd colsum = Alpha.colwise().sum();
+	colsum = (colsum.array() > 0).select(colsum, 1);
+	Alpha = Alpha.array().rowwise() / colsum.transpose().array();
+	Alpha = (Alpha.array() < epsilon).select(0, Alpha);
+	Alpha = (Alpha.array() >= epsilon).select(1, Alpha);
+
+	std::cout << "Estimated Structure : " << std::endl;
+
+	std::cout << Alpha.cast<unsigned>() << std::endl << std::endl;
+
+	Beta = (Alpha.array() == 0).select(0, Beta);
 
 }
 
@@ -334,7 +413,3 @@ void SelfInhibitingProcess::RestoreOptionToDefault()
 	options_.coefficients[LAMBDA] = 0;
 }
 
-void SelfInhibitingProcess::PlotIntensityFunction(const Sequence& data, const unsigned& dim_id)
-{
-	
-}

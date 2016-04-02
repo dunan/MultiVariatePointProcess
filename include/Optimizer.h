@@ -37,7 +37,7 @@ public:
 	{
 		RNG_.SetState(0, 0);
 		optTol = 1e-10;
-		maxIter_ = 500;
+		maxIter_ = 1000;
 	}
 
 	void SGD(const double& gamma0, const unsigned& ini_max_iter, const std::vector<Sequence>& data);

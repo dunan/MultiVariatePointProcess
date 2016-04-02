@@ -44,4 +44,6 @@ public:
 
 	static void TestSelfInhibiting();
 
+	static void TestSparseSelfInhibiting();
+
 };

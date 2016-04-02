@@ -69,6 +69,10 @@ public:
 //  Return the stochastic gradient on the random sample k.
 	virtual void Gradient(const unsigned &k, Eigen::VectorXd& gradient) = 0;
 
+	void PlotIntensityFunction(const Sequence& data);
+
+	void PlotIntensityFunction(const Sequence& data, const unsigned& dim_id);
+
 };
 
 #endif

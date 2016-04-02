@@ -30,6 +30,10 @@ protected:
 
 	void RestoreOptionToDefault();
 
+	void GetNegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient);
+
+	void PostProcessing();
+
 public:
 	//  Records the options
 
@@ -84,7 +88,9 @@ public:
 //  This function predicts the next event by simulation;
 	virtual double PredictNextEventTime(const Sequence& data, const unsigned& num_simulations);
 
-	void PlotIntensityFunction(const Sequence& data, const unsigned& dim_id);
+	// void PlotIntensityFunction(const Sequence& data, const unsigned& dim_id);
+
+	// void PlotIntensityFunction(const Sequence& data);
 	
 	
 };

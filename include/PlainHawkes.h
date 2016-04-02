@@ -97,8 +97,6 @@ public:
 //  This function predicts the next event by simulation;
 	virtual double PredictNextEventTime(const Sequence& data, const unsigned& num_simulations);
 
-	void PlotIntensityFunction(const Sequence& data, const unsigned& dim_id);
-
 
 };
 

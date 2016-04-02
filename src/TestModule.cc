@@ -694,7 +694,7 @@ void TestModule::TestPlot()
 	sequences.clear();
 	ot1.Simulate(hawkes1, 20, 1, sequences);
 
-	hawkes1.PlotIntensityFunction(sequences[0], 0);
+	hawkes1.PlotIntensityFunction(sequences[0],0);
 
 }
 
@@ -704,7 +704,7 @@ void TestModule::TestSelfInhibiting()
 	unsigned num_params = dim * (dim + 1);
 
 	Eigen::VectorXd params(num_params);
-	params << 1, 1, 0.1, 0.1, 0.1, 0.1;
+	params << 1.2, 1, 0.1, 0.1, 0.1, 0.05;
 	// params << 1, 0.1;
 
 	std::vector<Sequence> sequences;
@@ -712,7 +712,7 @@ void TestModule::TestSelfInhibiting()
 	SelfInhibitingProcess inhibiting(num_params, dim);
 	inhibiting.SetParameters(params);
 
-	std::vector<double> vec_T(1, 100);
+	std::vector<double> vec_T(1, 10);
 
 	OgataThinning ot(dim);
 	ot.Simulate(inhibiting, vec_T, sequences);
@@ -721,23 +721,109 @@ void TestModule::TestSelfInhibiting()
 	for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
 	{
 		// std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
-		std::cout << std::setprecision(16) << i_event -> time << " ";
+		std::cout << std::setprecision(4) << i_event -> time << " ";
 	}
 	std::cout << std::endl;
 
+	inhibiting.PlotIntensityFunction(sequences[0]);
+
+	// SelfInhibitingProcess::OPTION options;
+	// options.base_intensity_regularizer = SelfInhibitingProcess::NONE;
+	// options.excitation_regularizer = SelfInhibitingProcess::NONE;
+	// options.coefficients[SelfInhibitingProcess::LAMBDA0] = 0;
+	// options.coefficients[SelfInhibitingProcess::LAMBDA] = 0;
+
+	// SelfInhibitingProcess inhibiting_new(num_params, dim);
+
+	// inhibiting_new.fit(sequences, options);
+
+	// std::cout << "Estimated Parameters : " << std::endl;
+	// std::cout << inhibiting_new.GetParameters().transpose() << std::endl;
+	// std::cout << "True Parameters : " << std::endl;
+	// std::cout << params.transpose() << std::endl;
+
+}
+
+void TestModule::TestSparseSelfInhibiting()
+{
+	unsigned dim = 6, num_params = dim * (dim + 1);
+	Eigen::VectorXd params(num_params);
+	params << 1.0, 1.0, 1.0, 1.5, 1.0, 1.4, 
+			  0.1, 0.0, 0.0, 0.0, 0.0, 0.0,
+			  0.1, 0.0, 0.0, 0.0, 0.0, 0.0,
+			  0.0, 0.1, 0.0, 0.0, 0.0, 0.0,
+			  0.0, 0.1, 0.0, 0.1, 0.0, 0.0,
+			  0.0, 0.0, 0.0, 0.0, 0.1, 0.0,
+			  0.0, 0.0, 0.1, 0.0, 0.1, 0.0;
+
+	std::vector<Sequence> data;
+
+	SelfInhibitingProcess inhibiting(num_params, dim);
+	inhibiting.SetParameters(params);
+
+	OgataThinning ot(dim);
+	std::vector<double> vec_T(20, 10);
+	ot.Simulate(inhibiting, vec_T, data);
+	
+	for(unsigned c = 0; c < data.size(); ++ c)
+	{
+		std::map<unsigned, unsigned> dim2count;
+		const std::vector<Event>& seq = data[c].GetEvents();
+		for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
+		{
+			if(dim2count.find(i_event -> DimentionID) == dim2count.end())
+			{
+				dim2count[i_event -> DimentionID] = 1;
+			}else
+			{
+				++ dim2count[i_event -> DimentionID];
+			}
+		}
+
+		for(std::map<unsigned, unsigned>::const_iterator m = dim2count.begin(); m != dim2count.end(); ++ m)
+		{
+			std::cout << m->first << " " << m->second << std::endl;
+		}
+
+		std::cout << std::endl;
+	}
+	
+	double T = 0;
+	for(unsigned c = 0; c < data.size(); ++ c)
+	{
+		T = (T < data[c].GetTimeWindow() ? data[c].GetTimeWindow() : T);
+	}
+
+	std::cout << T << std::endl;
+
 	SelfInhibitingProcess::OPTION options;
 	options.base_intensity_regularizer = SelfInhibitingProcess::NONE;
-	options.excitation_regularizer = SelfInhibitingProcess::NONE;
+	options.excitation_regularizer = SelfInhibitingProcess::L1;
 	options.coefficients[SelfInhibitingProcess::LAMBDA0] = 0;
-	options.coefficients[SelfInhibitingProcess::LAMBDA] = 0;
+	options.coefficients[SelfInhibitingProcess::LAMBDA] = 1e1;
 
 	SelfInhibitingProcess inhibiting_new(num_params, dim);
 
-	inhibiting_new.fit(sequences, options);
+	inhibiting_new.fit(data, options);
+
+	Eigen::VectorXd parameters_estimated = inhibiting_new.GetParameters();
+
+	Eigen::Map<Eigen::VectorXd> Lambda0_hat = Eigen::Map<Eigen::VectorXd>(parameters_estimated.segment(0, dim).data(), dim);
+	
+	Eigen::Map<Eigen::MatrixXd> B_hat = Eigen::Map<Eigen::MatrixXd>(parameters_estimated.segment(dim, dim * dim).data(), dim, dim);
+	
+	
+	std::cout << "Estimated Parameters : " << std::endl;
+	std::cout << Lambda0_hat.transpose() << std::endl << std::endl;
+	std::cout << B_hat << std::endl << std::endl;
+
+	Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(params.segment(0, dim).data(), dim);
+	
+	Eigen::Map<Eigen::MatrixXd> B = Eigen::Map<Eigen::MatrixXd>(params.segment(dim, dim * dim).data(), dim, dim);
 
 	std::cout << "Estimated Parameters : " << std::endl;
-	std::cout << inhibiting_new.GetParameters().transpose() << std::endl;
-	std::cout << "True Parameters : " << std::endl;
-	std::cout << params.transpose() << std::endl;
+	std::cout << Lambda0.transpose() << std::endl << std::endl;
+	std::cout << B << std::endl << std::endl;
+	
 
 }

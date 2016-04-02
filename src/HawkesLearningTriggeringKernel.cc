@@ -443,7 +443,7 @@ void HawkesLearningTriggeringKernel::PlotTriggeringKernel(const unsigned& dim_m,
 		gp_y[i] = y(i);
 	}
 	
-	Plot plot("wxt size 640, 400","time", "intensity", "TriggeringKernel");
-	plot.PlotScatterLine(gp_x, gp_y);
+	Plot plot("wxt size 640, 400","time", "intensity");
+	plot.PlotScatterLine(gp_x, gp_y, "TriggeringKernel");
 	
 }

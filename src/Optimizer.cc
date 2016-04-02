@@ -226,6 +226,8 @@ void Optimizer::lbfgs(const Eigen::VectorXd& g, const Eigen::MatrixXd& s, const 
 void Optimizer::PLBFGS(const double& LB, const double& UB)
 {
 
+	maxIter_ = 10000;
+
 	std::cout << std::setw(10) << "Iteration" << "\t" << std::setw(10) << "FunEvals" << "\t" << std::setw(10) << "Step Length" << "\t" << std::setw(10) << "Function Val" << "\t" << std::setw(10) << "Opt Cond" << std::endl;
 	unsigned nVars = process_->GetParameters().size();
 
@@ -355,7 +357,7 @@ void Optimizer::PLBFGS(const double& LB, const double& UB)
 		{
 			double temp = t;
 
-			std::cout << "Reduce Step Size" << std::endl;
+			// std::cout << "Reduce Step Size" << std::endl;
 			// t = 0.5 * t;
 			t = 0.1 * t;
 
