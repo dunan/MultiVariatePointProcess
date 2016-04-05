@@ -508,14 +508,32 @@ void PlainHawkes::Simulate(const std::vector<double>& vec_T, std::vector<Sequenc
 
 			while(t < *i_vec_T)
 			{
-				const double& lambda_star = (((1 + expsum.array()) * Alpha_.array()).colwise().sum().transpose() + Lambda0_.array()).sum();
+				const double lambda_star = (( (((-Beta_.array()).colwise() * (t - last_event_per_dim.array())).exp().array()) * (1 + expsum.array()) * Alpha_.array()).colwise().sum().transpose() + Lambda0_.array()).sum();
 
-				double s = RNG_.GetExponential(1.0 / lambda_star);
+				t += RNG_.GetExponential(1.0 / lambda_star);
 
-				Eigen::VectorXd intensity_dim = (((((-Beta_.array()).colwise() * (t + s - last_event_per_dim.array())).exp().array()) * (1 + expsum.array()) * Alpha_.array()).colwise().sum().transpose() + Lambda0_.array());
+				Eigen::VectorXd intensity_dim = (((((-Beta_.array()).colwise() * (t - last_event_per_dim.array())).exp().array()) * (1 + expsum.array()) * Alpha_.array()).colwise().sum().transpose() + Lambda0_.array());
 
-				
+				double D = RNG_.GetUniform();
+
+				if(D <= intensity_dim.array().sum() / lambda_star)
+				{
+					expsum = (((-Beta_.array()).colwise() * (t - last_event_per_dim.array())).exp().array()) * (1 + expsum.array());
+					Event event;
+					event.EventID = eventID;
+					event.SequenceID = sequenceID;
+					event.DimentionID = AssignDim(intensity_dim);
+					event.time = t;
+					event.marker = 0;
+					seq.Add(event);
+					last_event_per_dim(event.DimentionID) = t;	
+					++ eventID;
+				}
 			}
+
+			sequences.push_back(seq);
+
+			++ sequenceID; 
 		}
 	}
 
