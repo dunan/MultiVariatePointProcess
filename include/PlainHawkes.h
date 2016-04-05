@@ -32,6 +32,9 @@ protected:
 
 	Eigen::VectorXd observation_window_T_;
 
+	// 	Internal implementation for random number generator;
+	SimpleRNG RNG_;
+
 //  This variable is process-specific. It records totoal number of sequences used to fit the process.
 	unsigned num_sequences_;
 
@@ -39,6 +42,8 @@ protected:
 	void Initialize(const std::vector<Sequence>& data);
 
 	void RestoreOptionToDefault();
+
+	unsigned AssignDim(const Eigen::VectorXd& lambda);
 
 public:
 
@@ -67,6 +72,8 @@ public:
 		options_.excitation_regularizer = NONE;
 		options_.coefficients[LAMBDA] = 0;
 		options_.coefficients[BETA] = 0;
+
+		RNG_.SetState(314, 314);
 	}
 
 //  MLE esitmation of the parameters
@@ -97,6 +104,7 @@ public:
 //  This function predicts the next event by simulation;
 	virtual double PredictNextEventTime(const Sequence& data, const unsigned& num_simulations);
 
+	void Simulate(const std::vector<double>& vec_T, std::vector<Sequence>& sequences);
 
 };
 

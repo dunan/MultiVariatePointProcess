@@ -7,6 +7,7 @@
 #include "../include/OgataThinning.h"
 #include "../include/Utility.h"
 #include "../include/GNUPlotWrapper.h"
+#include "../include/SimpleRNG.h"
 
 void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 {
@@ -444,5 +445,79 @@ void PlainHawkes::RestoreOptionToDefault()
 	options_.coefficients[BETA] = 0;
 }
 
+unsigned PlainHawkes::AssignDim(const Eigen::VectorXd& intensity_dim)
+{
+	double total_intensity = intensity_dim.array().sum();
 
+	std::vector<double> cumprob(num_dims_,0);
+
+	double p = 0;
+
+	for(unsigned d = 0; d < num_dims_; ++ d)
+	{
+		cumprob[d] = p + intensity_dim(d) / total_intensity;
+		p += intensity_dim(d) / total_intensity;
+	}
+
+	double D = RNG_.GetUniform();
+	for(unsigned d = 0; d < num_dims_; ++ d)
+	{
+		if(D <= cumprob[d])
+		{
+			return d;
+		}
+	}
+	return num_dims_;
+}
+
+void PlainHawkes::Simulate(const std::vector<double>& vec_T, std::vector<Sequence>& sequences)
+{
+	Eigen::Map<Eigen::VectorXd> Lambda0_ = Eigen::Map<Eigen::VectorXd>(parameters_.segment(0, num_dims_).data(), num_dims_);
+
+	Eigen::Map<Eigen::MatrixXd> Alpha_ = Eigen::Map<Eigen::MatrixXd>(parameters_.segment(num_dims_, num_dims_ * num_dims_).data(), num_dims_, num_dims_);
+
+	Eigen::MatrixXd expsum = Eigen::MatrixXd::Zero(num_dims_, num_dims_);
+
+	Eigen::VectorXd last_event_per_dim = Eigen::VectorXd::Zero(num_dims_);
+
+	sequences = std::vector<Sequence>();
+
+	unsigned sequenceID = 0;
+
+	for(std::vector<double>::const_iterator i_vec_T = vec_T.begin(); i_vec_T != vec_T.end(); ++ i_vec_T)
+	{
+		Sequence seq(*i_vec_T);
+
+		unsigned eventID = 1;
+
+		double t = RNG_.GetExponential(1.0 / Lambda0_.array().sum());
+
+		if(t < *i_vec_T)
+		{
+			Event event;
+			event.EventID = eventID;
+			event.SequenceID = sequenceID;
+			event.DimentionID = AssignDim(Lambda0_);
+			event.time = t;
+			event.marker = 0;
+			seq.Add(event);
+
+			last_event_per_dim(event.DimentionID) = t;			
+
+			++ eventID;
+
+			while(t < *i_vec_T)
+			{
+				const double& lambda_star = (((1 + expsum.array()) * Alpha_.array()).colwise().sum().transpose() + Lambda0_.array()).sum();
+
+				double s = RNG_.GetExponential(1.0 / lambda_star);
+
+				Eigen::VectorXd intensity_dim = (((((-Beta_.array()).colwise() * (t + s - last_event_per_dim.array())).exp().array()) * (1 + expsum.array()) * Alpha_.array()).colwise().sum().transpose() + Lambda0_.array());
+
+				
+			}
+		}
+	}
+
+}
 
