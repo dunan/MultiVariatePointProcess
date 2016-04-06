@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 
 	// 6.
 	// TestModule::TestPlainHawkes();
-	TestModule::TestPlot();
+	// TestModule::TestPlot();
 
 	// 7.
 	// TestModule::TestPlainHawkesNuclear();
@@ -38,6 +38,8 @@ int main(int argc, char** argv)
 	// TestModule::TestSelfInhibiting();
 
 	// TestModule::TestSparseSelfInhibiting();
+
+	TestModule::TestEfficientHawkesSimulation();
 
 	return 0;
 }

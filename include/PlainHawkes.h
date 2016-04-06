@@ -45,6 +45,8 @@ protected:
 
 	unsigned AssignDim(const Eigen::VectorXd& lambda);
 
+	void UpdateExpSum(double t, const Eigen::VectorXd& last_event_per_dim, Eigen::MatrixXd& expsum);
+
 public:
 
 	//  Records the options
@@ -86,7 +88,7 @@ public:
 //	The returned gradient vector wrt the current parameters is stored in the variable Gradient; 
 	virtual void NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient);
 
-	//  Return the stochastic gradient on the random sample k.
+//  Return the stochastic gradient on the random sample k.
 	virtual void Gradient(const unsigned &k, Eigen::VectorXd& gradient);
 
 //  This virtual function requires process-specific implementation. It returns the intensity value on each dimension in the variable intensity_dim for the given sequence stored in data and the given time t;
@@ -104,7 +106,11 @@ public:
 //  This function predicts the next event by simulation;
 	virtual double PredictNextEventTime(const Sequence& data, const unsigned& num_simulations);
 
+//  Efficient simulation by exploiting the property of exponential kernels
 	void Simulate(const std::vector<double>& vec_T, std::vector<Sequence>& sequences);
+
+//  Efficient simulation by exploiting the property of exponential kernels
+	void Simulate(const unsigned& n, const unsigned& num_sequences, std::vector<Sequence>& sequences);
 
 };
 

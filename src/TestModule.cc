@@ -827,3 +827,38 @@ void TestModule::TestSparseSelfInhibiting()
 	
 
 }
+
+void TestModule::TestEfficientHawkesSimulation()
+{
+	unsigned dim = 1, num_params = dim * (dim + 1);
+	Eigen::VectorXd params(num_params);
+
+	params << 0.5, 0.5; 
+
+	Eigen::MatrixXd beta(dim,dim);
+	beta << 1;
+
+	PlainHawkes hawkes(num_params, dim, beta);
+	hawkes.SetParameters(params);
+	std::vector<Sequence> sequences;
+
+	// std::vector<double> vec_T(1, 1000);
+	// hawkes.Simulate(vec_T, sequences);
+
+	hawkes.Simulate(1000, 1, sequences);
+
+	for(unsigned c = 0; c < sequences.size(); ++ c)
+	{
+		const std::vector<Event>& seq = sequences[c].GetEvents();
+		for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
+		{
+			std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
+			// std::cout << std::setprecision(16) << i_event -> time << " ";
+		}
+		// std::cout << std::endl;
+	}
+
+	std::cout << Diagnosis::TimeChangeFit(hawkes, sequences[0]) << std::endl;
+
+
+}

@@ -14,5 +14,5 @@ double Diagnosis::TimeChangeFit(IProcess& process, const Sequence& seq)
 		samples(i + 1) = process.IntensityIntegral(events[i].time, events[i + 1].time, seq);
 	}
 
-	return (samples.size() - 1) / samples.array().sum();
+	return samples.array().sum() / samples.size();
 }
