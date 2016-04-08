@@ -1,19 +1,21 @@
-#ifndef RAYLEIGH_KERNEL_H
-#define RAYLEIGH_KERNEL_H
+#ifndef POWERLAW_KERNEL_H
+#define POWERLAW_KERNEL_H
 
 #include "TriggeringKernel.h"
 
-class RayleighKernel : public TriggeringKernel
+
+class PowerlawKernel : public TriggeringKernel
 {
 
 private:
 
 	// expected time interval
+	double beta_;
 	double sigma_;
 
 public:
 
-	RayleighKernel(double sigma) : sigma_(sigma){}
+	PowerlawKernel(double beta, double sigma) : beta_(beta), sigma_(sigma){}
 
 	virtual double operator()(double t);
 

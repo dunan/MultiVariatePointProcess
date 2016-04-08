@@ -2,6 +2,7 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include "../include/OgataThinning.h"
+#include "../include/Utility.h"
 
 void OgataThinning::Simulate(IProcess& process, const std::vector<double>& vec_T, std::vector<Sequence>& sequences)
 {
@@ -119,9 +120,7 @@ void OgataThinning::Simulate(IProcess& process, const unsigned& n, const unsigne
 			}
 			else if (RNG_.GetUniform() > (lambda_t / lambda_star))
 			{
-
 				t += s;
-
 			}
 			else
 			{

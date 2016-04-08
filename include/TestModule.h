@@ -10,6 +10,12 @@
 #include "ContinEst.h"
 #include "HawkesLearningTriggeringKernel.h"
 #include "SelfInhibitingProcess.h"
+#include "HawkesGeneralKernel.h"
+#include "ExpKernel.h"
+#include "RayleighKernel.h"
+#include "PowerlawKernel.h"
+#include "LoglogisticKernel.h"
+#include "TriggeringKernel.h"
 
 class TestModule
 {
@@ -47,5 +53,9 @@ public:
 	static void TestSparseSelfInhibiting();
 
 	static void TestEfficientHawkesSimulation();
+
+	static void TestHawkesGeneralKernel();
+
+	static void TestHawkesGeneralKernelSparse();
 
 };

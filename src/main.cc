@@ -39,7 +39,11 @@ int main(int argc, char** argv)
 
 	// TestModule::TestSparseSelfInhibiting();
 
-	TestModule::TestEfficientHawkesSimulation();
+	// TestModule::TestEfficientHawkesSimulation();
+
+	TestModule::TestHawkesGeneralKernel();
+
+	// TestModule::TestHawkesGeneralKernelSparse();
 
 	return 0;
 }

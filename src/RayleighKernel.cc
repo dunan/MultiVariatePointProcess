@@ -3,23 +3,19 @@
 
 double RayleighKernel::operator()(double t)
 {
-	double d = t - base_;
-
-	return (d / (sigma_ * sigma_)) * exp(- (d * d) / (2 * sigma_ * sigma_));
+	return (t / (sigma_ * sigma_)) * exp(- (t * t) / (2 * sigma_ * sigma_));
 }
 
 double RayleighKernel::Integral(double from, double to)
 {
-	double a = from - base_;
-	double b = to - base_;
-	return (exp(- (a * a) / (2 * sigma_ * sigma_)) - exp(- (b * b) / (2 * sigma_ * sigma_)));
+	return (exp(- (from * from) / (2 * sigma_ * sigma_)) - exp(- (to * to) / (2 * sigma_ * sigma_)));
 }
 
 double RayleighKernel::Upper(double from, double duration)
 {
-	double d = from - base_ + duration;
+	double d = from + duration;
 
-	if ((from - base_ <= sigma_) && (d > sigma_))
+	if ((from <= sigma_) && (d > sigma_))
 	{
 		return exp(-0.5) / sigma_;
 	}else if (d <= sigma_)
@@ -27,7 +23,7 @@ double RayleighKernel::Upper(double from, double duration)
 		return (d / (sigma_ * sigma_)) * exp(- (d * d) / (2 * sigma_ * sigma_));
 	}else
 	{
-		d = from - base_;
+		d = from;
 		return (d / (sigma_ * sigma_)) * exp(- (d * d) / (2 * sigma_ * sigma_));
 	}
 }

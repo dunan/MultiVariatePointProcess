@@ -6,13 +6,7 @@
 
 class TriggeringKernel{
 
-protected:
-
-	double base_;
-
 public:
-
-	TriggeringKernel(double base) : base_(base){}
 
 	virtual double operator()(double t) = 0;
 

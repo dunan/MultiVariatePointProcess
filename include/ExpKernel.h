@@ -14,7 +14,7 @@ private:
 
 public:
 
-	ExpKernel(double base, double beta) : TriggeringKernel(base), beta_(beta){}
+	ExpKernel(double beta) : beta_(beta){}
 
 	virtual double operator()(double t);
 

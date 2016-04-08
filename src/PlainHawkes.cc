@@ -35,40 +35,51 @@ void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 
 	for (unsigned k = 0; k < num_sequences_; ++k) 
 	{
-	    for (unsigned m = 0; m < num_dims_; ++m) 
-	    {
-	      for (unsigned n = 0; n < num_dims_; ++n) 
-	      {
+		for (unsigned m = 0; m < num_dims_; ++m) 
+		{
+			for (unsigned n = 0; n < num_dims_; ++n) 
+			{
 
-	      	all_exp_kernel_recursive_sum_[k][m][n] = Eigen::VectorXd::Zero(all_timestamp_per_dimension_[k][n].size());
+				all_exp_kernel_recursive_sum_[k][m][n] = Eigen::VectorXd::Zero(all_timestamp_per_dimension_[k][n].size());
 
-	        if (m != n) {
+				if (m != n) 
+				{
+					// handle events on other dimensions that occur before the first event of dimension n
+					for (unsigned j = 0; j < all_timestamp_per_dimension_[k][m].size(); ++j) 
+					{
+						if (all_timestamp_per_dimension_[k][m][j] < all_timestamp_per_dimension_[k][n][0])
+						{
+							all_exp_kernel_recursive_sum_[k][m][n](0) += exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][0] - all_timestamp_per_dimension_[k][m][j]));
+						}
+					}
 
-	          for (unsigned i = 1; i < all_timestamp_per_dimension_[k][n].size(); ++i) 
-	          {
+					for (unsigned i = 1; i < all_timestamp_per_dimension_[k][n].size(); ++i) 
+					{
 
-	            double value = exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][n][i - 1])) * all_exp_kernel_recursive_sum_[k][m][n](i - 1);
+						double value = exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][n][i - 1])) * all_exp_kernel_recursive_sum_[k][m][n](i - 1);
 
-	            for (unsigned j = 0; j < all_timestamp_per_dimension_[k][m].size(); ++j) {
-	              if ((all_timestamp_per_dimension_[k][n][i - 1] <= all_timestamp_per_dimension_[k][m][j]) &&
-	                  (all_timestamp_per_dimension_[k][m][j] < all_timestamp_per_dimension_[k][n][i])) 
-	              {
-	                value += exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][m][j]));
-	              }
-	            }
+						for (unsigned j = 0; j < all_timestamp_per_dimension_[k][m].size(); ++j) 
+						{
+							if ((all_timestamp_per_dimension_[k][n][i - 1] <= all_timestamp_per_dimension_[k][m][j]) &&
+							  (all_timestamp_per_dimension_[k][m][j] < all_timestamp_per_dimension_[k][n][i])) 
+							{
+								value += exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][m][j]));
+							}
+						}
 
-	            all_exp_kernel_recursive_sum_[k][m][n](i) = value;
-	          }
-	        } else 
-	        {
-	          for (unsigned i = 1; i < all_timestamp_per_dimension_[k][n].size(); ++i) 
-	          {
-	            all_exp_kernel_recursive_sum_[k][m][n](i) = exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][n][i - 1])) * (1 + all_exp_kernel_recursive_sum_[k][m][n](i - 1));
-	          }
-	        }
-	      }
-	    }
-  	}
+						all_exp_kernel_recursive_sum_[k][m][n](i) = value;
+					}
+
+				} else 
+				{
+					for (unsigned i = 1; i < all_timestamp_per_dimension_[k][n].size(); ++i) 
+					{
+						all_exp_kernel_recursive_sum_[k][m][n](i) = exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][n][i - 1])) * (1 + all_exp_kernel_recursive_sum_[k][m][n](i - 1));
+					}
+				}
+			}
+		}
+	}
 
 	observation_window_T_ = Eigen::VectorXd::Zero(num_sequences_);
 
@@ -199,7 +210,7 @@ void PlainHawkes::NegLoglikelihood(double& objvalue, Eigen::VectorXd& gradient)
 
 	      for (unsigned i = 0; i < timestamp_per_dimension[n].size(); ++i) 
 	      {
-	        double local_sum = Lambda0_(n);
+	        double local_sum = Lambda0_(n) + 1e-4;
 	        
 	        for (unsigned m = 0; m < num_dims_; ++m) 
 	        {
@@ -361,6 +372,7 @@ void PlainHawkes::fit(const std::vector<Sequence>& data, const OPTION& options)
 
 	RestoreOptionToDefault();
 
+
 }
 
 void PlainHawkes::debugfit(const std::vector<Sequence>& data, const OPTION& options, const Eigen::VectorXd& trueparameters)
@@ -418,7 +430,7 @@ double PlainHawkes::IntensityIntegral(const double& lower, const double& upper, 
 
 	for(unsigned n = 0; n < num_dims_; ++ n)
 	{
-		integral_value = Lambda0_(n) * (upper - lower);
+		integral_value += Lambda0_(n) * (upper - lower);
 
 		for(unsigned m = 0; m < num_dims_; ++ m)
 		{

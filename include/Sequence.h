@@ -1,6 +1,6 @@
 #ifndef SEQUENCE_H
 #define SEQUENCE_H
-
+#include <iostream>
 #include <vector>
 #include <cstdio>
 #include "Event.h"
