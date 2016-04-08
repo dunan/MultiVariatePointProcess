@@ -916,7 +916,7 @@ void TestModule::TestHawkesGeneralKernel()
 	{
 		for(unsigned n = 0; n < dim; ++ n)
 		{
-			triggeringkernels[m][n] = new LoglogisticKernel(10.0, 2.0); 
+			triggeringkernels[m][n] = new PowerlawKernel(1.0, 1.0); 
 		}
 	}
 
