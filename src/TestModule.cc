@@ -916,7 +916,8 @@ void TestModule::TestHawkesGeneralKernel()
 	{
 		for(unsigned n = 0; n < dim; ++ n)
 		{
-			triggeringkernels[m][n] = new SineKernel(); 
+			// triggeringkernels[m][n] = new SineKernel(); 
+			triggeringkernels[m][n] = new LinearKernel(1.0); 
 		}
 	}
 

@@ -15,6 +15,7 @@
 #include "RayleighKernel.h"
 #include "PowerlawKernel.h"
 #include "SineKernel.h"
+#include "LinearKernel.h"
 #include "TriggeringKernel.h"
 
 class TestModule
