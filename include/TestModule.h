@@ -14,7 +14,7 @@
 #include "ExpKernel.h"
 #include "RayleighKernel.h"
 #include "PowerlawKernel.h"
-#include "LoglogisticKernel.h"
+#include "SineKernel.h"
 #include "TriggeringKernel.h"
 
 class TestModule

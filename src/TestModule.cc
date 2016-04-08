@@ -908,7 +908,7 @@ void TestModule::TestHawkesGeneralKernel()
 
 	unsigned dim = 1, num_params = dim * (dim + 1);
 	Eigen::VectorXd params(num_params);
-	params << 0.1, 0.5;
+	params << 0.5, 0.1;
 
 	std::vector<std::vector<TriggeringKernel*> > triggeringkernels(dim, std::vector<TriggeringKernel*>(dim, NULL));
 
@@ -916,7 +916,7 @@ void TestModule::TestHawkesGeneralKernel()
 	{
 		for(unsigned n = 0; n < dim; ++ n)
 		{
-			triggeringkernels[m][n] = new PowerlawKernel(1.0, 1.0); 
+			triggeringkernels[m][n] = new SineKernel(); 
 		}
 	}
 
@@ -925,7 +925,7 @@ void TestModule::TestHawkesGeneralKernel()
 
 	OgataThinning ot(dim);
 	std::vector<Sequence> sequences;
-	ot.Simulate(hawkes, 10000, 1, sequences);
+	ot.Simulate(hawkes, 50, 1, sequences);
 
 	// for(unsigned c = 0; c < sequences.size(); ++ c)
 	// {
@@ -940,6 +940,8 @@ void TestModule::TestHawkesGeneralKernel()
 	// std::cout << std::endl;
 	
 	std::cout << Diagnosis::TimeChangeFit(hawkes, sequences[0]) << std::endl;
+
+	hawkes.PlotIntensityFunction(sequences[0]);
 
 }
 
