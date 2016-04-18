@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 	// TestModule::TestSparsePlainHawkes();
 
 	// 6.
-	// TestModule::TestPlainHawkes();
+	TestModule::TestPlainHawkes();
 	// TestModule::TestPlot();
 
 	// 7.
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 
 	// TestModule::TestEfficientHawkesSimulation();
 
-	TestModule::TestHawkesGeneralKernel();
+	// TestModule::TestHawkesGeneralKernel();
 
 	// TestModule::TestHawkesGeneralKernelSparse();
 

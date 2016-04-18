@@ -22,7 +22,7 @@ class TestModule
 {
 
 public:
-
+   
 	static void TestHPoisson();
 
 	static void TestPlainHawkes();

@@ -2,7 +2,7 @@
 #include <sstream>
 #include "../include/GNUPlotWrapper.h"
 #include "../include/Utility.h"
-#include "../include/gnuplot/gnuplot_i.hpp"
+#include "../3rd-party/gnuplot/gnuplot_i.hpp"
 
 void Plot::PlotLinePoint(const std::vector<double>& gp_x, const std::vector<double>& gp_y, const std::vector<double>& gp_point_x, const std::vector<double>& gp_point_y, const std::string& line_title, const std::string& point_title)
 {

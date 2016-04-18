@@ -676,25 +676,25 @@ void TestModule::TestInfluenceEstimation()
 
 void TestModule::TestPlot()
 {
-	unsigned dim = 1;
+	unsigned dim = 2;
 	unsigned num_params = dim * (dim + 1);
 
 	Eigen::VectorXd params1(num_params);
-	params1 << 0.1, 0.5;
+	params1 << 0.1, 0.5, 0.5, 0.1, 0.2, 0.5;
 
 	Eigen::MatrixXd beta1(dim,dim);
-	beta1 << 1;
-
-	std::vector<Sequence> sequences;
+	beta1 << 1,1,1,1;
 
 	PlainHawkes hawkes1(num_params, dim, beta1);
 	hawkes1.SetParameters(params1);
 
-	OgataThinning ot1(dim);
-	sequences.clear();
-	ot1.Simulate(hawkes1, 20, 1, sequences);
+	std::vector<double> vec_T(1, 10);
+	std::vector<Sequence> sequences;
 
-	hawkes1.PlotIntensityFunction(sequences[0],0);
+	OgataThinning ot(dim);
+	ot.Simulate(hawkes1, vec_T, sequences);
+	
+	hawkes1.PlotIntensityFunction(sequences[0]);
 
 }
 
@@ -911,13 +911,12 @@ void TestModule::TestHawkesGeneralKernel()
 	params << 0.5, 0.1;
 
 	std::vector<std::vector<TriggeringKernel*> > triggeringkernels(dim, std::vector<TriggeringKernel*>(dim, NULL));
-
 	for(unsigned m = 0; m < dim; ++ m)
 	{
 		for(unsigned n = 0; n < dim; ++ n)
 		{
-			// triggeringkernels[m][n] = new SineKernel(); 
-			triggeringkernels[m][n] = new LinearKernel(1.0); 
+			triggeringkernels[m][n] = new SineKernel(); 
+			// triggeringkernels[m][n] = new LinearKernel(1.0); 
 		}
 	}
 
