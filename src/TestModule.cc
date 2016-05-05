@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip> 
+#include <chrono>
 #include "../include/TestModule.h"
 
 void TestModule::TestHPoisson()
@@ -53,41 +54,41 @@ void TestModule::TestHPoisson()
 
 void TestModule::TestPlainHawkes()
 {
-	unsigned dim = 2, num_params = dim * (dim + 1);
+	// unsigned dim = 2, num_params = dim * (dim + 1);
 
-	OgataThinning ot(dim);
+	// OgataThinning ot(dim);
 
-	Eigen::VectorXd params(num_params);
-	params << 0.1, 0.2, 0.5, 0.5, 0.5, 0.5; 
+	// Eigen::VectorXd params(num_params);
+	// params << 0.1, 0.2, 0.5, 0.5, 0.5, 0.5; 
 
-	Eigen::MatrixXd beta(dim,dim);
-	beta << 1, 1, 1, 1;
+	// Eigen::MatrixXd beta(dim,dim);
+	// beta << 1, 1, 1, 1;
 
-	PlainHawkes hawkes(num_params, dim, beta);
-	hawkes.SetParameters(params);
+	// PlainHawkes hawkes(num_params, dim, beta);
+	// hawkes.SetParameters(params);
 
-	// Store the simulated sequences
-	std::vector<Sequence> sequences;
+	// // Store the simulated sequences
+	// std::vector<Sequence> sequences;
 
-	unsigned num_events = 1000, num_sequences = 10;
-	std::cout << "1. Simulating " << num_sequences << " sequences with " << num_events << " events each " << std::endl;
+	// unsigned num_events = 1000, num_sequences = 10;
+	// std::cout << "1. Simulating " << num_sequences << " sequences with " << num_events << " events each " << std::endl;
 
-	ot.Simulate(hawkes, num_events, num_sequences, sequences);
+	// ot.Simulate(hawkes, num_events, num_sequences, sequences);
 
-	PlainHawkes hawkes_new(num_params, dim, beta);
-	// hawkes_new.fit(sequences, "SGD");
-	PlainHawkes::OPTION options;
-	options.method = PLBFGS;
-	options.base_intensity_regularizer = NONE;
-	options.excitation_regularizer = NONE;
+	// PlainHawkes hawkes_new(num_params, dim, beta);
+	// // hawkes_new.fit(sequences, "SGD");
+	// PlainHawkes::OPTION options;
+	// options.method = PlainHawkes::PLBFGS;
+	// options.base_intensity_regularizer = PlainHawkes::NONE;
+	// options.excitation_regularizer = PlainHawkes::NONE;
 
-	std::cout << "2. Fitting Parameters " << std::endl << std::endl;  
-	hawkes_new.fit(sequences, options);
+	// std::cout << "2. Fitting Parameters " << std::endl << std::endl;  
+	// hawkes_new.fit(sequences, options);
 	
-	std::cout << "Estimated Parameters : " << std::endl;
-	std::cout << hawkes_new.GetParameters().transpose() << std::endl;
-	std::cout << "True Parameters : " << std::endl;
-	std::cout << params.transpose() << std::endl;
+	// std::cout << "Estimated Parameters : " << std::endl;
+	// std::cout << hawkes_new.GetParameters().transpose() << std::endl;
+	// std::cout << "True Parameters : " << std::endl;
+	// std::cout << params.transpose() << std::endl;
 
 	// unsigned dim = 1;
 	// unsigned num_params = dim * (dim + 1);
@@ -118,6 +119,29 @@ void TestModule::TestPlainHawkes()
 	// }
 
 	// std::cout << Diagnosis::TimeChangeFit(hawkes1, sequences[0]) << std::endl;
+	// 
+
+	Sequence seq;
+	ImportFromExistingSingleSequence("/Users/nandu/MyPapers/NeuralPointProcess/data/synthetic/exp/time-train.txt", seq);
+	std::vector<Sequence> sequences;
+	sequences.push_back(seq);
+
+	unsigned dim = 1;
+	unsigned num_params = dim * (dim + 1);
+	Eigen::MatrixXd beta1(dim,dim);
+	beta1 << 1;
+
+	PlainHawkes hawkes1(num_params, dim, beta1);
+	PlainHawkes::OPTION options;
+	options.method = PlainHawkes::PLBFGS;
+	options.base_intensity_regularizer = PlainHawkes::NONE;
+	options.excitation_regularizer = PlainHawkes::NONE;
+
+	hawkes1.fit(sequences, options);
+
+	std::cout << hawkes1.GetParameters().transpose() << std::endl;
+
+	
 }
 
 void TestModule::TestSparsePlainHawkes()
@@ -178,11 +202,11 @@ void TestModule::TestSparsePlainHawkes()
 	PlainHawkes hawkes_new(num_params, dim, beta);
 	
 	PlainHawkes::OPTION options;
-	options.method = PLBFGS;
-	options.base_intensity_regularizer = L22;
-	options.excitation_regularizer = L1;
-	options.coefficients[LAMBDA] = 500;
-	options.coefficients[BETA] = 70;
+	options.method = PlainHawkes::PLBFGS;
+	options.base_intensity_regularizer = PlainHawkes::L22;
+	options.excitation_regularizer = PlainHawkes::L1;
+	options.coefficients[PlainHawkes::LAMBDA] = 500;
+	options.coefficients[PlainHawkes::BETA] = 70;
 
 	std::cout << "3. Fitting Parameters " << std::endl;  
 	hawkes_new.fit(data, options);
@@ -338,7 +362,7 @@ void TestModule::TestHawkesLearningTriggeringKernelUnknownStructure()
 			  0.0, 0.0, 0.0, 0.0, 0.5, 0.0,
 			  0.0, 0.0, 0.5, 0.0, 0.5, 0.5;
 
-	Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(params.segment(0, dim).data(), dim);
+	// Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(params.segment(0, dim).data(), dim);
 	
 	Eigen::Map<Eigen::MatrixXd> A = Eigen::Map<Eigen::MatrixXd>(params.segment(dim, dim * dim).data(), dim, dim);
 	
@@ -420,7 +444,7 @@ void TestModule::TestHawkesLearningTriggeringKernel()
 			  0.0, 0.0, 0.0, 0.0, 0.5, 0.0,
 			  0.0, 0.0, 0.5, 0.0, 0.5, 0.5;
 
-	Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(params.segment(0, dim).data(), dim);
+	// Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(params.segment(0, dim).data(), dim);
 	
 	Eigen::Map<Eigen::MatrixXd> A = Eigen::Map<Eigen::MatrixXd>(params.segment(dim, dim * dim).data(), dim, dim);
 	
@@ -574,10 +598,10 @@ void TestModule::TestPlainHawkesNuclear()
 	PlainHawkes hawkes_new(num_params, dim, beta);
 	
 	PlainHawkes::OPTION options;
-	options.base_intensity_regularizer = NONE;
-	options.excitation_regularizer = NUCLEAR;
+	options.base_intensity_regularizer = PlainHawkes::NUCLEAR;
+	options.excitation_regularizer = PlainHawkes::NUCLEAR;
 
-	hawkes_new.debugfit(sequences, options, params);
+	hawkes_new.fit(sequences, options, params);
 	
 	std::cout << "Estimated Parameters : " << std::endl;
 	std::cout << hawkes_new.GetParameters().transpose() << std::endl;
@@ -592,7 +616,7 @@ void TestModule::TestLowRankHawkes()
 	std::vector<Sequence> data;
 	std::cout << "1. Loading " << num_users << " users " << num_items << " items " << " with 1000 events each" << std::endl;
 	ImportFromExistingUserItemSequences("/Users/nandu/Development/Recommendation/sampled_entries_events", num_users, num_items, data);
-	unsigned dim = num_users * num_items, num_params = 2 * dim;
+	unsigned dim = num_users * num_items;
 	Eigen::VectorXd beta = Eigen::VectorXd::Constant(dim, 1.0);
 	LowRankHawkesProcess low_rank_hawkes(num_users, num_items, beta);
 	LowRankHawkesProcess::OPTION options;
@@ -680,7 +704,7 @@ void TestModule::TestPlot()
 	unsigned num_params = dim * (dim + 1);
 
 	Eigen::VectorXd params1(num_params);
-	params1 << 0.1, 0.5, 0.5, 0.1, 0.2, 0.5;
+	params1 << 0.8, 0.8, 0.5, 0.2, 0.2, 0.5;
 
 	Eigen::MatrixXd beta1(dim,dim);
 	beta1 << 1,1,1,1;
@@ -698,34 +722,60 @@ void TestModule::TestPlot()
 
 }
 
-void TestModule::TestSelfInhibiting()
+void TestModule::TestSimpleSelfInhibiting()
 {
-	unsigned dim = 2;
+	unsigned dim = 1;
 	unsigned num_params = dim * (dim + 1);
 
 	Eigen::VectorXd params(num_params);
-	params << 1.2, 1, 0.1, 0.1, 0.1, 0.05;
-	// params << 1, 0.1;
+	params << 1, 0.2;
 
 	std::vector<Sequence> sequences;
 
 	SelfInhibitingProcess inhibiting(num_params, dim);
 	inhibiting.SetParameters(params);
 
-	std::vector<double> vec_T(1, 10);
-
 	OgataThinning ot(dim);
-	ot.Simulate(inhibiting, vec_T, sequences);
+	ot.Simulate(inhibiting, 100000, 1, sequences);
 
 	const std::vector<Event>& seq = sequences[0].GetEvents();
 	for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
 	{
 		// std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
-		std::cout << std::setprecision(4) << i_event -> time << " ";
+		std::cout << std::setprecision(16) << i_event -> time << " ";
 	}
-	std::cout << std::endl;
+	// std::cout << std::endl;
+	// inhibiting.PlotIntensityFunction(sequences[0]);
+}
 
-	inhibiting.PlotIntensityFunction(sequences[0]);
+void TestModule::TestSelfInhibiting()
+{
+	// unsigned dim = 2;
+	// unsigned num_params = dim * (dim + 1);
+
+	// Eigen::VectorXd params(num_params);
+	// params << 1.2, 1, 0.1, 0.1, 0.1, 0.05;
+	// // params << 1, 0.1;
+
+	// std::vector<Sequence> sequences;
+
+	// SelfInhibitingProcess inhibiting(num_params, dim);
+	// inhibiting.SetParameters(params);
+
+	// std::vector<double> vec_T(1, 10);
+
+	// OgataThinning ot(dim);
+	// ot.Simulate(inhibiting, vec_T, sequences);
+
+	// const std::vector<Event>& seq = sequences[0].GetEvents();
+	// for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
+	// {
+	// 	// std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
+	// 	std::cout << std::setprecision(4) << i_event -> time << " ";
+	// }
+	// std::cout << std::endl;
+
+	// inhibiting.PlotIntensityFunction(sequences[0]);
 
 	// SelfInhibitingProcess::OPTION options;
 	// options.base_intensity_regularizer = SelfInhibitingProcess::NONE;
@@ -741,7 +791,59 @@ void TestModule::TestSelfInhibiting()
 	// std::cout << inhibiting_new.GetParameters().transpose() << std::endl;
 	// std::cout << "True Parameters : " << std::endl;
 	// std::cout << params.transpose() << std::endl;
+	// 
+	// Sequence seq;
+	// ImportFromExistingSingleSequence("/Users/nandu/MyPapers/NeuralPointProcess/data/synthetic/mixture-HMM/time-temporal-3.txt", seq);
+	// std::vector<Sequence> sequences;
+	// sequences.push_back(seq);
 
+	// unsigned dim = 1;
+	// unsigned num_params = dim * (dim + 1);
+
+	// SelfInhibitingProcess inhibiting_new(num_params, dim);
+	// SelfInhibitingProcess::OPTION options;
+	// options.base_intensity_regularizer = SelfInhibitingProcess::NONE;
+	// options.excitation_regularizer = SelfInhibitingProcess::NONE;
+	// options.coefficients[SelfInhibitingProcess::LAMBDA0] = 0;
+	// options.coefficients[SelfInhibitingProcess::LAMBDA] = 0;
+
+	// inhibiting_new.fit(sequences, options);
+
+	// std::cout << "Estimated Parameters : " << std::endl;
+	// std::cout << inhibiting_new.GetParameters().transpose() << std::endl;
+	
+	
+	std::vector<Sequence> sequences;
+	double scale = 1.0 / 60.0;
+	// ImportFromExistingSequences("/Users/nandu/MyPapers/NeuralPointProcess/data/real/mimic2/time-train.txt", sequences, scale);
+	// ImportFromExistingSequences("/Users/nandu/MyPapers/NeuralPointProcess/data/real/taxi/samples.txt", sequences, scale);
+	// ImportFromExistingSequences("/Users/nandu/MyPapers/NeuralPointProcess/data/real/so/time-train.txt", sequences, scale);
+	ImportFromExistingSequences("/Users/nandu/MyPapers/NeuralPointProcess/data/real/book_order/time-train.txt", sequences, scale);
+	for(unsigned c = 0; c < sequences.size(); ++ c)
+	{
+		std::vector<Event> events = sequences[c].GetEvents();
+		for(unsigned i = 0; i < events.size(); ++ i)
+		{
+			std::cout << events[i].time <<  " ";
+		}
+		std::cout << std::endl;
+	}
+
+	unsigned dim = 1;
+	unsigned num_params = dim * (dim + 1);
+
+	SelfInhibitingProcess inhibiting_new(num_params, dim);
+	SelfInhibitingProcess::OPTION options; 
+	options.base_intensity_regularizer = SelfInhibitingProcess::L22;
+	options.excitation_regularizer = SelfInhibitingProcess::L22;
+	options.coefficients[SelfInhibitingProcess::LAMBDA0] = 0;
+	options.coefficients[SelfInhibitingProcess::LAMBDA] = 0;
+
+	inhibiting_new.fit(sequences, options);
+
+	std::cout << "Estimated Parameters : " << std::endl;
+	std::cout << inhibiting_new.GetParameters().transpose() << std::endl;
+	
 }
 
 void TestModule::TestSparseSelfInhibiting()
@@ -832,7 +934,7 @@ void TestModule::TestEfficientHawkesSimulation()
 {
 	unsigned dim = 1, num_params = dim * (dim + 1);
 	Eigen::VectorXd params(num_params);
-	params << 0.5, 0.5; 
+	params << 0.2, 0.8; 
 
 	Eigen::MatrixXd beta(dim,dim);
 	beta << 1;
@@ -843,21 +945,24 @@ void TestModule::TestEfficientHawkesSimulation()
 
 	// std::vector<double> vec_T(1, 1000);
 	// hawkes.Simulate(vec_T, sequences);
+	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+	hawkes.Simulate(1000000, 1, sequences);
+	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+    std::cout << duration << std::endl;
 
-	hawkes.Simulate(1000, 1, sequences);
+	// for(unsigned c = 0; c < sequences.size(); ++ c)
+	// {
+	// 	const std::vector<Event>& seq = sequences[c].GetEvents();
+	// 	for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
+	// 	{
+	// 		// std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
+	// 		// std::cout << std::setprecision(16) << i_event -> time << " ";
+	// 	}
+	// 	// std::cout << std::endl;
+	// }
 
-	for(unsigned c = 0; c < sequences.size(); ++ c)
-	{
-		const std::vector<Event>& seq = sequences[c].GetEvents();
-		for(std::vector<Event>::const_iterator i_event = seq.begin(); i_event != seq.end(); ++ i_event)
-		{
-			// std::cout << i_event -> time << " " << i_event -> DimentionID << "; ";
-			std::cout << std::setprecision(16) << i_event -> time << " ";
-		}
-		// std::cout << std::endl;
-	}
-
-	std::cout << Diagnosis::TimeChangeFit(hawkes, sequences[0]) << std::endl;
+	// std::cout << Diagnosis::TimeChangeFit(hawkes, sequences[0]) << std::endl;
 
 
 }
@@ -1034,11 +1139,11 @@ void TestModule::TestHawkesGeneralKernelSparse()
 	PlainHawkes hawkes_new_temp(num_params, dim, beta);
 	
 	PlainHawkes::OPTION options_temp;
-	options_temp.method = PLBFGS;
-	options_temp.base_intensity_regularizer = L22;
-	options_temp.excitation_regularizer = L1;
-	options_temp.coefficients[LAMBDA] = 500;
-	options_temp.coefficients[BETA] = 70;
+	options_temp.method = PlainHawkes::PLBFGS;
+	options_temp.base_intensity_regularizer = PlainHawkes::L22;
+	options_temp.excitation_regularizer = PlainHawkes::L1;
+	options_temp.coefficients[PlainHawkes::LAMBDA] = 500;
+	options_temp.coefficients[PlainHawkes::BETA] = 70;
 
 	hawkes_new_temp.fit(data, options_temp);
 
@@ -1058,3 +1163,4 @@ void TestModule::TestHawkesGeneralKernelSparse()
 
 
 }
+

@@ -100,3 +100,7 @@ double HPoisson::IntensityIntegral(const double& lower, const double& upper, con
 	return 0;
 }
 
+double HPoisson::PredictNextEventTime(const Sequence& data, const unsigned& num_simulations)
+{
+	return 0;
+}

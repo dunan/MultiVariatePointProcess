@@ -73,9 +73,10 @@ void IProcess::PlotIntensityFunction(const Sequence& data)
 		gp_y_point[i_event->DimentionID].push_back(-0.2 * (i_event->DimentionID + 1));
 	}
 
-	std::vector<std::string> colors = {"'dark-red'", "'dark-spring-green'", "'dark-orange'", "'royalblue'"};
+	std::vector<std::string> colors = {"'dark-orange'", "'blue'", "'dark-red'", "'dark-spring-green'"};
 
 	Plot plot("wxt size 640, 400", "time", "intensity");
+	// Plot plot("wxt size 640, 400", "", "");
 	plot.PlotLinePoint(gp_x, gp_y, gp_x_point, gp_y_point, line_title, point_title, colors);
 }
 

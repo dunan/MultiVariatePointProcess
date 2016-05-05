@@ -1,31 +1,38 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-
-/*
-	
-	This class defines the general Event class.
-	 
-*/
-
+/**
+ * \class Event Event.h "include/Event.h" Defines a simple structure for describing an event point.
+ * \brief Event contains simple attributes of an event point.
+ */
 class Event
 {
 
 public:
 
-//  The unique ID in the current sequence;
+/**
+ * 	\brief The unique ID in the current sequence.
+ */
 	int EventID;
 
-//  The unique ID of the sequence this event is associated with;
+/**
+ * 	\brief The unique ID of the sequence this event is associated with.
+ */
 	int SequenceID;
 
-//  The unique ID of the dimension this event is associated with;
+/**
+ * 	\brief The unique ID of the dimension this event is associated with.
+ */
 	int DimentionID;
 
-//  The event time;
+/**
+ * 	\brief The time when this event occurs.
+ */
 	double time;
 
-//  The event marker;
+/**
+ * 	\brief The marker ID associated with this event.
+ */
 	int marker;
 
 };

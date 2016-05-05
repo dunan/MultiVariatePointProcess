@@ -102,6 +102,7 @@ void ImportFromExistingSingleSequence(const std::string& filename, Sequence& seq
     std::getline(fin, str);
     std::vector<std::string> parts = SeperateLineWordsVector(str, " ");
     unsigned eventID = 0;
+    unsigned count = 0;
     for(std::vector<std::string>::const_iterator i_timing = parts.begin(); i_timing != parts.end(); ++ i_timing)
     {
         Event event;
@@ -111,9 +112,53 @@ void ImportFromExistingSingleSequence(const std::string& filename, Sequence& seq
         event.time = atof(i_timing->c_str());
         event.marker = -1;
         seq.Add(event);
+        if(++count > 100000)
+        {
+            break;
+        }
     }
     
     fin.close();
+}
+
+void ImportFromExistingSequences(const std::string& filename, std::vector<Sequence>& data, double scale)
+{
+    std::ifstream fin(filename.c_str());
+    std::string str;
+    unsigned seqID = 0;
+
+    std::cout << filename << std::endl;
+
+    while(std::getline(fin, str))
+    {
+        std::vector<std::string> parts = SeperateLineWordsVector(str, " ");
+
+        double origin = atof(parts[0].c_str());
+
+        Sequence seq;
+
+        unsigned eventID = 0;
+
+        for(std::vector<std::string>::const_iterator i_timing = parts.begin(); i_timing != parts.end(); ++ i_timing)
+        {
+            Event event;
+            event.EventID = (eventID ++);
+            event.SequenceID = seqID;
+            event.DimentionID = 0;
+            event.time = (atof(i_timing->c_str()) - origin) / scale;
+            event.marker = -1;
+            seq.Add(event);
+        }
+
+        data.push_back(seq);
+        ++ seqID;
+        
+    }
+
+    fin.close();
+
+    std::cout << seqID << std::endl;
+
 }
 
 void ImportFromExistingUserItemSequences(const std::string& filename, const unsigned& num_users, const unsigned& num_items, std::vector<Sequence>& data)

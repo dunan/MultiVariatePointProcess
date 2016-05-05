@@ -13,7 +13,5 @@ double Diagnosis::TimeChangeFit(IProcess& process, const Sequence& seq)
 		samples(i + 1) = process.IntensityIntegral(events[i].time, events[i + 1].time, seq);
 	}
 
-	std::cout << samples.transpose() << std::endl;
-
 	return samples.array().sum() / samples.size();
 }

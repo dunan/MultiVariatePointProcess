@@ -356,47 +356,78 @@ void PlainHawkes::fit(const std::vector<Sequence>& data, const OPTION& options)
 
 	Optimizer opt(this);
 
-	switch (options.method)
+	switch (options_.excitation_regularizer)
 	{
-		case SGD:
-			opt.SGD(1e-5, 5000, data);
-			
+		case NUCLEAR :
+		{
+			opt.ProximalFrankWolfe(5e-5, 0.1, 1, 1, 1000);
 			break;
+		}
 
-		case PLBFGS:
-			opt.PLBFGS(0, 1e10);
+		default :	
+		{
+			assert(options_.base_intensity_regularizer != NUCLEAR);
+
+			switch (options.method)
+			{
+				case SGD:
+					opt.SGD(1e-5, 5000, data);
+					
+					break;
+
+				case PLBFGS:
+					opt.PLBFGS(0, 1e10);
+
+					break;
+			}
 
 			break;
+		}
+
 	}
-
 
 	RestoreOptionToDefault();
 
-
 }
 
-void PlainHawkes::debugfit(const std::vector<Sequence>& data, const OPTION& options, const Eigen::VectorXd& trueparameters)
+void PlainHawkes::fit(const std::vector<Sequence>& data, const OPTION& options, const Eigen::VectorXd& trueparameters)
 {
+	assert(options.base_intensity_regularizer != NUCLEAR);
+
 	PlainHawkes::Initialize(data);
 
 	options_ = options;
 
 	Optimizer opt(this);
 
-	opt.ProximalFrankWolfe(0.1, 1, 1000, trueparameters);
+	switch (options_.excitation_regularizer)
+	{
+		case NUCLEAR :
+		{
+			opt.ProximalFrankWolfe(5e-5, 0.1, 1, 1, 1000, trueparameters);
+			break;
+		}
 
-	// switch (options.method)
-	// {
-	// 	case SGD:
-	// 		opt.SGD(1e-5, 5000, data);
-	// 		return;
+		default :	
+		{
+			switch (options.method)
+			{
+				case SGD:
+					opt.SGD(1e-5, 5000, data);
+					
+					break;
 
-	// 	case PLBFGS:
-	// 		opt.PLBFGS(0, 1e10);
-	// 		return;
-	// }
+				case PLBFGS:
+					opt.PLBFGS(0, 1e10);
 
+					break;
+			}
 
+			break;
+		}
+
+	}
+	
 	RestoreOptionToDefault();
 
 }

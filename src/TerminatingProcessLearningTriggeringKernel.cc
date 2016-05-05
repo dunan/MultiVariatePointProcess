@@ -81,7 +81,6 @@ void TerminatingProcessLearningTriggeringKernel::InitializeWithGraph(const std::
 		
 		for(unsigned c = 0; c < num_sequences_; ++ c)
 		{
-			const std::vector<Event>& seq = data[c].GetEvents();
 			
 			if(all_timestamp_per_dimension_[c][i].size() > 0) // if infected
 			{

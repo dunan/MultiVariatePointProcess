@@ -4,7 +4,7 @@
 #include <iostream>
 #include "Process.h"
 #include "SimpleRNG.h"
-#include "RedSVD.h"
+#include "../3rd-party/RedSVD.h"
 
 
 class Optimizer
@@ -50,7 +50,9 @@ public:
 
 	void ProximalNuclear(const double& lambda, const double& rho, const unsigned& ini_max_iter, const Eigen::VectorXd& trueparameters);
 
-	void ProximalFrankWolfe(const double& lambda, const double& rho, const unsigned& ini_max_iter, const Eigen::VectorXd& trueparameters);
+	void ProximalFrankWolfe(const double& gamma0, const double& lambda, const double& rho, const double& ub_alpha, const unsigned& ini_max_iter, const Eigen::VectorXd& trueparameters);
+
+	void ProximalFrankWolfe(const double& gamma0, const double& lambda, const double& rho, const double& ub_alpha, const unsigned& ini_max_iter);
 
 	void ProximalFrankWolfeForLowRankHawkes(const double& gamma0, const double& lambda0, const double& lambda, const double& ub_lambda0, const double& ub_alpha, const double& rho, const unsigned& ini_max_iter, const unsigned& num_rows, const unsigned& num_cols, const Eigen::MatrixXd& TrueLambda0, const Eigen::MatrixXd& TrueAlpha, const Eigen::VectorXd& X0);
 

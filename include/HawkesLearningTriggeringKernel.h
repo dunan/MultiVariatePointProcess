@@ -72,13 +72,13 @@ protected:
 public:
 
 	//  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process;
-	HawkesLearningTriggeringKernel(const unsigned& n, const unsigned& num_dims, const Eigen::VectorXd& tau, const Eigen::VectorXd& sigma) : IProcess(n, num_dims), num_sequences_(0), graph_(NULL), tau_(tau), sigma_(sigma)
+	HawkesLearningTriggeringKernel(const unsigned& n, const unsigned& num_dims, const Eigen::VectorXd& tau, const Eigen::VectorXd& sigma) : IProcess(n, num_dims), tau_(tau), sigma_(sigma), num_sequences_(0), graph_(NULL)
 	{
 		HawkesLearningTriggeringKernel::InitializeConstants();
 	}
 
 //  Constructor : n is the number of parameters in total; num_dims is the number of dimensions in the process; graph is the pointer to the given network structure;
-	HawkesLearningTriggeringKernel(const unsigned& n, const unsigned& num_dims, const Graph* graph, const Eigen::VectorXd& tau, const Eigen::VectorXd& sigma) : IProcess(n, num_dims), num_sequences_(0), graph_(graph), tau_(tau), sigma_(sigma)
+	HawkesLearningTriggeringKernel(const unsigned& n, const unsigned& num_dims, const Graph* graph, const Eigen::VectorXd& tau, const Eigen::VectorXd& sigma) : IProcess(n, num_dims), tau_(tau), sigma_(sigma), num_sequences_(0), graph_(graph)
 	{
 		HawkesLearningTriggeringKernel::InitializeConstants();
 	}

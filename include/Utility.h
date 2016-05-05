@@ -24,6 +24,8 @@ void LoadEigenMatrixFromTxt(const std::string& filename, const unsigned& num_row
 
 void ImportFromExistingSingleSequence(const std::string& filename, Sequence& seq);
 
+void ImportFromExistingSequences(const std::string& filename, std::vector<Sequence>& data, double scale);
+
 void wait_for_key();
 
 #endif

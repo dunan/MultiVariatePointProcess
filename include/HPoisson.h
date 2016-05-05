@@ -53,6 +53,8 @@ public:
 
 	virtual void Gradient(const unsigned &k, Eigen::VectorXd& gradient);
 
+	virtual double PredictNextEventTime(const Sequence& data, const unsigned& num_simulations);
+
 	void fit(const std::vector<Sequence>& data);
 
 };

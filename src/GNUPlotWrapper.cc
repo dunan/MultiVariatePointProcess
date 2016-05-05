@@ -24,13 +24,15 @@ void Plot::PlotLinePoint(const std::vector<std::vector<double> >& gp_x, const st
 	Gnuplot g1("lines");
 
 	g1.set_xlabel(x_label_).set_ylabel(y_label_);
-
+	// g1.unset_frame();
+	// g1.unset_xtics();
+	// g1.unset_ytics();
 	std::stringstream css;
 
 	for(unsigned c = 0; c < gp_x.size(); ++ c)
 	{
 		css.str("");
-		css << "lines lw 2 lc rgb " << colors[c];
+		css << "lines lw 2 lc rgb" << colors[c];
 		g1.set_style(css.str()).plot_xy(gp_x[c],gp_y[c],line_title[c]);
 		css.str("");
 		css << "points ps 1 linecolor rgb " << colors[c]<< " pt 7";

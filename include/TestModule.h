@@ -51,6 +51,8 @@ public:
 
 	static void TestSelfInhibiting();
 
+	static void TestSimpleSelfInhibiting();
+
 	static void TestSparseSelfInhibiting();
 
 	static void TestEfficientHawkesSimulation();

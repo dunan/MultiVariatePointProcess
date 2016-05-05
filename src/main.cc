@@ -20,11 +20,13 @@ int main(int argc, char** argv)
 	// TestModule::TestSparsePlainHawkes();
 
 	// 6.
-	TestModule::TestPlainHawkes();
+	// TestModule::TestPlainHawkes();
 	// TestModule::TestPlot();
 
 	// 7.
 	// TestModule::TestPlainHawkesNuclear();
+	// 
+	// TestModule::TestSimpleSelfInhibiting();main
 
 	// 8. 
 	// TestModule::TestLowRankHawkes();
@@ -35,7 +37,7 @@ int main(int argc, char** argv)
 	// 10. 
 	// TestModule::TestInfluenceEstimation();
 
-	// TestModule::TestSelfInhibiting();
+	TestModule::TestSelfInhibiting();
 
 	// TestModule::TestSparseSelfInhibiting();
 
