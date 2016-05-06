@@ -104,8 +104,9 @@ public:
 					LAMBDA
 				};
 
-	//  Records the options
-
+	/**
+	 * \brief Options used to configure the fitting of the Low-rank Hawkes process.
+	 */
 	struct OPTION
 	{
 		/**
@@ -139,11 +140,18 @@ public:
 /**
  * \brief Maximum likelihood estimation for the model parameters.
  * @param[in] data    vectors of observed sequences.
- * @param[in] options data structure sotring different configuration for the optimization algorithm and the respective regularizations.
+ * @param[in] options data structure containing different configurations for the optimization algorithm and the respective regularizations.
  */
 	void fit(const std::vector<Sequence>& data, const OPTION& options);
 
-	void debugfit(const std::vector<Sequence>& data, const LowRankHawkesProcess::OPTION& options, const Eigen::MatrixXd& TrueLambda0, const Eigen::MatrixXd& TrueAlpha, const Eigen::VectorXd& X0);
+/**
+ * \brief Maximum likelihood estimation for the model parameters.
+ * @param[in] data        vectors of observed sequences.
+ * @param[in] options     data structure containing different configurations for the optimization algorithm and the respective regularizations.
+ * @param[in] TrueLambda0 ground truth \f$\boldsymbol{\Lambda}_0\f$.
+ * @param[in] TrueAlpha   ground truth \f$\boldsymbol{A}\f$.
+ */
+	void fit(const std::vector<Sequence>& data, const LowRankHawkesProcess::OPTION& options, const Eigen::MatrixXd& TrueLambda0, const Eigen::MatrixXd& TrueAlpha);
 
 /**
  * \brief Negative log-likelihood of the sequences from the observed user-item pairs. 

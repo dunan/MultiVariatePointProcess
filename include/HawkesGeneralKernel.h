@@ -13,7 +13,7 @@
  *
  * A multivariate Hawkes Process is a process where the occurrence of an event to a dimension will trigger more events on this dimension and other related dimensions in the near future. The intensity function of each dimension of the Hawkes process is generally defined as the following:
  * \f{align}{
- * 	\lambda^*_n(t) = \lambda_0^n + \sum_{m=1}^D\alpha_{mn}\sum_{t^m_j < t}\gamma(t - t^m_j),
+ * 	\lambda^n(t) = \lambda_0^n + \sum_{m=1}^D\alpha_{mn}\sum_{t^m_j < t}\gamma(t - t^m_j),
  * \f}
  * where \f$\lambda_0^n\geq 0\f$ is the base intensity, \f$D\f$ is the number of dimensions, \f$\alpha_{mn}\geq 0\f$, and the triggering kernel \f$\gamma(t - t^m_j)\f$  captures the extent to which an event on dimension m at the time \f$t^m_j\f$ can trigger an event on dimension n in the near future. Normally, in the [standard Hawkes process](@ref PlainHawkes), we have \f$\gamma(t - t^m_j) = \exp(-\beta_{mn}(t - t^m_j))\f$. However, in more general cases, the form of the triggering kernel can be formulated to catpure the phenomena of interest. The collection of \f$\{\alpha_{mn}\}\f$ can be represented as a matrix \f$\mathbf{A}(m,n) = \alpha_{mn}\f$, and the collection of \f$\{\lambda_0^n\}\f$ can be represented as a column vector \f$\boldsymbol{\lambda}_0\f$. 
  */
@@ -28,7 +28,7 @@ protected:
  *
  * The log-likelihood of observing a collection of C sequences can be derived as the following:
  * \f{align}{
- * \sum_{n=1}^D\bigg\{\frac{1}{C}\sum_{c=1}^C\bigg(\sum_{i = 1}^{n_c}\bigg(\log(\lambda^n_0 + \sum_{m=1}^D\alpha_{mn}\underbrace{\sum_{t^m_{i,c}<t^n_{i,c}}\gamma_{mn}(t^n_{i,c} - t^m_{i,c})}_{\text{arrayK[n][c](i,m)}})\bigg) - T_c\lambda_0^n - \sum_{m=1}^D\alpha_{mn}\underbrace{\sum_{t^m_{j,c} < T_c}\int_{t^m_j}^{T_c}\gamma_{mn}(t - t^m_{j,c})dt)}_{\text{arrayG[n](c,m)}}\bigg)\bigg\}.
+ * \sum_{n=1}^D\bigg\{\frac{1}{C}\sum_{c=1}^C\bigg(\sum_{i = 1}^{n_c}\bigg(\log(\lambda^n_0 + \sum_{m=1}^D\alpha_{mn}\underbrace{\sum_{t^m_{j,c}<t^n_{i,c}}\gamma_{mn}(t^n_{i,c} - t^m_{j,c})}_{\text{arrayK[n][c](i,m)}})\bigg) - T_c\lambda_0^n - \sum_{m=1}^D\alpha_{mn}\underbrace{\sum_{t^m_{j,c} < T_c}\int_{t^m_j}^{T_c}\gamma_{mn}(t - t^m_{j,c})dt)}_{\text{arrayG[n](c,m)}}\bigg)\bigg\}.
  * \f}
  *
  * arrayK[n][c] is an \f$n_c\f$ by \f$D\f$ matrix where \f$n_c\f$ is the number of events on the nth dimension in the sequence c. arrayK[n][c](i,m) stores the cumulative influence of the past events on dimension \f$m\f$ in the sequence \f$c\f$ to the occurence of the \f$i\f$th event on dimension \f$n\f$.
@@ -187,7 +187,8 @@ public:
 	void fit(const std::vector<Sequence>& data, const OPTION& options);
 
 /**
- * \brief Negative loglikelihood of general Hawkes process, which is 
+ * \brief Negative loglikelihood of general Hawkes process
+ * 
  * \f{align}{
  * -\sum_{n=1}^D\bigg\{\frac{1}{C}\sum_{c=1}^C\bigg(\sum_{i = 1}^{n_c}\bigg(\log(\lambda^n_0 + \sum_{m=1}^D\alpha_{mn}\underbrace{\sum_{t^m_{i,c}<t^n_{i,c}}\gamma_{mn}(t^n_{i,c} - t^m_{i,c})}_{\text{arrayK[n][c](i,m)}})\bigg) - T_c\lambda_0^n - \sum_{m=1}^D\alpha_{mn}\underbrace{\sum_{t^m_{j,c} < T_c}\int_{t^m_j}^{T_c}\gamma_{mn}(t - t^m_{j,c})dt)}_{\text{arrayG[n](c,m)}}\bigg)\bigg\}.
  * \f}

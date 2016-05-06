@@ -12,7 +12,7 @@
  *
  * A multivariate Hawkes Process is a process where the occurrence of an event to a dimension will trigger more events on this dimension and other related dimensions in the near future. The intensity function of each dimension of the Hawkes process is defined as the following :
  * \f{align}{
- * 	\lambda^*_n(t) = \lambda_0^n + \sum_{m=1}^D\alpha_{mn}\sum_{t^m_j < t}\exp(-\beta_{mn}(t - t^m_j)),
+ * 	\lambda^n(t) = \lambda_0^n + \sum_{m=1}^D\alpha_{mn}\sum_{t^m_j < t}\exp(-\beta_{mn}(t - t^m_j)),
  * \f}
  * where \f$\lambda_0^n\geq 0\f$ is the base intensity, \f$D\f$ is the number of dimensions, and \f$\alpha_{mn}\geq 0\f$ captures the extent to which an event on dimension m can trigger an event on dimension n in the near future. The collection of \f$\{\alpha_{mn}\}\f$ can be represented as a matrix \f$\mathbf{A}(m,n) = \alpha_{mn}\f$, and the collection of \f$\{\lambda_0^n\}\f$ can be represented as a column vector \f$\boldsymbol{\lambda}_0\f$.
  *
