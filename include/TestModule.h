@@ -1,4 +1,4 @@
-#include "HPoisson.h"
+#include "Poisson.h"
 #include "OgataThinning.h"
 #include "PlainHawkes.h"
 #include "Diagnosis.h"

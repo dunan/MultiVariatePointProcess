@@ -858,12 +858,11 @@ void Optimizer::ProximalFrankWolfe(const double& gamma0, const double& lambda, c
 	}	
 }
 
-void Optimizer::ProximalFrankWolfeForLowRankHawkes(const double& gamma0, const double& lambda0, const double& lambda, const double& ub_lambda0, const double& ub_alpha, const double& rho, const unsigned& ini_max_iter, const unsigned& num_rows, const unsigned& num_cols, const Eigen::MatrixXd& TrueLambda0, const Eigen::MatrixXd& TrueAlpha, const Eigen::VectorXd& X0)
+void Optimizer::ProximalFrankWolfeForLowRankHawkes(const double& gamma0, const double& lambda0, const double& lambda, const double& ub_lambda0, const double& ub_alpha, const double& rho, const unsigned& ini_max_iter, const unsigned& num_rows, const unsigned& num_cols, const Eigen::MatrixXd& TrueLambda0, const Eigen::MatrixXd& TrueAlpha)
 {
 	unsigned nVars = process_->GetParameters().size();
 
-	// Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
-	Eigen::VectorXd x = X0;
+	Eigen::VectorXd x = (Eigen::VectorXd::Random(nVars).array() + 1) * 0.5;
 	process_->SetParameters(x);
 
 	Eigen::VectorXd gradient;

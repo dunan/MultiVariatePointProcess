@@ -4,7 +4,12 @@
 
 #include "TriggeringKernel.h"
 
-
+/**
+ * \class SineKernel SineKernel.h "include/SineKernel.h"
+ * \brief The Sine triggering kernel.
+ *
+ * The Sine triggering kernel is defined as: \f$\gamma(t,t_i) = \sin(t - t_i - 2\pi\lfloor\frac{t - t_i}{2\pi}\rfloor) + 1\f$.
+ */
 class SineKernel : public TriggeringKernel
 {
 

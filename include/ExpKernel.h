@@ -3,7 +3,12 @@
 
 #include "TriggeringKernel.h"
 
-
+/**
+ * \class ExpKernel ExpKernel.h "include/ExpKernel.h"
+ * \brief The Exponential triggering kernel.
+ *
+ * The Exponential triggering kernel is defined as: \f$\gamma(t,t_i) = \exp(-\beta(t - t_i))\f$.
+ */
 class ExpKernel : public TriggeringKernel
 {
 

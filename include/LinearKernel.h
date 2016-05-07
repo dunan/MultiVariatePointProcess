@@ -1,10 +1,13 @@
-#ifndef LINEAR_KERNEL
-#define LINEAR_KERNEL
+#ifndef LINEAR_KERNEL_H
+#define LINEAR_KERNEL_H
 
 
 #include "TriggeringKernel.h"
 
-
+/**
+ * \class LinearKernel LinearKernel.h "include/LinearKernel.h"
+ * \brief The linear triggering kernel is defined as: \f$\gamma(t,t_i) = \beta(t - t_i)\f,\beta\geq 0$. 
+ */
 class LinearKernel : public TriggeringKernel
 {
 

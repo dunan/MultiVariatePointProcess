@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 	// TestModule::TestSimpleSelfInhibiting();main
 
 	// 8. 
-	// TestModule::TestLowRankHawkes();
+	TestModule::TestLowRankHawkes();
 
 	// 9. 
 	// TestModule::TestHawkesLearningTriggeringKernel();
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 	// 10. 
 	// TestModule::TestInfluenceEstimation();
 
-	TestModule::TestSelfInhibiting();
+	// TestModule::TestSelfInhibiting();
 
 	// TestModule::TestSparseSelfInhibiting();
 

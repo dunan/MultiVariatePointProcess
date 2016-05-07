@@ -287,7 +287,7 @@ std::vector<std::set<unsigned> > ConTinEst::Optimize(const std::vector<double>& 
 	return sources;	
 }
 
-void ConTinEst::GenerateCascade(std::vector<Node2Time>& cascade, std::set<unsigned>& initialSet, double TimeHorizon, std::map<unsigned, unsigned>& infectedBy)
+void ConTinEst::GenerateCascade(std::set<unsigned>& initialSet, double TimeHorizon, std::map<unsigned, unsigned>& infectedBy, std::vector<Node2Time>& cascade)
 {
 	double GlobalTime = 0.0;
 	
@@ -374,7 +374,7 @@ double ConTinEst::RandomSimulation(double T, std::set<unsigned>& initialSet, uns
 		
 		if (initialSet.size() > 0) {
 			
-			GenerateCascade(cascade, initialSet, T, infectedBy);
+			GenerateCascade(initialSet, T, infectedBy, cascade);
 			
 			for (int i = 0; i < cascade.size(); ++ i) {
 				if (cascade[i].time <= T) {

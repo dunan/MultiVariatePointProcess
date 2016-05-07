@@ -4,36 +4,39 @@
 #include "Process.h"
 #include "Sequence.h"
 
-/*
-	
-	This class defines the general Simulator Interface.
-	 
-*/
-
+/**
+ * \class Simulator Simulator.h "include/Simulator.h"
+ * \brief Simulator defines a general simulator for point processes.
+ */
 class Simulator
 {
 
 public:
 
-//  This virtual function requires process-specific implementation. It simulates collection of sequences before the observation window in vec_T;
-//  Parameter process stores the parameters of the specific process we are going to simulate from;
-//	Parameter vec_T stores the collection of obsrvation window before which we can simualte the events. The numbef of elements in vec_T determins how many sequences we want to simulate. Each element of vec_T is the observation window wrt the respetive sequence;
-//	Parameter sequences stores the simulated sequences. The number of elements in sequences is the same as that in vec_T; 
+/**
+ * Simulates collection of sequences before the observation window in vec_T;
+ * @param[in] process   the parameters of the specific process we are going to simulate from.
+ * @param[in] vec_T     the collection of obsrvation window before which we can simualte the events. The numbef of elements in vec_T determins how many sequences we want to simulate. Each element of vec_T is the observation window wrt the respetive sequence.
+ * @param[out] sequences the simulated sequences. The number of elements in sequences is the same as that in vec_T; 
+ */
 	virtual void Simulate(IProcess& process, const std::vector<double>& vec_T, std::vector<Sequence>& sequences) = 0;
 
-//  This virtual function requires process-specific implementation. It simulates collection of sequences.
-//	Parameter process stores the parameters of the specific process we are going to simulate from;
-//	Parameter n is the number of events we are going to simualte in each sequence;
-//	Parameter num_sequences is the number of sequence we are going to simulate;
-//	Parameter sequences stores the simulated sequences. The number of elements in sequences is the same as num_sequences;
+/**
+ * Simulates collection of sequences, each of which has \f$n\f$ events.
+ * @param process       the parameters of the specific process we are going to simulate from.
+ * @param n             the number of events we are going to simualte in each sequence.
+ * @param num_sequences the number of sequence we are going to simulate.
+ * @param sequences     the simulated sequences. The number of elements in sequences is the same as num_sequences.
+ */
 	virtual void Simulate(IProcess& process, const unsigned& n, const unsigned& num_sequences, std::vector<Sequence>& sequences) = 0;
 
-//  This virtual function requires process-specific implementation. It returns the next simulated event
-//	Parameter process stores the parameters of the specific process we are going to simulate from;
-//	Parameter data is the given history. 
+/**
+ * Simulates the next single event.
+ * @param  process the parameters of the specific process we are going to simulate from.
+ * @param  data    the sequence of past events.
+ * @return         the simulated next event.
+ */
 	virtual Event SimulateNext(IProcess& process, const Sequence& data) = 0;
-
-
 
 };
 #endif

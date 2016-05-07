@@ -134,7 +134,7 @@ void LowRankHawkesProcess::fit(const std::vector<Sequence>& data, const LowRankH
 
 }
 
-void LowRankHawkesProcess::debugfit(const std::vector<Sequence>& data, const LowRankHawkesProcess::OPTION& options, const Eigen::MatrixXd& TrueLambda0, const Eigen::MatrixXd& TrueAlpha, const Eigen::VectorXd& X0)
+void LowRankHawkesProcess::fit(const std::vector<Sequence>& data, const LowRankHawkesProcess::OPTION& options, const Eigen::MatrixXd& TrueLambda0, const Eigen::MatrixXd& TrueAlpha)
 {
 
 	Initialize(data);
@@ -143,7 +143,7 @@ void LowRankHawkesProcess::debugfit(const std::vector<Sequence>& data, const Low
 
 	Optimizer opt(this);
 
-	opt.ProximalFrankWolfeForLowRankHawkes(1e-2, 1.0, 1.0, 25, 25, 1e1, 1000, 64, 64, TrueLambda0, TrueAlpha, X0);
+	opt.ProximalFrankWolfeForLowRankHawkes(1e-2, 1.0, 1.0, 25, 25, 1e1, 1000, 64, 64, TrueLambda0, TrueAlpha);
 }
 
 double LowRankHawkesProcess::PredictNextEventTime(const Sequence& data, const unsigned& num_simulations)

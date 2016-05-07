@@ -3,7 +3,12 @@
 
 #include "TriggeringKernel.h"
 
-
+/**
+ * \class PowerlawKernel PowerlawKernel.h "include/PowerlawKernel.h"
+ * \brief The Power-Law triggering kernel.
+ *
+ * The Power-Law triggering kernel is defined as: \f$\gamma(t,t_i) = \frac{\beta}{\sigma}\bigg(\frac{t-t_i}{\sigma}\bigg)^{-\beta-1}\f$, \f$t - t_i\geq\sigma\f$.
+ */
 class PowerlawKernel : public TriggeringKernel
 {
 

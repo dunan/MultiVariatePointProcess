@@ -12,7 +12,7 @@ void TestModule::TestHPoisson()
 
 	OgataThinning ot(dim);
 
-	HPoisson hpoisson(dim,dim);
+	Poisson hpoisson(dim,dim);
 
 	Eigen::VectorXd params(dim);
 	params << 1.0, 0.5;
@@ -43,7 +43,7 @@ void TestModule::TestHPoisson()
 	// Eigen::VectorXd params_hat;
 	// bpl.fit(sequences, params_hat);
 	// Print estimated parameter
-	HPoisson hpoisson1(dim,dim);
+	Poisson hpoisson1(dim,dim);
 	hpoisson1.fit(sequences);
 	std::cout << "estimated : " << std::endl;
 	std::cout << hpoisson1.GetParameters().transpose() << std::endl;
@@ -626,11 +626,11 @@ void TestModule::TestLowRankHawkes()
 	Eigen::MatrixXd TrueLambda0, TrueAlpha;
 	LoadEigenMatrixFromTxt("/Users/nandu/Development/Recommendation/truth-syn-Lambda0", num_users, num_items, TrueLambda0);
 	LoadEigenMatrixFromTxt("/Users/nandu/Development/Recommendation/truth-syn-Alpha", num_users, num_items, TrueAlpha);
-	Eigen::MatrixXd temp;
-	LoadEigenMatrixFromTxt("/Users/nandu/Development/Recommendation/truth-syn-X0", 2 * num_users * num_items, 1, temp);
-	Eigen::VectorXd X0 = temp;
+	// Eigen::MatrixXd temp;
+	// LoadEigenMatrixFromTxt("/Users/nandu/Development/Recommendation/truth-syn-X0", 2 * num_users * num_items, 1, temp);
+	// Eigen::VectorXd X0 = temp;
 	std::cout << "2. Fitting Parameters " << std::endl;
-	low_rank_hawkes.debugfit(data, options, TrueLambda0, TrueAlpha, X0);
+	low_rank_hawkes.fit(data, options, TrueLambda0, TrueAlpha);
 	
 }
 

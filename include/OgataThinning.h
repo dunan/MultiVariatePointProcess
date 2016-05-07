@@ -5,29 +5,36 @@
 #include "../include/Process.h"
 #include "../include/SimpleRNG.h"
 
-/*
-	
-	This class defines the general Simulator based on Ogata's Thinning algorithm.
-	 
-*/
-
+/**
+ * \class OgataThinning OgataThinning.h "include/OgataThinning.h"
+ * \brief This class implements the general Simulator based on Ogata's Thinning algorithm.
+ */
 class OgataThinning : public Simulator
 {
 
 private:
 
-//	Records the number of dimensions for internal use;
+/**
+ * Records the number of dimensions for internal use.
+ */
 	unsigned num_dims_;
 
-//  Step we simulate into the future;
-	double step_;
-
-// 	Internal implementation for random number generator;
+/**
+ * Step we simulate into the future.
+ */
+	double step_;	
+/**
+ * Internal implementation for random number generator.
+ */
 	SimpleRNG RNG_;
 
 public:
 
-//  Constructor : num_dims is the number of dimensions we are going to simulate;
+/**
+ * The constructor.
+ *
+ * @param[in] num_dims the number of dimension of the given point process.
+ */
 	OgataThinning(const unsigned& num_dims) : Simulator(), num_dims_(num_dims)
 	{
 		step_ = 1.0;
@@ -36,22 +43,10 @@ public:
 		RNG_.SetState(314, 314);
 	}
 
-//  This virtual function requires process-specific implementation. It simulates collection of sequences before the observation window in vec_T;
-//  Parameter process stores the parameters of the specific process we are going to simulate from;
-//	Parameter vec_T stores the collection of obsrvation window before which we can simualte the events. The numbef of elements in vec_T determins how many sequences we want to simulate. Each element of vec_T is the observation window wrt the respetive sequence;
-//	Parameter sequences stores the simulated sequences. The number of elements in sequences is the same as that in vec_T; 
 	virtual void Simulate(IProcess& process, const std::vector<double>& vec_T, std::vector<Sequence>& sequences);
 
-//  This virtual function requires process-specific implementation. It simulates collection of sequences.
-//	Parameter process stores the parameters of the specific process we are going to simulate from;
-//	Parameter n is the number of events we are going to simualte in each sequence;
-//	Parameter num_sequences is the number of sequence we are going to simulate;
-//	Parameter sequences stores the simulated sequences. The number of elements in sequences is the same as num_sequences;
 	virtual void Simulate(IProcess& process, const unsigned& n, const unsigned& num_sequences, std::vector<Sequence>& sequences);
 
-//  This virtual function requires process-specific implementation. It returns the next simulated event
-//	Parameter process stores the parameters of the specific process we are going to simulate from;
-//	Parameter data is the given history. 
 	virtual Event SimulateNext(IProcess& process, const Sequence& data);
 
 };
