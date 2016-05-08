@@ -1,5 +1,50 @@
-# PtPack: A C++ Multivaraite Point Process Package
+# PtPack: A C++ Multivaraite Point Process Package {#mainpage}
 ![Build Status](https://img.shields.io/teamcity/codebetter/bt428.svg)
 ![License](https://img.shields.io/badge/license-BSD-blue.svg)
 
-PtPack is a C++ software library for learning and making inference from high-dimensional point processes. This package provides a basic implementation of our proposed framework for fitting and assessing general large-scale multivariate point processes with different structure constraints, including: sparse structure, group sparse structure, low-rank structure, etc. In addition to the standard simulation task, it also supports the various inference algorithms proposed in the thesis, such as scalable inference estimation and maximization, time-sensitive recommendation, shaping user activities.
+# PtPack: A C++ Multivariate Point Process Package {#mainpage}
+
+PtPack is a C++ software library of high-dimensional temporal point processes. It aims to provide flexible modeling, learning, and inference of general multivariate temporal point processes to capture the latent dynamics governing the sheer volume of various temporal events arising from social networks, online media, financial trading, modern health-care, recommender systems, etc.
+
+## Prerequisites
+
+- PtPack can be build on OS X and Linux.
+- [gnuplot](http://www.gnuplot.info)
+
+## Features
+
+- Learning sparse interdependency structure of terminating point processes with applications in continuous-time information diffusions.
+
+- Scalable continuous-time influence estimation and maximization.
+
+- Learning multivariate Hawkes processes with different structural constraints, like: sparse, low-rank, customized triggering kernels, etc.
+
+- Learning low-rank Hawkes processes for time-sensitive recommendations.
+
+- Efficient simulation of standard multivariate Hawkes processes.
+
+- Learning multivariate self-correcting processes.
+
+- Simulation of customized general temporal point processes.
+
+- Basic residual analysis and model checking of customized temporal point processes.
+
+- Visualization of triggering kernels, intensity functions, and simulated events.
+
+## Build static library
+
+- cd MultiVariatePointProcess
+- make
+
+The built library will be saved under the directory build/lib
+
+## Build examples
+
+- cd MultiVariatePointProcess/example
+- make
+
+All built examples will be saved under the directory example/build
+
+
+
+
