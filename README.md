@@ -2,7 +2,7 @@
 ![Build Status](https://img.shields.io/teamcity/codebetter/bt428.svg)
 ![License](https://img.shields.io/badge/license-BSD-blue.svg)
 
-PtPack is a C++ software library of high-dimensional temporal point processes. It aims to provide flexible modeling, learning, and inference of general multivariate temporal point processes to capture the latent dynamics governing the sheer volume of various temporal events arising from social networks, online media, financial trading, modern health-care, recommender systems, etc.
+PtPack is a C++ software library of high-dimensional temporal point processes. It aims to provide flexible modeling, learning, and inference of general multivariate temporal point processes to capture the latent dynamics governing the sheer volume of various temporal events arising from social networks, online media, financial trading, modern health-care, recommender systems, etc. Please the [project site](http://www.cc.gatech.edu/~ndu8/ptpack/html/index.html) for more details and documents.
 
 ## Prerequisites
 
