@@ -1,3 +1,7 @@
+/**
+ * \file Graph.h
+ * \brief The class definition of Graph.
+ */
 #ifndef GRAPH_H
 #define GRAPH_H
 #include <vector>

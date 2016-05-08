@@ -1,3 +1,7 @@
+/**
+ * \file GNUPlotWrapper.h
+ * \brief The class definition of Plot which is GNUPlot wrapper class.
+ */
 #ifndef GNUPLOT_WRAPPER_H
 #define GNUPLOT_WRAPPER_H
 
@@ -5,7 +9,7 @@
 #include <string>
 
 /**
- * \class Plot Plot.h "include/Plot.h"
+ * \class Plot GNUPlotWrapper.h "include/GNUPlotWrapper.h"
  * \brief Plot is a wrapper of the GNU plot.
  */
 class Plot

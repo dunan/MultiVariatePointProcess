@@ -1,3 +1,7 @@
+/**
+ * \file SineKernel.cc
+ * \brief The class implementation of SineKernel implementing the Sine triggering kernel.
+ */
 #include <cmath>
 #include <cassert>
 #include <iostream>

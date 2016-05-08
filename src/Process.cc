@@ -1,3 +1,7 @@
+/**
+ * \file Process.cc
+ * \brief The class implementation of Process which defines the general interface of a point process.
+ */
 #include "../include/Process.h"
 #include "../include/GNUPlotWrapper.h"
 

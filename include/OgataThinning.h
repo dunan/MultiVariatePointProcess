@@ -1,3 +1,7 @@
+/**
+ * \file OgataThinning.h
+ * \brief The class definition of OgataThinning implementing Ogata's thinning algorithm.
+ */
 #ifndef OGATA_THINNING_H
 #define OGATA_THINNING_H
 #include <vector>

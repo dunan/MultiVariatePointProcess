@@ -1,3 +1,7 @@
+/**
+ * \file GNUPlotWrapper.cc
+ * \brief The class implementation of Plot which is GNUPlot wrapper class.
+ */
 #include <string>
 #include <sstream>
 #include "../include/GNUPlotWrapper.h"

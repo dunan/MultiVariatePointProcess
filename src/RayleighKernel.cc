@@ -1,3 +1,7 @@
+/**
+ * \file RayleighKernel.cc
+ * \brief The class implementation of RayleighKernel implementing the Rayleigh triggering kernel.
+ */
 #include <cmath>
 #include "../include/RayleighKernel.h"
 

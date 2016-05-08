@@ -1,3 +1,7 @@
+/**
+ * \file Event.h
+ * \brief The class definition of Event.
+ */
 #ifndef EVENT_H
 #define EVENT_H
 

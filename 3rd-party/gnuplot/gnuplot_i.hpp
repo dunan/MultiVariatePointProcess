@@ -259,6 +259,12 @@ class Gnuplot
     /// grid is not set by default	
     inline Gnuplot& unset_grid(){cmd("unset grid");return *this;}; 
 
+    inline Gnuplot& unset_frame(){cmd("unset border");return *this;}; 
+
+    inline Gnuplot& unset_xtics(){cmd("unset xtics");return *this;}; 
+
+    inline Gnuplot& unset_ytics(){cmd("unset ytics");return *this;}; 
+
     // -----------------------------------------------
     /// set the mulitplot mode
     /// 

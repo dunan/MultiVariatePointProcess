@@ -1,3 +1,7 @@
+/**
+ * \file PowerlawKernel.cc
+ * \brief The class implementation of PowerlawKernel implementing the PowerLaw triggering kernel.
+ */
 #include <cmath>
 #include <cassert>
 #include <iostream>

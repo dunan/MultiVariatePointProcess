@@ -1,3 +1,7 @@
+/**
+ * \file LowRankHawkesProcess.cc
+ * \brief The class implementation of LowRankHawkesProcess implementing the low-rank Hawkes process.
+ */
 #include <vector>
 #include <cmath>
 #include <iostream>

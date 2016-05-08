@@ -1,3 +1,7 @@
+/**
+ * \file SelfInhibitingProcess.cc
+ * \brief The class implementation of SelfInhibitingProcess implementing the standard Self-Inhibiting (or Self-Correcting) process.
+ */
 #include <vector>
 #include <cmath>
 #include <iostream>
@@ -376,7 +380,6 @@ void SelfInhibitingProcess::fit(const std::vector<Sequence>& data, const OPTION&
 
 void SelfInhibitingProcess::PostProcessing()
 {
-	Eigen::Map<Eigen::VectorXd> Lambda0 = Eigen::Map<Eigen::VectorXd>(parameters_.segment(0, num_dims_).data(), num_dims_);
 	Eigen::Map<Eigen::MatrixXd> Beta = Eigen::Map<Eigen::MatrixXd>(parameters_.segment(num_dims_, num_dims_ * num_dims_).data(), num_dims_, num_dims_);
 
 	Eigen::MatrixXd Alpha = Beta;

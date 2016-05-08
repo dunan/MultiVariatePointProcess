@@ -1,8 +1,13 @@
+/**
+ * \file LowRankHawkesProcess.h
+ * \brief The class definition of LowRankHawkesProcess implementing the low-rank Hawkes process.
+ */
 #ifndef LOW_RANK_HAWKES_PROCESS_H
 #define LOW_RANK_HAWKES_PROCESS_H
 #include <vector>
 #include <string>
 #include <map>
+#include <Eigen/Sparse>
 #include "Process.h"
 #include "Optimizer.h"
 

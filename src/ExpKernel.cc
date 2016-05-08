@@ -1,3 +1,7 @@
+/**
+ * \file ExpKernel.cc
+ * \brief The class implementation of ExpKernel implementing the Exponential triggering kernel.
+ */
 #include <cmath>
 #include "../include/ExpKernel.h"
 

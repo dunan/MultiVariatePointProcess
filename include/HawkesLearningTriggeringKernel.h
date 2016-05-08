@@ -1,3 +1,7 @@
+/**
+ * \file HawkesLearningTriggeringKernel.h
+ * \brief The class definition of HawkesLearningTriggeringKernel.
+ */
 #ifndef HAWKES_LEARNING_TRIGGERING_KERNEL_H
 #define HAWKES_LEARNING_TRIGGERING_KERNEL_H
 

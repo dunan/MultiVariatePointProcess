@@ -1,3 +1,7 @@
+/**
+ * \file HawkesLearningTriggeringKernel.cc
+ * \brief The class implementation of HawkesLearningTriggeringKernel.
+ */
 #include <vector>
 #include <cmath>
 #include <functional>

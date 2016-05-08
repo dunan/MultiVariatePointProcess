@@ -1,3 +1,7 @@
+/**
+ * \file ExpKernel.h
+ * \brief The class definition of ExpKernel implementing the Exponential triggering kernel.
+ */
 #ifndef EXP_KERNEL_H
 #define EXP_KERNEL_H
 

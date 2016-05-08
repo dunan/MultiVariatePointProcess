@@ -1,3 +1,7 @@
+/**
+ * \file HawkesGeneralKernel.cc
+ * \brief The class implementation of HawkesGeneralKernel for [Hawkes](@ref PlainHawkes) process with customized triggering kernels.
+ */
 #include <vector>
 #include <cmath>
 #include <iostream>
@@ -281,8 +285,6 @@ double HawkesGeneralKernel::IntensityIntegral(const double& lower, const double&
 
 		for(unsigned m = 0; m < num_dims_; ++ m)
 		{
-			Eigen::Map<Eigen::VectorXd> event_dim_m = Eigen::Map<Eigen::VectorXd>(timestamp_per_dimension[m].data(), timestamp_per_dimension[m].size());
-
 			for(unsigned i = 0; i < timestamp_per_dimension[m].size(); ++ i)
 			{
 				if(timestamp_per_dimension[m][i] <= lower)

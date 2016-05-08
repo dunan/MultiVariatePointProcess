@@ -1,3 +1,7 @@
+/**
+ * \file Poisson.h
+ * \brief The class definition of Poisson implementing the homogeneous Poisson process.
+ */
 #ifndef HPROCESS_H
 #define HPROCESS_H
 #include <vector>

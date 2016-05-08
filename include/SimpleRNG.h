@@ -1,3 +1,7 @@
+/**
+ * \file SimpleRNG.h
+ * \brief The class definition of SimpleRNG implementing a simple random number generator.
+ */
 #ifndef SIMPLERNG_H
 #define SIMPLERNG_H
 

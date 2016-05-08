@@ -1,3 +1,7 @@
+/**
+ * \file Poisson.cc
+ * \brief The class implementation of Poisson implementing the homogeneous Poisson process.
+ */
 #include <vector>
 #include <cmath>
 #include "../include/Poisson.h"
@@ -88,8 +92,6 @@ void Poisson::Gradient(const unsigned &c, Eigen::VectorXd& gradient)
 void Poisson::fit(const std::vector<Sequence>& data)
 {
 	Initialize(data);
-
-	const unsigned& D = IProcess::GetNumDims();
 
 	IProcess::SetParameters(intensity_features_.array() / intensity_itegral_features_);
 }

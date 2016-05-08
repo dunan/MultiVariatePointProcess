@@ -1,3 +1,7 @@
+/**
+ * \file Process.h
+ * \brief The class definition of Process which defines the general interface of a point process.
+ */
 #ifndef PROCESS_H
 #define PROCESS_H
 

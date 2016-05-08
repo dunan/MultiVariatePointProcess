@@ -1,3 +1,7 @@
+/**
+ * \file PowerlawKernel.h
+ * \brief The class definition of PowerlawKernel implementing the PowerLaw triggering kernel.
+ */
 #ifndef POWERLAW_KERNEL_H
 #define POWERLAW_KERNEL_H
 

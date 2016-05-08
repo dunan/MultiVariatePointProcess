@@ -1,3 +1,7 @@
+/**
+ * \file Optimizer.cc
+ * \brief The class implementation of Optimizer implementing a collection of optimization algorithms. 
+ */
 #include <cmath>
 #include <iomanip>
 #include <algorithm>
@@ -730,10 +734,6 @@ void Optimizer::ProximalFrankWolfe(const double& gamma0, const double& lambda, c
 	Eigen::MatrixXd U_MatrixAlpha = Y_MatrixAlpha;
 	Eigen::MatrixXd U_Z = U_MatrixAlpha;
 
-	// double ub_alpha = 1;
-
-	RedSVD::RedSVD<Eigen::MatrixXd> svd;
-
 	for(unsigned iter = 1; iter < ini_max_iter; ++ iter)
 	{
 
@@ -760,8 +760,10 @@ void Optimizer::ProximalFrankWolfe(const double& gamma0, const double& lambda, c
 		X_MatrixAlpha = (1 - delta) * X_MatrixAlpha.array() + delta * U_MatrixAlpha.array();
 
 		// FrankWolfe Update for Z
-		svd.compute(rho * (Y_MatrixAlpha.array() - Y_Z.array()),1);
-		U_Z = svd.matrixU() * svd.matrixV().transpose();
+		Eigen::VectorXd u;
+		Eigen::VectorXd v;
+		PowerMethod(rho * (Y_MatrixAlpha - Y_Z), 300, 1e-6, u, v);
+		U_Z = u * v.transpose();
 
 		double alpha_Z = (rho * ((Y_MatrixAlpha.array() - (1 - delta) * Y_Z.array()) * U_Z.array()).sum() - lambda) / (rho * U_Z.squaredNorm());
 		alpha_Z = std::fmin(ub_alpha, std::fmax(alpha_Z / delta, 0.0));
@@ -808,10 +810,6 @@ void Optimizer::ProximalFrankWolfe(const double& gamma0, const double& lambda, c
 	Eigen::MatrixXd U_MatrixAlpha = Y_MatrixAlpha;
 	Eigen::MatrixXd U_Z = U_MatrixAlpha;
 
-	// double ub_alpha = 1;
-
-	RedSVD::RedSVD<Eigen::MatrixXd> svd;
-
 	for(unsigned iter = 1; iter < ini_max_iter; ++ iter)
 	{
 
@@ -838,8 +836,10 @@ void Optimizer::ProximalFrankWolfe(const double& gamma0, const double& lambda, c
 		X_MatrixAlpha = (1 - delta) * X_MatrixAlpha.array() + delta * U_MatrixAlpha.array();
 
 		// FrankWolfe Update for Z
-		svd.compute(rho * (Y_MatrixAlpha.array() - Y_Z.array()),1);
-		U_Z = svd.matrixU() * svd.matrixV().transpose();
+		Eigen::VectorXd u;
+		Eigen::VectorXd v;
+		PowerMethod(rho * (Y_MatrixAlpha - Y_Z), 300, 1e-6, u, v);
+		U_Z = u * v.transpose();
 
 		double alpha_Z = (rho * ((Y_MatrixAlpha.array() - (1 - delta) * Y_Z.array()) * U_Z.array()).sum() - lambda) / (rho * U_Z.squaredNorm());
 		alpha_Z = std::fmin(ub_alpha, std::fmax(alpha_Z / delta, 0.0));
@@ -889,8 +889,6 @@ void Optimizer::ProximalFrankWolfeForLowRankHawkes(const double& gamma0, const d
 	Eigen::MatrixXd U_Z1 = U_MatrixLambda0;
 	Eigen::MatrixXd U_Z2 = U_MatrixAlpha;
 
-	RedSVD::RedSVD<Eigen::MatrixXd> svd;
-
 	for(unsigned iter = 1; iter <= ini_max_iter; ++ iter)
 	{
 
@@ -917,15 +915,18 @@ void Optimizer::ProximalFrankWolfeForLowRankHawkes(const double& gamma0, const d
 		X_MatrixAlpha = (1 - delta) * X_MatrixAlpha + delta * U_MatrixAlpha;
 
 		// FrankWolfe Update for Z
-		// svd.compute(rho * (Y_MatrixLambda0 - Y_Z1),1);
-		// U_Z1 = svd.matrixU() * svd.matrixV().transpose();
-		// svd.compute(rho * (Y_MatrixAlpha - Y_Z2),1);
-		// U_Z2 = svd.matrixU() * svd.matrixV().transpose();
+		// Eigen::JacobiSVD<Eigen::MatrixXd> svdfull(rho * (Y_MatrixLambda0 - Y_Z1), Eigen::ComputeThinU | Eigen::ComputeThinV);
+		// U_Z1 = svdfull.matrixU().col(0) * svdfull.matrixV().col(0).transpose();
+		// Eigen::JacobiSVD<Eigen::MatrixXd> svdfull2(rho * (Y_MatrixAlpha - Y_Z2), Eigen::ComputeThinU | Eigen::ComputeThinV);
+		// U_Z2 = svdfull2.matrixU().col(0) * svdfull2.matrixV().col(0).transpose();
 
-		Eigen::JacobiSVD<Eigen::MatrixXd> svdfull(rho * (Y_MatrixLambda0 - Y_Z1), Eigen::ComputeThinU | Eigen::ComputeThinV);
-		U_Z1 = svdfull.matrixU().col(0) * svdfull.matrixV().col(0).transpose();
-		Eigen::JacobiSVD<Eigen::MatrixXd> svdfull2(rho * (Y_MatrixAlpha - Y_Z2), Eigen::ComputeThinU | Eigen::ComputeThinV);
-		U_Z2 = svdfull2.matrixU().col(0) * svdfull2.matrixV().col(0).transpose();
+		Eigen::VectorXd u;
+		Eigen::VectorXd v;
+
+		PowerMethod(rho * (Y_MatrixLambda0 - Y_Z1), 300, 1e-6, u, v);
+		U_Z1 = u * v.transpose();
+		PowerMethod(rho * (Y_MatrixAlpha - Y_Z2), 300, 1e-6, u, v);
+		U_Z2 = u * v.transpose();
 
 		double alpha_Z1 = (rho * ((Y_MatrixLambda0.array() - (1 - delta) * Y_Z1.array()) * U_Z1.array()).sum() - lambda0) / (rho * U_Z1.squaredNorm());
 		double alpha_Z2 = (rho * ((Y_MatrixAlpha.array() - (1 - delta) * Y_Z2.array()) * U_Z2.array()).sum() - lambda) / (rho * U_Z2.squaredNorm());
@@ -946,6 +947,4 @@ void Optimizer::ProximalFrankWolfeForLowRankHawkes(const double& gamma0, const d
 
 		std::cout << std::setw(10) << iter << "\t" << std::setw(10) << delta << "\t" << std::setw(10) << f_new << "\t" << (MatrixLambda0_new - TrueLambda0).array().abs().mean() << "\t" << (MatrixAlpha_new - TrueAlpha).array().abs().mean() << std::endl;
 	}
-
-
 }

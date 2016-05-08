@@ -1,3 +1,7 @@
+/**
+ * \file Simulator.h
+ * \brief The class definition of Simulator which defines the general interface of a point process simulator.
+ */
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 #include <vector>

@@ -1,3 +1,7 @@
+/**
+ * \file ConTinEst.cc
+ * \brief The class implementation of ConTinEst for scalable continuous-time influence estimation.
+ */
 #include <map>
 #include <algorithm>
 #include "ConTinEst.h"

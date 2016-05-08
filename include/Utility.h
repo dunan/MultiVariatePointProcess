@@ -1,10 +1,13 @@
+/**
+ * \file Utility.h
+ * \brief Contains auxiliary I/O functions.
+ */
 #ifndef UTILITY_H
 #define UTILITY_H
 #include "Process.h"
 #include <string>
 #include <vector>
 #include <Eigen/Dense>
-
 
 
 // constexpr unsigned int string2int(const char *str, int h = 0)
@@ -25,6 +28,8 @@ void LoadEigenMatrixFromTxt(const std::string& filename, const unsigned& num_row
 void ImportFromExistingSingleSequence(const std::string& filename, Sequence& seq);
 
 void ImportFromExistingSequences(const std::string& filename, std::vector<Sequence>& data, double scale);
+
+double PowerMethod(const Eigen::MatrixXd& M, unsigned it_max, double tol, Eigen::VectorXd& u, Eigen::VectorXd& v);
 
 void wait_for_key();
 

@@ -1,3 +1,7 @@
+/**
+ * \file SineKernel.h
+ * \brief The class definition of SineKernel implementing the Sine triggering kernel.
+ */
 #ifndef SINE_KERNEL
 #define SINE_KERNEL
 

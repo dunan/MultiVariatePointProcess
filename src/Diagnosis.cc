@@ -1,3 +1,7 @@
+/**
+ * \file Diagnosis.cc
+ * \brief The class implementation of Diagnosis for the basic residual analysis.
+ */
 #include "../include/Diagnosis.h"
 #include <iostream>
 

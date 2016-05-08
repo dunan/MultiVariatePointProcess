@@ -1,3 +1,7 @@
+/**
+ * \file TerminatingProcessLearningTriggeringKernel.cc
+ * \brief The class implementation of TerminatingProcessLearningTriggeringKernel.
+ */
 #include <vector>
 #include <cmath>
 #include <functional>

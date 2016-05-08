@@ -1,3 +1,7 @@
+/**
+ * \file Graph.cc
+ * \brief The class implementation of Graph.
+ */
 #include <iostream>
 #include <sstream>
 #include <fstream>

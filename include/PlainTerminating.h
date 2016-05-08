@@ -1,3 +1,7 @@
+/**
+ * \file PlainTerminating.h
+ * \brief The class definition of PlainTerminating implementing the Terminating process.
+ */
 #ifndef PLAIN_TERMINATING_H
 #define PLAIN_TERMINATING_H
 

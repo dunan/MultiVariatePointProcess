@@ -1,3 +1,7 @@
+/**
+ * \file TriggeringKernel.h
+ * \brief The class definition of TriggeringKernel which defines the general interface of a triggering kernel.
+ */
 #ifndef TRIGGERING_KERNEL_H
 #define TRIGGERING_KERNEL_H
 

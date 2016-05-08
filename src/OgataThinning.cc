@@ -1,3 +1,7 @@
+/**
+ * \file OgataThinning.cc
+ * \brief The class implementation of OgataThinning implementing Ogata's thinning algorithm.
+ */
 #include <vector>
 #include <iostream>
 #include <Eigen/Dense>

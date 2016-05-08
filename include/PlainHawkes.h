@@ -1,3 +1,7 @@
+/**
+ * \file PlainHawkes.h
+ * \brief The class definition of PlainHawkes implementing the standard Hawkes process.
+ */
 #ifndef PLAIN_HAWKES_H
 #define PLAIN_HAWKES_H
 #include <vector>

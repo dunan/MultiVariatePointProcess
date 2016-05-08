@@ -1,3 +1,7 @@
+/**
+ * \file SimpleRNG.cc
+ * \brief The class implementation of SimpleRNG implementing a simple random number generator.
+ */
 #include <cmath>
 #include <stdexcept>
 #include <sstream>

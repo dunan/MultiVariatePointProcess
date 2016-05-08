@@ -1,3 +1,7 @@
+/**
+ * \file PlainHawkes.cc
+ * \brief The class implementation of PlainHawkes implementing the standard Hawkes process.
+ */
 #include <vector>
 #include <cmath>
 #include <iostream>

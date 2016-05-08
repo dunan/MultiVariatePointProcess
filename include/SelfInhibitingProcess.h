@@ -1,3 +1,7 @@
+/**
+ * \file SelfInhibitingProcess.h
+ * \brief The class definition of SelfInhibitingProcess implementing the standard Self-Inhibiting (or Self-Correcting) process.
+ */
 #ifndef SELF_INHIBITING_PROCESS
 #define SELF_INHIBITING_PROCESS
 #include <vector>

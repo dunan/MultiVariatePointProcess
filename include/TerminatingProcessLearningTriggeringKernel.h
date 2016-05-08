@@ -1,3 +1,7 @@
+/**
+ * \file TerminatingProcessLearningTriggeringKernel.h
+ * \brief The class definition of TerminatingProcessLearningTriggeringKernel.
+ */
 #ifndef TERMINATING_PROCESS_LEARNING_TRIGGERING_KERNEL_H
 #define TERMINATING_PROCESS_LEARNING_TRIGGERING_KERNEL_H
 

@@ -1,3 +1,7 @@
+/**
+ * \file Diagnosis.h
+ * \brief The class definition of Diagnosis for the basic residual analysis.
+ */
 #ifndef DIAGNOSIS_H
 #define DIAGNOSIS_H
 

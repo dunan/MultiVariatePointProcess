@@ -1,3 +1,7 @@
+/**
+ * \file LinearKernel.cc
+ * \brief The class implementation of the linear triggering kernel.
+ */
 #include <cmath>
 #include <cassert>
 #include <iostream>

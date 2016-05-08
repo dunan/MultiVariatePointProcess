@@ -1,3 +1,7 @@
+/**
+ * \file Utility.cc
+ * \brief Contains the implementation of auxiliary I/O functions.
+ */
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
@@ -223,4 +227,42 @@ void wait_for_key()
     std::cin.clear();
     std::cin.ignore(std::cin.rdbuf()->in_avail());
     std::cin.get();
+}
+
+double PowerMethod(const Eigen::MatrixXd& M, unsigned it_max, double tol, Eigen::VectorXd& u, Eigen::VectorXd& v)
+{
+
+    Eigen::MatrixXd MM = M.transpose() * M;
+    unsigned n = MM.rows();
+    if(MM.isZero())
+    {
+        u = Eigen::MatrixXd::Identity(n,1);
+        v = u;
+        return 0;
+    }
+
+    
+    Eigen::VectorXd x = (Eigen::VectorXd::Random(n).array() + 1) * 0.5;
+    double s, s_old;
+    v = x.array() / x.norm();
+    s_old = (M * v).norm();
+    for(unsigned i = 0; i < it_max; ++ i)
+    {
+        x = MM * x;
+        v = x.array() / x.norm();
+        s = (M * v).norm();
+        if (std::fabs(s - s_old) < tol)
+        {
+            break;
+        }
+        s_old = s;
+    }
+
+    v = x.array() / x.norm();
+
+    Eigen::VectorXd temp = M * v;
+    s = temp.norm();
+    u = temp.array() / s;
+
+    return s;
 }

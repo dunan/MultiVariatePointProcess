@@ -1,3 +1,7 @@
+/**
+ * \file Sequence.h
+ * \brief The class definition of Sequence.
+ */
 #ifndef SEQUENCE_H
 #define SEQUENCE_H
 #include <iostream>

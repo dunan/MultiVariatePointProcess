@@ -1,3 +1,7 @@
+/**
+ * \file HawkesGeneralKernel.h
+ * \brief The class definition of HawkesGeneralKernel for [Hawkes](@ref PlainHawkes) process with customized triggering kernels.
+ */
 #ifndef HAWKES_GENERAL_KERNEL
 #define HAWKES_GENERAL_KERNEL
 

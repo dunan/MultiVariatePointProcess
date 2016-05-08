@@ -1,3 +1,7 @@
+/**
+ * \file LinearKernel.h
+ * \brief The class definition of the linear triggering kernel.
+ */
 #ifndef LINEAR_KERNEL_H
 #define LINEAR_KERNEL_H
 

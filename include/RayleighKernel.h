@@ -1,3 +1,7 @@
+/**
+ * \file RayleighKernel.h
+ * \brief The class definition of RayleighKernel implementing the Rayleigh triggering kernel.
+ */
 #ifndef RAYLEIGH_KERNEL_H
 #define RAYLEIGH_KERNEL_H
 

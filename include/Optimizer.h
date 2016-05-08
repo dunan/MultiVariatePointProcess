@@ -1,10 +1,14 @@
+/**
+ * \file Optimizer.h
+ * \brief The class definition of Optimizer implementing a collection of optimization algorithms. 
+ */
 #ifndef OPTIMIZER_H
 #define OPTIMIZER_H
 
 #include <iostream>
 #include "Process.h"
 #include "SimpleRNG.h"
-#include "../3rd-party/RedSVD.h"
+#include "Utility.h"
 
 /**
  * \class Optimizer Optimizer.h "include/Optimizer.h"

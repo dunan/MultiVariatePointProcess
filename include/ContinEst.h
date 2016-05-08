@@ -1,3 +1,7 @@
+/**
+ * \file ConTinEst.h
+ * \brief The class definition of ConTinEst for scalable continuous-time influence estimation.
+ */
 #ifndef CONTINEST_H
 #define CONTINEST_H
 
