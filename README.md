@@ -1,4 +1,4 @@
-# PtPack: The C++ Multivaraite Temporal Point Process Package
+# PtPack: The C++ Multivariate Temporal Point Process Package
 ![Build Status](https://img.shields.io/teamcity/codebetter/bt428.svg)
 ![License](https://img.shields.io/badge/license-BSD-blue.svg)
 
