@@ -6,7 +6,7 @@ PtPack is a C++ software library of high-dimensional temporal point processes. I
 
 ## Prerequisites
 
-- PtPack can be build on OS X and Linux.
+- PtPack can be built on OS X and Linux.
 - [gnuplot](http://www.gnuplot.info)
 
 ## Features
