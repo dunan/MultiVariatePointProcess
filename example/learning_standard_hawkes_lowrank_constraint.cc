@@ -47,7 +47,11 @@ int main(const int argc, const char** argv)
 	PlainHawkes::OPTION options;
 	options.base_intensity_regularizer = PlainHawkes::NONE;
 	options.excitation_regularizer = PlainHawkes::NUCLEAR;
-	options.coefficients[PlainHawkes::BETA] = 1.0;
+	options.coefficients[PlainHawkes::BETA] = 0.1;
+	options.ini_learning_rate = 5e-5;
+	options.rho = 1;
+	options.ub_nuclear = 1;
+	options.ini_max_iter = 1000;
 	hawkes_new.fit(sequences, options, params);
 	
 	std::cout << "Estimated Parameters : " << std::endl;
