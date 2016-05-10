@@ -16,6 +16,8 @@
  * \brief LowRankHawkesProcess implements the standard multivariate Hawkes process.
  * 
  * The Low-rank Hawkes Process is an $mn$-dimensional Hawkes process arranged in an \f$m\f$-by-\f$n\f$ grid. For instance, we have \f$m\f$ users and \f$n\f$ items. The conditional intensity function of the entry \f$(u,i)\f$ between user \f$u\f$ and item \f$i\f$ is \f$\lambda^{u,i}(t) = \boldsymbol{\Lambda}_0(u,i) + \boldsymbol{A}(u,i)\sum_{t^{u,i}_k < t}\exp(-\beta_{u,i}(t - t^{u,i}_k))\f$ where \f$\boldsymbol{\Lambda}_0\f$ and \f$\boldsymbol{A}\f$ are the low-rank base intensity matrix and the self-exciting matrix, respectively.
+ * Check out the following paper for more details.
+ * - [Time-Sensitive Recommendation From Recurrent User Activities](http://www.cc.gatech.edu/~ndu8/pdf/DuWangHeSong-NIPS-2015.pdf). Nan Du, Yichen Wang, Niao He, and Le Song. Neural Information Processing Systems (NIPS), 2015, Montreal, Quebec, Canada.
  */
 class LowRankHawkesProcess : public IProcess
 {
@@ -117,7 +119,27 @@ public:
 		/**
 		 * Regularization coefficients value.
 		 */
-		std::map<RegCoef, double> coefficients;	
+		std::map<RegCoef, double> coefficients;
+		/**
+		 * Initial learning rate of gradient descend.
+		 */
+		double ini_learning_rate;
+		/**
+		 * Coefficient to enforce the low-rank constraint.
+		 */
+		double rho;
+		/**
+		 * Upper bound estimation of the nuclear norm of the base intensity matrix
+		 */
+		double ub_nuclear_lambda0;
+		/**
+		 * Upper bound estimation of the nuclear norm of the excitation matrix
+		 */
+		double ub_nuclear_alpha;
+		/**
+		 * Maximum number of iterations.
+		 */
+		unsigned ini_max_iter;		
 	};
 
 protected:
@@ -126,6 +148,27 @@ protected:
 	 * \brief A configuration object which saves the optimization options.
 	 */
 	LowRankHawkesProcess::OPTION options_;
+
+private:
+
+	class ExpectationHandler : public FunctionHandler
+	{
+		private:
+			
+			unsigned uid_;
+			
+			unsigned itemid_;
+
+			Sequence sequence_;
+
+			LowRankHawkesProcess& parent_;
+
+		public:
+
+			ExpectationHandler(unsigned u, unsigned i, const Sequence& sequence, LowRankHawkesProcess& parent) : uid_(u), itemid_(i), sequence_(sequence), parent_(parent){}
+			
+			virtual void operator()(const Eigen::VectorXd& t, Eigen::VectorXd& y);
+	};
 
 public:
 
@@ -139,7 +182,12 @@ public:
 	LowRankHawkesProcess(const unsigned& num_rows, const unsigned& num_cols, const Eigen::VectorXd& beta) : IProcess(2 * num_rows * num_cols, num_rows * num_cols), beta_(beta), num_rows_(num_rows), num_cols_(num_cols)
 	{
 		options_.coefficients[LowRankHawkesProcess::LAMBDA0] = 0;
-		options_.coefficients[LowRankHawkesProcess::LAMBDA] = 0;	
+		options_.coefficients[LowRankHawkesProcess::LAMBDA] = 0;
+		options_.ini_learning_rate = 1e-2;
+		options_.rho = 1;
+		options_.ub_nuclear_lambda0 = 25;
+		options_.ub_nuclear_alpha = 25;
+		options_.ini_max_iter = 1000;	
 	}
 
 /**
@@ -179,6 +227,10 @@ public:
 	virtual double IntensityIntegral(const double& lower, const double& upper, const Sequence& data);
 
 	virtual double PredictNextEventTime(const Sequence& data, const unsigned& num_simulations);
+
+	double PredictNextEventTime(unsigned uid, unsigned itemid, double T, const std::vector<Sequence>& data);
+
+	unsigned PredictNextItem(unsigned uid, double t, const std::vector<Sequence>& data);
 
 };
 

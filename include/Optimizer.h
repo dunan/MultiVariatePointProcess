@@ -167,6 +167,19 @@ public:
  * @param TrueAlpha    true model parameters of the excitation matrix to compare with the current solution.
  */
 	void ProximalFrankWolfeForLowRankHawkes(const double& gamma0, const double& lambda0, const double& lambda, const double& ub_lambda0, const double& ub_alpha, const double& rho, const unsigned& ini_max_iter, const unsigned& num_rows, const unsigned& num_cols, const Eigen::MatrixXd& TrueLambda0, const Eigen::MatrixXd& TrueAlpha);
+/**
+ * \brief Proximal method using conditional gradient update for Low-rank Hawkes process.
+ * @param gamma0       initial learning rate.
+ * @param lambda0      regularization coefficient for the base intensity function.
+ * @param lambda       regularization coefficient for the excitation matrix.
+ * @param ub_lambda0   upper bound of the nuclear norm of the base intensity matrix.
+ * @param ub_alpha     upper bound of the nuclear norm of the excitation matrix.
+ * @param rho          coefficient to enforce the low-rank constraint.
+ * @param ini_max_iter initial maximum number of iterations.
+ * @param num_rows     the number of rows (or users) of the base intensity (or excitation) matrix.
+ * @param num_cols     the number of cols (or items) of the base intensity (or excitation) matrix.
+ */
+	void ProximalFrankWolfeForLowRankHawkes(const double& gamma0, const double& lambda0, const double& lambda, const double& ub_lambda0, const double& ub_alpha, const double& rho, const unsigned& ini_max_iter, const unsigned& num_rows, const unsigned& num_cols);
 
 };
 

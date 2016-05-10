@@ -20,7 +20,9 @@
  *
  * The Multivariate Terminating Point Process is an \f$D\f$-dimensional temporal point process with the conditional intensity function of each dimension \f$d\f$ is given by \f$\lambda_d^*(t) = \mathbb{I}\{N_d(t)\leq 1\}\cdot g(t)\f$ where \f$N_d(t)\f$ is the number of events on the dimension \f$d\f$, \f$g(t)\f$ is a non-negative function, and \f$\mathbb{I}\{{\cdot}\}\f$ is the indicator function. The Multivariate Terminating Process instantiates the continuous-time information diffusion model with general pairwise infection risk functions \f$\gamma_{ji}(t, t^c_j)\f$, so we have \f$g(t) = \sum_{j\neq i}\mathbb{I}(t^c_j < t)\gamma_{ji}(t, t^c_j)\f$ in a sequence \f$c\f$.
  *
- * 
+ * Check out the following papers for more details.
+ * - [Learning Networks of Heterogeneous Influence](http://www.cc.gatech.edu/~ndu8/pdf/DuSonAleYua-NIPS-2012.pdf). Nan Du, Le Song, Alex Smola, and Ming Yuan. Neural Information Processing Systems (NIPS), 2012.
+ * - [Uncover Topic-Sensitive Information Diffusion Networks](http://www.cc.gatech.edu/~ndu8/pdf/DuSonWooZha-aistats-2013.pdf). Nan Du, Le Song, Hyenkyun Woo, and Hongyuan Zha. Sixteenth International Conference on Artificial Intelligence and Statistics (AISTATS) , Apr. 29 - May 1, 2013, Scottsdale, AZ, USA.
  */
 class TerminatingProcessLearningTriggeringKernel : public IProcess
 {

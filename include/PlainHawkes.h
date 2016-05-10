@@ -168,7 +168,23 @@ public:
 		/**
 		 * Regularization coefficients value.
 		 */
-		std::map<RegCoef, double> coefficients;	
+		std::map<RegCoef, double> coefficients;
+		/**
+		 * Initial learning rate of gradient descend.
+		 */
+		double ini_learning_rate;
+		/**
+		 * Coefficient to enforce the low-rank constraint.
+		 */
+		double rho;
+		/**
+		 * Upper bound estimation of the nuclear norm.
+		 */
+		double ub_nuclear;
+		/**
+		 * Maximum number of iterations.
+		 */
+		unsigned ini_max_iter;
 	};
 
 protected:
@@ -192,7 +208,10 @@ public:
 		options_.excitation_regularizer = NONE;
 		options_.coefficients[LAMBDA] = 0;
 		options_.coefficients[BETA] = 0;
-
+		options_.ini_learning_rate = 1e-2;
+		options_.rho = 1;
+		options_.ub_nuclear = 25;
+		options_.ini_max_iter = 1000;
 		RNG_.SetState(314, 314);
 	}
 

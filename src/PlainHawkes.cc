@@ -364,7 +364,7 @@ void PlainHawkes::fit(const std::vector<Sequence>& data, const OPTION& options)
 	{
 		case NUCLEAR :
 		{
-			opt.ProximalFrankWolfe(5e-5, 0.1, 1, 1, 1000);
+			opt.ProximalFrankWolfe(options_.ini_learning_rate, options_.coefficients[BETA], options_.rho, options_.ub_nuclear, options_.ini_max_iter);
 			break;
 		}
 
@@ -375,13 +375,11 @@ void PlainHawkes::fit(const std::vector<Sequence>& data, const OPTION& options)
 			switch (options.method)
 			{
 				case SGD:
-					opt.SGD(1e-5, 5000, data);
-					
+					opt.SGD(options_.ini_learning_rate, options_.ini_max_iter, data);
 					break;
 
 				case PLBFGS:
 					opt.PLBFGS(0, 1e10);
-
 					break;
 			}
 
@@ -408,7 +406,7 @@ void PlainHawkes::fit(const std::vector<Sequence>& data, const OPTION& options, 
 	{
 		case NUCLEAR :
 		{
-			opt.ProximalFrankWolfe(5e-5, 0.1, 1, 1, 1000, trueparameters);
+			opt.ProximalFrankWolfe(options_.ini_learning_rate, options_.coefficients[BETA], options_.rho, options_.ub_nuclear, options_.ini_max_iter, trueparameters);
 			break;
 		}
 
@@ -417,13 +415,11 @@ void PlainHawkes::fit(const std::vector<Sequence>& data, const OPTION& options, 
 			switch (options.method)
 			{
 				case SGD:
-					opt.SGD(1e-5, 5000, data);
-					
+					opt.SGD(options_.ini_learning_rate, options_.ini_max_iter, data);
 					break;
 
 				case PLBFGS:
 					opt.PLBFGS(0, 1e10);
-
 					break;
 			}
 

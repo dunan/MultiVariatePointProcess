@@ -14,6 +14,9 @@
 /**
  * \class ConTinEst ConTinEst.h "include/ConTinEst.h"
  * \brief ConTinEst implements the scalable influence estimation algorithm. 
+ * 
+ * Check out the following paper for more details.
+ * - [Scalable Influence Estimation in Continuous-Time Diffusion Networks](http://www.cc.gatech.edu/~ndu8/pdf/DuSonZhaMan-NIPS-2013.pdf). Nan Du, Le Song, Manuel Gomez Rodriguez, and Hongyuan Zha. Neural Information Processing Systems (NIPS). Dec. 5 - Dec. 10, 2013, Lake Tahoe, Nevada, USA.
  *
  * The current version does not include the MPI implementaion, so the memory consumption will be large when working with networks of millions of nodes. 
  */

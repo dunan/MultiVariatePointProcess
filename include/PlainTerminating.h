@@ -16,7 +16,9 @@
  * \class PlainTerminating PlainTerminating.h "include/PlainTerminating.h"
  * \brief PlainTerminating implements the multivariate terminating process.
  *
- * The Multivariate Terminating Point Process is an \f$D\f$-dimensional temporal point process with the conditional intensity function of each dimension \f$d\f$ is given by \f$\lambda_d^*(t) = \mathbb{I}\{N_d(t)\leq 1\}\cdot g(t)\f$ where \f$N_d(t)\f$ is the number of events on the dimension \f$d\f$, \f$g(t)\f$ is a non-negative function, and \f$\mathbb{I}\{{\cdot}\}\f$ is the indicator function. The Multivariate Terminating Process instantiates the continuous-time information diffusion model. In this class, we assume the pairwise diffusion time conforms to an exponential distribution, that is, \f$f_{ji}(t) = \alpha_{ji}\f$.
+ * The Multivariate Terminating Point Process is an \f$D\f$-dimensional temporal point process with the conditional intensity function of each dimension \f$d\f$ is given by \f$\lambda_d^*(t) = \mathbb{I}\{N_d(t)\leq 1\}\cdot g(t)\f$ where \f$N_d(t)\f$ is the number of events on the dimension \f$d\f$, \f$g(t)\f$ is a non-negative function, and \f$\mathbb{I}\{{\cdot}\}\f$ is the indicator function. The Multivariate Terminating Process instantiates the continuous-time information diffusion model. In this class, we assume the pairwise diffusion time conforms to an exponential distribution, that is, \f$f_{ji}(t) = \alpha_{ji}\f$. Check out the following papers for more details. 
+ * - [Uncovering the Temporal Dynamics of Diffusion Networks](https://www.mpi-sws.org/~manuelgr/pubs/netrate-icml11.pdf). M. Gomez-Rodriguez, D. Balduzzi, B. Schölkopf. The 28th International Conference on Machine Learning (ICML), 2011.
+ * - [Learning Networks of Heterogeneous Influence](http://www.cc.gatech.edu/~ndu8/pdf/DuSonAleYua-NIPS-2012.pdf). Nan Du, Le Song, Alex Smola, and Ming Yuan. Neural Information Processing Systems (NIPS), 2012.
  */
 class PlainTerminating : public IProcess
 {

@@ -136,6 +136,12 @@ void LowRankHawkesProcess::fit(const std::vector<Sequence>& data, const LowRankH
 {
 	Initialize(data);
 
+	options_ = options;
+
+	Optimizer opt(this);
+
+	opt.ProximalFrankWolfeForLowRankHawkes(options_.ini_learning_rate, options_.coefficients[LAMBDA0], options_.coefficients[LAMBDA], options_.ub_nuclear_lambda0, options_.ub_nuclear_alpha, options_.rho, options_.ini_max_iter, num_rows_, num_cols_);
+
 }
 
 void LowRankHawkesProcess::fit(const std::vector<Sequence>& data, const LowRankHawkesProcess::OPTION& options, const Eigen::MatrixXd& TrueLambda0, const Eigen::MatrixXd& TrueAlpha)
@@ -147,7 +153,7 @@ void LowRankHawkesProcess::fit(const std::vector<Sequence>& data, const LowRankH
 
 	Optimizer opt(this);
 
-	opt.ProximalFrankWolfeForLowRankHawkes(1e-2, 1.0, 1.0, 25, 25, 1e1, 1000, 64, 64, TrueLambda0, TrueAlpha);
+	opt.ProximalFrankWolfeForLowRankHawkes(options_.ini_learning_rate, options_.coefficients[LAMBDA0], options_.coefficients[LAMBDA], options_.ub_nuclear_lambda0, options_.ub_nuclear_alpha, options_.rho, options_.ini_max_iter, num_rows_, num_cols_, TrueLambda0, TrueAlpha);
 }
 
 double LowRankHawkesProcess::PredictNextEventTime(const Sequence& data, const unsigned& num_simulations)
@@ -158,4 +164,119 @@ double LowRankHawkesProcess::PredictNextEventTime(const Sequence& data, const un
 double LowRankHawkesProcess::IntensityIntegral(const double& lower, const double& upper, const Sequence& data)
 {
 	return 0;
+}
+
+void LowRankHawkesProcess::ExpectationHandler::operator()(const Eigen::VectorXd& t, Eigen::VectorXd& y)
+{
+	Eigen::Map<Eigen::MatrixXd> Lambda0 = Eigen::Map<Eigen::MatrixXd>(parent_.parameters_.segment(0, parent_.num_dims_).data(), parent_.num_rows_, parent_.num_cols_);
+	
+	Eigen::Map<Eigen::MatrixXd> A = Eigen::Map<Eigen::MatrixXd>(parent_.parameters_.segment(parent_.num_dims_, parent_.num_dims_).data(), parent_.num_rows_, parent_.num_cols_);
+
+	Eigen::Map<Eigen::MatrixXd> Beta = Eigen::Map<Eigen::MatrixXd>(parent_.beta_.segment(0, parent_.num_dims_).data(), parent_.num_rows_, parent_.num_cols_);
+
+	std::vector<Event> events = sequence_.GetEvents();
+	
+	unsigned num_elements = t.size();
+	y = Eigen::VectorXd::Zero(num_elements);
+	Eigen::VectorXd expsum = Eigen::VectorXd::Zero(events.size());
+
+	for(unsigned i = 1; i < events.size(); ++ i)
+	{
+		expsum(i) = exp(-Beta(uid_, itemid_) * (events[i].time - events[i-1].time)) * (1 + expsum(i - 1));
+	}
+
+	y = (Lambda0(uid_, itemid_) + A(uid_, itemid_) * (1 + expsum(expsum.size() - 1)) * (-Beta(uid_, itemid_) * t.array()).exp()) * (-Lambda0(uid_, itemid_) * t.array() - (A(uid_, itemid_) / Beta(uid_, itemid_)) * (1 + expsum(expsum.size() - 1)) * (1 - (-Beta(uid_, itemid_) * t.array()).exp())).exp() * t.array();
+
+}
+
+double LowRankHawkesProcess::PredictNextEventTime(unsigned uid, unsigned itemid, double T, const std::vector<Sequence>& data)
+{
+
+	assert((uid >= 0) && (uid < num_rows_) && (itemid >= 0) && (itemid < num_cols_));
+	unsigned i, j;
+	for(unsigned c = 0; c < data.size(); ++ c)
+	{
+		const std::vector<Event>& seq = data[c].GetEvents();
+		unsigned dimID = seq[0].DimentionID;
+		Ind2Vec(dimID, i, j);
+
+		if((i == uid) && (j == itemid))
+		{
+			ExpectationHandler handler(uid, itemid, data[c], *this);
+
+			return seq[seq.size() - 1].time + SimpsonIntegral38(handler, 0, 100, 9000);
+		}
+	}
+
+	Eigen::Map<Eigen::MatrixXd> Lambda0 = Eigen::Map<Eigen::MatrixXd>(parameters_.segment(0, num_dims_).data(), num_rows_, num_cols_);
+
+	return std::min(1 / Lambda0(uid, itemid), T);
+}
+
+unsigned LowRankHawkesProcess::PredictNextItem(unsigned uid, double t, const std::vector<Sequence>& data)
+{
+	assert((uid >= 0) && (uid < num_rows_));
+	unsigned i, j;
+	std::map<unsigned, std::map<unsigned, unsigned> > user_item_pair;
+
+	for(unsigned c = 0; c < data.size(); ++ c)
+	{
+		const std::vector<Event>& seq = data[c].GetEvents();
+		unsigned dimID = seq[0].DimentionID;
+		Ind2Vec(dimID, i, j);
+
+		if(i == uid)
+		{
+			if(user_item_pair.find(i) == user_item_pair.end())
+			{
+				std::map<unsigned, unsigned> item_to_index;
+				item_to_index.insert(std::make_pair(j, c));
+				user_item_pair.insert(std::make_pair(i, item_to_index));
+			}else if(user_item_pair[i].find(j) == user_item_pair[i].end())
+			{
+				user_item_pair[i].insert(std::make_pair(j, c));
+			}
+		}
+	}
+
+	Eigen::Map<Eigen::MatrixXd> Lambda0 = Eigen::Map<Eigen::MatrixXd>(parameters_.segment(0, num_dims_).data(), num_rows_, num_cols_);
+	
+	Eigen::Map<Eigen::MatrixXd> A = Eigen::Map<Eigen::MatrixXd>(parameters_.segment(num_dims_, num_dims_).data(), num_rows_, num_cols_);
+
+	Eigen::Map<Eigen::MatrixXd> Beta = Eigen::Map<Eigen::MatrixXd>(beta_.segment(0, num_dims_).data(), num_rows_, num_cols_);
+
+	std::vector<std::pair<double, unsigned> > intensity_list;
+
+	if(user_item_pair.size() == 0)
+	{
+		for(unsigned j = 0; j < num_cols_; ++ j)
+		{
+			intensity_list.push_back(std::make_pair(Lambda0(uid, j), j));
+		}
+	}else
+	{
+		for(unsigned j = 0; j < num_cols_; ++ j)
+		{
+			if(user_item_pair[uid].find(j) == user_item_pair[uid].end())
+			{
+				intensity_list.push_back(std::make_pair(Lambda0(uid, j), j));
+			}else
+			{
+				double intensity = Lambda0(uid, j);
+				const std::vector<Event>& events = data[user_item_pair[uid][j]].GetEvents();
+				for(unsigned k = 0; k < events.size(); ++ k)
+				{
+					if(events[k].time < t)
+					{
+						intensity += A(uid, j) * exp(-Beta(uid, j) * (t - events[k].time));
+					}
+				}
+				intensity_list.push_back(std::make_pair(intensity, j));
+			}
+		}
+	}
+	
+	std::sort(intensity_list.begin(), intensity_list.end(), std::greater<std::pair<double, unsigned> >());
+
+	return intensity_list[0].second;
 }

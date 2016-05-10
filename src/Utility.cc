@@ -266,3 +266,36 @@ double PowerMethod(const Eigen::MatrixXd& M, unsigned it_max, double tol, Eigen:
 
     return s;
 }
+
+double SimpsonIntegral38(FunctionHandler& functor, double a, double b, unsigned n)
+{
+    Eigen::VectorXd t = Eigen::VectorXd::Zero(n + 1);
+    Eigen::VectorXd y = Eigen::VectorXd::Zero(n + 1);
+
+    double h = (b - a) / double(n);
+
+    for(unsigned i = 0; i < n + 1; ++ i)
+    {
+        t(i) = a + i * h;
+    }
+
+    functor(t, y);
+
+    double integral = 0;
+
+    for(unsigned i = 1; i < n; ++ i)
+    {
+        if(i % 3 == 0)
+        {
+            integral += 2 * y(i);
+        }else
+        {
+            integral += 3 * y(i);
+        }
+    }
+
+    integral = (3 * h / 8) * (y(0) + y(n) + integral);
+
+    return integral;
+
+}

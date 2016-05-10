@@ -33,4 +33,6 @@ double PowerMethod(const Eigen::MatrixXd& M, unsigned it_max, double tol, Eigen:
 
 void wait_for_key();
 
+double SimpsonIntegral38(FunctionHandler& functor, double a, double b, unsigned n);
+
 #endif
