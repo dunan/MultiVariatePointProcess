@@ -5,6 +5,7 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 #include "Process.h"
+#include "FunctionHandler.h"
 #include <string>
 #include <vector>
 #include <Eigen/Dense>
