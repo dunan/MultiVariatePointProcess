@@ -3,8 +3,10 @@
  * \brief The class implementation of LowRankHawkesProcess implementing the low-rank Hawkes process.
  */
 #include <vector>
+#include <map>
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 #include <igl/slice.h>
 #include <igl/slice_into.h>
 #include "../include/LowRankHawkesProcess.h"
