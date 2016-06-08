@@ -31,7 +31,7 @@ int main(const int argc, const char** argv)
 
 	Eigen::VectorXd result = terminating.GetParameters();
 	Eigen::Map<Eigen::MatrixXd> alpha_matrix = Eigen::Map<Eigen::MatrixXd>(result.data(), dim, dim);
-	std::cout << std::endl << "Estimated Parameters : " << std::endl << alpha_matrix << std::endl;
+	std::cout << std::endl << "Estimated Parameters : " << std::endl << alpha_matrix << std::endl << std::endl;
 
 	return 0;
 }
