@@ -4,7 +4,7 @@
  */
 #include <map>
 #include <algorithm>
-#include "ConTinEst.h"
+#include "ContinEst.h"
 
 ConTinEst::ConTinEst(Graph *G_inverse, Graph *G, unsigned num_samples, unsigned num_rankings)
 {
