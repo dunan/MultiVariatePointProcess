@@ -534,16 +534,15 @@ void PlainHawkes::Simulate(const std::vector<double>& vec_T, std::vector<Sequenc
 
 	Eigen::Map<Eigen::MatrixXd> Alpha_ = Eigen::Map<Eigen::MatrixXd>(parameters_.segment(num_dims_, num_dims_ * num_dims_).data(), num_dims_, num_dims_);
 
-	Eigen::MatrixXd expsum = Eigen::MatrixXd::Zero(num_dims_, num_dims_);
-
-	Eigen::VectorXd last_event_per_dim = Eigen::VectorXd::Zero(num_dims_);
-
 	sequences = std::vector<Sequence>();
 
 	unsigned sequenceID = 0;
 
 	for(std::vector<double>::const_iterator i_vec_T = vec_T.begin(); i_vec_T != vec_T.end(); ++ i_vec_T)
 	{
+		Eigen::MatrixXd expsum = Eigen::MatrixXd::Zero(num_dims_, num_dims_);
+		Eigen::VectorXd last_event_per_dim = Eigen::VectorXd::Zero(num_dims_);
+
 		Sequence seq(*i_vec_T);
 
 		unsigned eventID = 0;
