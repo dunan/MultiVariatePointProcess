@@ -44,41 +44,44 @@ void PlainHawkes::Initialize(const std::vector<Sequence>& data)
 			for (unsigned n = 0; n < num_dims_; ++n) 
 			{
 
-				all_exp_kernel_recursive_sum_[k][m][n] = Eigen::VectorXd::Zero(all_timestamp_per_dimension_[k][n].size());
-
-				if (m != n) 
+				if (all_timestamp_per_dimension_[k][n].size() > 0)
 				{
-					// handle events on other dimensions that occur before the first event of dimension n
-					for (unsigned j = 0; j < all_timestamp_per_dimension_[k][m].size(); ++j) 
+					all_exp_kernel_recursive_sum_[k][m][n] = Eigen::VectorXd::Zero(all_timestamp_per_dimension_[k][n].size());
+
+					if (m != n) 
 					{
-						if (all_timestamp_per_dimension_[k][m][j] < all_timestamp_per_dimension_[k][n][0])
-						{
-							all_exp_kernel_recursive_sum_[k][m][n](0) += exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][0] - all_timestamp_per_dimension_[k][m][j]));
-						}
-					}
-
-					for (unsigned i = 1; i < all_timestamp_per_dimension_[k][n].size(); ++i) 
-					{
-
-						double value = exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][n][i - 1])) * all_exp_kernel_recursive_sum_[k][m][n](i - 1);
-
+						// handle events on other dimensions that occur before the first event of dimension n
 						for (unsigned j = 0; j < all_timestamp_per_dimension_[k][m].size(); ++j) 
 						{
-							if ((all_timestamp_per_dimension_[k][n][i - 1] <= all_timestamp_per_dimension_[k][m][j]) &&
-							  (all_timestamp_per_dimension_[k][m][j] < all_timestamp_per_dimension_[k][n][i])) 
+							if (all_timestamp_per_dimension_[k][m][j] < all_timestamp_per_dimension_[k][n][0])
 							{
-								value += exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][m][j]));
+								all_exp_kernel_recursive_sum_[k][m][n](0) += exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][0] - all_timestamp_per_dimension_[k][m][j]));
 							}
 						}
 
-						all_exp_kernel_recursive_sum_[k][m][n](i) = value;
-					}
+						for (unsigned i = 1; i < all_timestamp_per_dimension_[k][n].size(); ++i) 
+						{
 
-				} else 
-				{
-					for (unsigned i = 1; i < all_timestamp_per_dimension_[k][n].size(); ++i) 
+							double value = exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][n][i - 1])) * all_exp_kernel_recursive_sum_[k][m][n](i - 1);
+
+							for (unsigned j = 0; j < all_timestamp_per_dimension_[k][m].size(); ++j) 
+							{
+								if ((all_timestamp_per_dimension_[k][n][i - 1] <= all_timestamp_per_dimension_[k][m][j]) &&
+								  (all_timestamp_per_dimension_[k][m][j] < all_timestamp_per_dimension_[k][n][i])) 
+								{
+									value += exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][m][j]));
+								}
+							}
+
+							all_exp_kernel_recursive_sum_[k][m][n](i) = value;
+						}
+
+					} else 
 					{
-						all_exp_kernel_recursive_sum_[k][m][n](i) = exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][n][i - 1])) * (1 + all_exp_kernel_recursive_sum_[k][m][n](i - 1));
+						for (unsigned i = 1; i < all_timestamp_per_dimension_[k][n].size(); ++i) 
+						{
+							all_exp_kernel_recursive_sum_[k][m][n](i) = exp(-Beta_(m,n) * (all_timestamp_per_dimension_[k][n][i] - all_timestamp_per_dimension_[k][n][i - 1])) * (1 + all_exp_kernel_recursive_sum_[k][m][n](i - 1));
+						}
 					}
 				}
 			}
