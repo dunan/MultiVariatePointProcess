@@ -6,7 +6,7 @@ PtPack is a C++ software library of high-dimensional temporal point processes. I
 
 ## Prerequisites
 
-- PtPack can be built on OS X and Linux.
+- PtPack can be built on OS X, Linux, and Windows.
 - [gnuplot](http://www.gnuplot.info)
 
 ## Features
@@ -43,6 +43,7 @@ The built library will be saved under the directory build/lib
 
 All built examples will be saved under the directory example/build
 
+## Windows and gnuplot
 
-
+On Windows, PtPack could be build with MinGW version 4.8 or above. It is recommended to have gnuplot installed in a directory that contains no spaces. Gnuplot binary location is hard-coded to be `/c/tools/gnuplot/bin/` for Windows. To change it, you may edit the code of `3rd-party/gnuplot/gnuplot_i.hpp` where the `Gnuplot::m_sGNUPlotPath` constant is set.
 
