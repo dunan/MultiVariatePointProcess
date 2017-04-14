@@ -2,7 +2,7 @@
  * \file Process.cc
  * \brief The class implementation of Process which defines the general interface of a point process.
  */
-#include "../include/Process.h"
+#include "../include/IProcess.h"
 #include "../include/GNUPlotWrapper.h"
 
 void IProcess::InitializeDimension(const std::vector<Sequence>& data)

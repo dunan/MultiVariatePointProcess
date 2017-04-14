@@ -5,7 +5,7 @@
 #ifndef DIAGNOSIS_H
 #define DIAGNOSIS_H
 
-#include "Process.h"
+#include "IProcess.h"
 #include "Sequence.h"
 
 /**

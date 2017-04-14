@@ -6,7 +6,7 @@
 #define OPTIMIZER_H
 
 #include <iostream>
-#include "Process.h"
+#include "IProcess.h"
 #include "SimpleRNG.h"
 #include "Utility.h"
 

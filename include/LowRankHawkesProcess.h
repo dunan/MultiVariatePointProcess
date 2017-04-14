@@ -8,7 +8,7 @@
 #include <string>
 #include <map>
 #include <Eigen/Sparse>
-#include "Process.h"
+#include "IProcess.h"
 #include "Optimizer.h"
 
 /**

@@ -10,7 +10,7 @@
 #include <string>
 #include <functional>
 #include <map>
-#include "Process.h"
+#include "IProcess.h"
 #include "Optimizer.h"
 #include "Graph.h"
 

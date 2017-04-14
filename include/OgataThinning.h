@@ -6,7 +6,7 @@
 #define OGATA_THINNING_H
 #include <vector>
 #include "../include/Simulator.h"
-#include "../include/Process.h"
+#include "../include/IProcess.h"
 #include "../include/SimpleRNG.h"
 
 /**

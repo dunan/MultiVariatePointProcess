@@ -5,7 +5,7 @@
 #ifndef HPROCESS_H
 #define HPROCESS_H
 #include <vector>
-#include "Process.h"
+#include "IProcess.h"
 
 
 /**
