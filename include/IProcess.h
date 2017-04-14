@@ -1,16 +1,16 @@
 /**
- * \file Process.h
+ * \file IProcess.h
  * \brief The class definition of Process which defines the general interface of a point process.
  */
-#ifndef PROCESS_H
-#define PROCESS_H
+#ifndef IPROCESS_H
+#define IPROCESS_H
 
 #include <Eigen/Dense>
 #include "Sequence.h"
 
 
 /**
- *	\interface IProcess Process.h "include/Process.h"
+ *	\interface IProcess IProcess.h "include/IProcess.h"
  *	
  *	\brief IProcess defines a general interface for each specific point process.
  *

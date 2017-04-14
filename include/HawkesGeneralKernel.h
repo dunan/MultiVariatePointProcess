@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <map>
-#include "Process.h"
+#include "IProcess.h"
 #include "TriggeringKernel.h"
 #include "SimpleRNG.h"
 

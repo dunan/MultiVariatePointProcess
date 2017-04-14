@@ -5,7 +5,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 #include <vector>
-#include "Process.h"
+#include "IProcess.h"
 #include "Sequence.h"
 
 /**

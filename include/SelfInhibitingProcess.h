@@ -7,7 +7,7 @@
 #include <vector>
 #include <cstdlib>
 #include <map>
-#include "Process.h"
+#include "IProcess.h"
 #include "Optimizer.h"
 
 /**
